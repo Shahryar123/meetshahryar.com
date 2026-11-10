@@ -1,0 +1,5 @@
+- id: degree
+  order: 1
+  degree: "[degree]"
+  institution: "[institution]"
+  year: "[year]"

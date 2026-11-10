@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content';
+import Section from '@/components/Section.astro';
+import T from '@/components/T.astro';
+import { byOrder } from '@/lib/format';
+
+const steps = (await getCollection('process')).sort(byOrder);
+---
+
+<Section id="process" title="How I work">
+  <!-- A real sequence, so the steps are numbered. -->
+  <ol role="list" class="steps">
+    {steps.map((step, i) => (
+      <li class="step">
+        <span class="step-num tabular-nums" aria-hidden="true">
+          {i + 1}
+        </span>
+        <h3 class="type-subhead mt-5">{step.data.title}</h3>
+        <p class="mt-2 type-small text-muted">
+          <T v={step.data.body} />
+        </p>
+      </li>
+    ))}
+  </ol>
+</Section>
+
+<style>
+  .steps {
+    display: grid;
+    gap: 2.5rem 1.5rem;
+  }
+  .step {
+    position: relative;
+  }
+  .step-num {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-node);
+    background: var(--panel);
+    font-size: 1rem;
+    font-stretch: 112%;
+    font-weight: 680;
+  }
+  @media (min-width: 40rem) {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .steps {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    /* A decorative connector from each step to the next. */
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: calc(1.375rem - 0.75px);
+      left: calc(2.75rem + 0.75rem);
+      right: calc(-1.5rem + 0.75rem);
+      height: 1.5px;
+      background: var(--rule);
+    }
+  }
+</style>

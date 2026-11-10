@@ -1,0 +1,162 @@
+---
+import { getCollection, getEntries } from 'astro:content';
+import Plus from '@lucide/astro/icons/plus';
+import Section from '@/components/Section.astro';
+import CategoryIcon from '@/components/CategoryIcon.astro';
+import T from '@/components/T.astro';
+import { CATEGORIES, type CategoryId } from '@/lib/categories';
+
+const entries = await getCollection('services');
+// Same order as the hero nodes.
+const services = await Promise.all(
+  CATEGORIES.map(async (c) => {
+    const entry = entries.find((s) => s.id === c.id);
+    if (!entry) throw new Error(`services.yaml is missing an entry with id "${c.id}"`);
+    return {
+      id: c.id as CategoryId,
+      ...entry.data,
+      proofs: await getEntries(entry.data.proofProjects),
+    };
+  }),
+);
+---
+
+<Section id="services" title="Services">
+  <div class="service-list">
+    {services.map((s) => (
+      <details id={`service-${s.id}`} class="service" data-service>
+        <summary class="service-summary">
+          <CategoryIcon id={s.id} size={22} class="service-icon" />
+          <span class="service-name type-subhead">{s.name}</span>
+          <span class="service-blurb text-muted">
+            <T v={s.summary} />
+          </span>
+          <Plus size={22} stroke-width={1.75} aria-hidden="true" class="service-toggle" />
+        </summary>
+        <div class="service-body">
+          <div class="md:col-span-5">
+            <h4 class="type-small text-muted">Deliverables</h4>
+            <ul role="list" class="mt-3 space-y-1.5">
+              {s.deliverables.map((d) => (
+                <li>
+                  <T v={d} />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="md:col-span-4">
+            <h4 class="type-small text-muted">Tools</h4>
+            <ul role="list" class="mt-3 space-y-1.5">
+              {s.tools.map((t) => (
+                <li>
+                  <T v={t} />
+                </li>
+              ))}
+            </ul>
+          </div>
+          {s.proofs.length > 0 && (
+            <div class="md:col-span-3">
+              <h4 class="type-small text-muted">
+                {s.proofs.length === 1 ? 'See the project' : 'See the projects'}
+              </h4>
+              <ul role="list" class="mt-3 space-y-1.5">
+                {s.proofs.map((p) => (
+                  <li>
+                    <a class="link" href={`/work/${p.id}/`}>
+                      <T v={p.data.title} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </details>
+    ))}
+  </div>
+</Section>
+
+<style>
+  .service-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .service {
+    border-radius: var(--radius-node);
+  }
+  .service[open] {
+    background: var(--panel);
+  }
+  .service-summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'icon name toggle' '. blurb blurb';
+    align-items: center;
+    column-gap: 1rem;
+    row-gap: 0.25rem;
+    padding: 1.25rem 1rem;
+    border-radius: var(--radius-node);
+    cursor: pointer;
+  }
+  .service-summary :global(.service-icon) {
+    grid-area: icon;
+    color: var(--muted);
+  }
+  .service-name {
+    grid-area: name;
+  }
+  .service-blurb {
+    grid-area: blurb;
+  }
+  .service-summary :global(.service-toggle) {
+    grid-area: toggle;
+    color: var(--muted);
+  }
+  .service[open] .service-summary :global(.service-toggle) {
+    rotate: 45deg;
+  }
+  .service-summary:hover .service-name,
+  .service-summary:hover :global(.service-toggle) {
+    color: var(--ink);
+  }
+  .service-body {
+    display: grid;
+    gap: 2rem 1.5rem;
+    padding: 0.5rem 1rem 2rem;
+  }
+
+  @media (min-width: 48rem) {
+    .service-summary {
+      grid-template-columns: auto minmax(0, 3fr) minmax(0, 6fr) auto;
+      grid-template-areas: 'icon name blurb toggle';
+      column-gap: 1.5rem;
+      padding: 1.5rem;
+    }
+    .service-body {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      padding: 0.5rem 1.5rem 2.25rem calc(1.5rem + 22px + 1.5rem);
+    }
+  }
+</style>
+
+<script>
+  // Opening a service from a link (#service-…, e.g. a hero node) expands its row.
+  function openFromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id.startsWith('service-')) return;
+    const target = document.getElementById(id);
+    if (target instanceof HTMLDetailsElement) target.open = true;
+  }
+  // Module scripts run once, so these listeners are added once.
+  document.addEventListener('astro:page-load', openFromHash);
+  window.addEventListener('hashchange', openFromHash);
+  // Astro's router handles same-page #links itself, without a hashchange event,
+  // so links to a service (the hero nodes) also open it directly.
+  document.addEventListener('click', (event) => {
+    const link = (event.target as Element | null)?.closest?.('a[href*="#service-"]');
+    const id = link?.getAttribute('href')?.split('#')[1];
+    const target = id ? document.getElementById(id) : null;
+    if (target instanceof HTMLDetailsElement) target.open = true;
+  });
+</script>

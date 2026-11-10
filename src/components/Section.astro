@@ -1,0 +1,20 @@
+---
+/** A home-page section: the heading stands alone, at most one plain sentence under it. */
+interface Props {
+  id: string;
+  title: string;
+  intro?: string;
+  class?: string;
+}
+const { id, title, intro, class: className } = Astro.props;
+---
+
+<section id={id} aria-labelledby={`${id}-title`} class:list={['shell section-gap', className]}>
+  <h2 id={`${id}-title`} class="type-h2">
+    {title}
+  </h2>
+  {intro && <p class="type-lead mt-4 max-w-[46ch] text-muted">{intro}</p>}
+  <div class="mt-10 md:mt-14">
+    <slot />
+  </div>
+</section>

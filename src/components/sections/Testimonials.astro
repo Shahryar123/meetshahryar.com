@@ -1,0 +1,49 @@
+---
+/** Real testimonials only. Renders nothing while testimonials.yaml is empty. */
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Section from '@/components/Section.astro';
+
+const testimonials = await getCollection('testimonials');
+---
+
+{testimonials.length > 0 && (
+  <Section id="testimonials" title="What clients say">
+    <ul role="list" class="grid gap-x-6 gap-y-14 md:grid-cols-2">
+      {testimonials.map((t) => (
+        <li>
+          <figure>
+            <blockquote class="type-lead measure">
+              <p>{t.data.quote}</p>
+            </blockquote>
+            <figcaption class="mt-6 flex items-center gap-4">
+              {t.data.photo && (
+                <Image
+                  src={t.data.photo}
+                  alt=""
+                  width={56}
+                  height={56}
+                  class="size-14 rounded-node object-cover"
+                />
+              )}
+              <span>
+                <span class="block font-[560]">
+                  {t.data.linkedin ? (
+                    <a class="link" href={t.data.linkedin}>
+                      {t.data.name}
+                    </a>
+                  ) : (
+                    t.data.name
+                  )}
+                </span>
+                <span class="block type-small text-muted">
+                  {t.data.role}, {t.data.company}
+                </span>
+              </span>
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ul>
+  </Section>
+)}

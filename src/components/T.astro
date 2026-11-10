@@ -1,0 +1,14 @@
+---
+/**
+ * Prints a content string. Any [placeholder] inside it gets the visible TODO style.
+ */
+import { todoHtml } from '@/lib/todo';
+
+interface Props {
+  v: string | number | undefined | null;
+}
+const { v } = Astro.props;
+const html = todoHtml(v === undefined || v === null ? '[missing]' : String(v));
+---
+
+<Fragment set:html={html} />

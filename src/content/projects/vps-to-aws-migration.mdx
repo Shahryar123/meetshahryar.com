@@ -1,0 +1,38 @@
+---
+title: VPS-to-AWS production migration
+client: IdeasRegistration
+year: "[year]"
+order: 1
+categories: [cloud]
+role: "[your role, e.g. DevOps engineer, sole owner of the migration]"
+summary: IdeasRegistration's production .NET 8 app, moved from a VPS into a custom AWS VPC with per-environment pipelines and CloudWatch alarms.
+result: "[one-line result with a real number]"
+timeline: "[e.g. 6 weeks, 2024]"
+problem: "[What was wrong with the VPS setup? e.g. manual deploys, no alerting, single server]"
+approach:
+  - Custom VPC with Windows Server 2022 on EC2
+  - RDS SQL Server, restored from a backup in S3
+  - IIS hosting .NET 8 and Hangfire
+  - CodePipeline, CodeBuild and CodeDeploy with per-environment config
+  - CloudWatch and SNS alarms for CPU, memory, disk and RDS
+results:
+  - "[result with a real number]"
+stack:
+  [
+    AWS VPC,
+    EC2,
+    Windows Server 2022,
+    RDS SQL Server,
+    S3,
+    IIS,
+    .NET 8,
+    Hangfire,
+    CodePipeline,
+    CodeBuild,
+    CodeDeploy,
+    CloudWatch,
+    SNS,
+  ]
+---
+
+{/* The case-study narrative and architecture diagram are added in phase 4. */}

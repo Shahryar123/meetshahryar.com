@@ -1,0 +1,31 @@
+---
+/** Technical notes. Renders nothing until src/content/writing has a published post. */
+import { getCollection } from 'astro:content';
+import Section from '@/components/Section.astro';
+import { formatDay } from '@/lib/format';
+
+const posts = (await getCollection('writing', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.published.getTime() - a.data.published.getTime(),
+);
+---
+
+{posts.length > 0 && (
+  <Section id="writing" title="Writing">
+    <ul role="list" class="space-y-2">
+      {posts.map((post) => (
+        <li>
+          <a href={`/writing/${post.id}/`} class="block py-4">
+            <span class="type-subhead block">{post.data.title}</span>
+            <span class="measure mt-1 block text-muted">{post.data.description}</span>
+            <time
+              class="mt-2 block type-small text-muted tabular-nums"
+              datetime={post.data.published.toISOString()}
+            >
+              {formatDay(post.data.published)}
+            </time>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </Section>
+)}

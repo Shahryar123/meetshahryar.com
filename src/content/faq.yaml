@@ -1,0 +1,22 @@
+# Questions clients ask. Answers in "[brackets]" are TODOs: replace them with
+# your real policies.
+
+- id: engagement
+  order: 1
+  question: How can we work together?
+  answer: "Three ways: a fixed-price project with an agreed scope, hourly work for smaller or open-ended tasks, or a monthly retainer for ongoing operations and support. [your rates or minimums, if you want them public]"
+
+- id: time-zones
+  order: 2
+  question: Which time zones do you cover?
+  answer: "I'm based in [city] ([UTC offset]) and overlap [how many hours] with [UK/UAE/other] working days."
+
+- id: response-time
+  order: 3
+  question: How quickly do you reply?
+  answer: "[e.g. Within one working day.]"
+
+- id: nda
+  order: 4
+  question: Will you sign an NDA?
+  answer: "[e.g. Yes, before we discuss any details.]"

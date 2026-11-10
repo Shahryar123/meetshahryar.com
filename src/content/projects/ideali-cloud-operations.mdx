@@ -1,0 +1,40 @@
+---
+title: Ideali cloud operations
+client: Ideali
+year: "[year]"
+order: 2
+categories: [cloud, security]
+role: "[your role]"
+summary: Pipelines, disaster recovery, single sign-on, secrets and a region consolidation for Ideali's AWS setup.
+result: "[one-line result with a real number]"
+timeline: "[timeline]"
+problem: "[What needed fixing at Ideali?]"
+approach:
+  - Bitbucket to CodeBuild to CodeDeploy pipeline for Windows EC2
+  - RDS disaster recovery with point-in-time restore and cross-region backup replication
+  - Cost review and region consolidation, with a dependency-ordered teardown of the old environment
+  - Security headers fixed after a ZAP scan
+  - Entra ID SAML single sign-on
+  - .NET secrets moved to Parameter Store
+  - CloudWatch dashboards
+results:
+  - "[result with a real number]"
+stack:
+  [
+    AWS,
+    Bitbucket,
+    CodeBuild,
+    CodeDeploy,
+    EC2,
+    RDS,
+    Parameter Store,
+    CloudWatch,
+    Entra ID,
+    OWASP ZAP,
+    .NET,
+  ]
+links:
+  live: https://ideali.io
+---
+
+{/* The case-study narrative and architecture diagram are added in phase 4. */}

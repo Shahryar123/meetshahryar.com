@@ -1,0 +1,128 @@
+---
+import MenuIcon from '@lucide/astro/icons/menu';
+import XIcon from '@lucide/astro/icons/x';
+import ThemeToggle from './ThemeToggle.astro';
+
+const links = [
+  { href: '/#work', label: 'Work' },
+  { href: '/#services', label: 'Services' },
+  { href: '/#experience', label: 'Experience' },
+  { href: '/#about', label: 'About' },
+  { href: '/#contact', label: 'Contact' },
+];
+---
+
+<header class="sticky top-0 z-40 bg-page">
+  <nav aria-label="Main" class="shell flex h-(--header-h) items-center gap-10">
+    <a href="/" class="monogram" aria-label="Shahryar, home">
+      S
+    </a>
+    <ul role="list" class="hidden items-center gap-7 lg:flex">
+      {links.map((link) => (
+        <li>
+          <a href={link.href} class="type-control text-muted hover:text-ink">
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="ml-auto flex items-center gap-2">
+      <div class="hidden lg:block">
+        <ThemeToggle />
+      </div>
+      <a href="/#contact" class="btn btn-secondary min-h-10 px-4">
+        Let's talk
+      </a>
+      <button
+        type="button"
+        class="inline-flex size-10 items-center justify-center rounded-chip text-ink lg:hidden"
+        aria-label="Open menu"
+        aria-haspopup="dialog"
+        aria-controls="mobile-menu"
+        aria-expanded="false"
+        data-menu-open
+      >
+        <MenuIcon size={24} stroke-width={1.75} aria-hidden="true" />
+      </button>
+    </div>
+  </nav>
+</header>
+
+<dialog id="mobile-menu" class="mobile-menu" aria-label="Menu">
+  <div class="shell flex h-(--header-h) items-center">
+    <a href="/" class="monogram" aria-label="Shahryar, home">
+      S
+    </a>
+    <button
+      type="button"
+      class="ml-auto inline-flex size-10 items-center justify-center rounded-chip text-ink"
+      aria-label="Close menu"
+      data-menu-close
+    >
+      <XIcon size={24} stroke-width={1.75} aria-hidden="true" />
+    </button>
+  </div>
+  <nav aria-label="Menu" class="shell mt-6">
+    <ul role="list" class="flex flex-col gap-1">
+      {links.map((link) => (
+        <li>
+          <a href={link.href} class="type-h2 block py-2">
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="mt-10">
+      <ThemeToggle withLabel />
+    </div>
+  </nav>
+</dialog>
+
+<style>
+  .monogram {
+    font-size: 1.625rem;
+    line-height: 1;
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+  .mobile-menu {
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    padding: 0;
+    border: 0;
+    background: var(--page);
+    color: var(--ink);
+  }
+  .mobile-menu::backdrop {
+    background: var(--page);
+  }
+</style>
+
+<script>
+  // Native <dialog>: showModal() traps focus and Esc closes it.
+  function init() {
+    const dialog = document.getElementById('mobile-menu');
+    const opener = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+    if (!(dialog instanceof HTMLDialogElement) || !opener) return;
+
+    opener.addEventListener('click', () => {
+      dialog.showModal();
+      opener.setAttribute('aria-expanded', 'true');
+    });
+    dialog.querySelector('[data-menu-close]')?.addEventListener('click', () => dialog.close());
+    dialog.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => dialog.close()));
+    dialog.addEventListener('close', () => opener.setAttribute('aria-expanded', 'false'));
+
+    // If the window grows to desktop width while the menu is open, close it.
+    const desktop = matchMedia('(min-width: 64rem)');
+    desktop.addEventListener('change', (e) => {
+      if (e.matches && dialog.open) dialog.close();
+    });
+  }
+  document.addEventListener('astro:page-load', init);
+</script>

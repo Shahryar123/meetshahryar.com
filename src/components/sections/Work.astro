@@ -1,0 +1,192 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Section from '@/components/Section.astro';
+import T from '@/components/T.astro';
+import { CATEGORIES } from '@/lib/categories';
+import { isHttpUrl } from '@/lib/todo';
+import { byOrder } from '@/lib/format';
+
+const projects = (await getCollection('projects', (p) => p.data.featured)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const moreWork = (await getCollection('moreWork')).sort(byOrder);
+const usedCategories = CATEGORIES.filter((c) =>
+  projects.some((p) => p.data.categories.includes(c.id)),
+);
+---
+
+<Section id="work" title="Selected work">
+  <div role="group" aria-label="Filter projects by area" class="flex flex-wrap gap-2">
+    <button type="button" class="chip" aria-pressed="true" data-filter="all">
+      All
+    </button>
+    {usedCategories.map((c) => (
+      <button type="button" class="chip" aria-pressed="false" data-filter={c.id}>
+        {c.label}
+      </button>
+    ))}
+  </div>
+  <p class="sr-only" aria-live="polite" data-filter-status></p>
+
+  <ul role="list" class="mt-8 md:mt-10" data-work-list>
+    {projects.map((p) => (
+      <li data-categories={p.data.categories.join(' ')}>
+        <a href={`/work/${p.id}/`} class="work-row">
+          {p.data.cover && (
+            <Image
+              src={p.data.cover}
+              alt={p.data.coverAlt ?? ''}
+              widths={[400, 800]}
+              sizes="(min-width: 48rem) 0px, 100vw"
+              class="work-cover"
+            />
+          )}
+          <div class="work-main">
+            <h3 class="type-project">
+              <T v={p.data.title} />
+            </h3>
+            <p class="mt-2 max-w-[54ch] text-muted">
+              <T v={p.data.summary} />
+            </p>
+          </div>
+          <p class="work-client type-small text-muted">
+            <T v={p.data.client} />
+          </p>
+          <p class="work-year type-small text-muted tabular-nums">
+            <T v={p.data.year} />
+          </p>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <h3 class="type-subhead mt-20 md:mt-24">More work</h3>
+  <ul role="list" class="mt-4">
+    {moreWork.map((item) => (
+      <li class="more-row">
+        <div class="more-main">
+          <p class="font-[560]">
+            {isHttpUrl(item.data.url) ? (
+              <a class="link" href={item.data.url}>
+                {item.data.title}
+              </a>
+            ) : (
+              item.data.title
+            )}
+          </p>
+          <p class="type-small text-muted">
+            <T v={item.data.summary} />
+          </p>
+        </div>
+        <p class="more-meta type-small text-muted tabular-nums">
+          <T v={item.data.status ?? item.data.year ?? ''} />
+        </p>
+      </li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  /* Rows are separated by space, never lines. */
+  .work-row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 1.5rem;
+    padding-block: 1.5rem;
+    text-decoration: none;
+  }
+  .work-cover {
+    grid-column: 1 / -1;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    height: auto;
+    margin-bottom: 1rem;
+    border-radius: var(--radius-media);
+    object-fit: cover;
+  }
+  .work-main {
+    grid-column: 1 / -1;
+  }
+  .work-client {
+    grid-column: 1 / span 8;
+    margin-top: 0.75rem;
+  }
+  .work-year {
+    grid-column: 9 / -1;
+    margin-top: 0.75rem;
+    text-align: right;
+  }
+  @media (min-width: 48rem) {
+    .work-row {
+      padding-block: 1.75rem;
+    }
+    /* Touch screens see covers inline; pointer screens get the hover preview (phase 3). */
+    .work-cover {
+      display: none;
+    }
+    .work-main {
+      grid-column: 1 / span 7;
+    }
+    .work-client {
+      grid-column: 9 / span 3;
+      margin-top: 0.5rem;
+    }
+    .work-year {
+      grid-column: 12 / span 1;
+      margin-top: 0.5rem;
+    }
+  }
+  @media (hover: none) and (min-width: 48rem) {
+    .work-cover {
+      display: block;
+    }
+  }
+
+  .more-row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 1.5rem;
+    padding-block: 0.875rem;
+  }
+  .more-main {
+    grid-column: 1 / span 9;
+  }
+  .more-meta {
+    grid-column: 10 / -1;
+    text-align: right;
+  }
+  @media (min-width: 48rem) {
+    .more-main {
+      grid-column: 1 / span 9;
+    }
+    .more-meta {
+      grid-column: 12 / span 1;
+    }
+  }
+</style>
+
+<script>
+  // Filter chips. Phase 3 animates the reorder with GSAP Flip.
+  function init() {
+    const chips = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const rows = document.querySelectorAll<HTMLLIElement>('[data-work-list] > li');
+    const status = document.querySelector<HTMLElement>('[data-filter-status]');
+    if (!chips.length || !rows.length) return;
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const filter = chip.dataset.filter ?? 'all';
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        let shown = 0;
+        rows.forEach((row) => {
+          const match = filter === 'all' || row.dataset.categories?.split(' ').includes(filter);
+          row.hidden = !match;
+          if (match) shown += 1;
+        });
+        if (status) status.textContent = `${shown} ${shown === 1 ? 'project' : 'projects'}`;
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', init);
+</script>

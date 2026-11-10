@@ -1,0 +1,287 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. See docs/design-plan.md for the reasoning and contrast ratios.
+ * Tailwind's default palette, shadows and radii are removed so only these exist.
+ */
+@theme {
+  --color-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --radius-*: initial;
+  --ease-*: initial;
+  --breakpoint-*: initial;
+
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-wide: 75rem; /* hero goes side by side */
+  --breakpoint-xl: 80rem;
+
+  --radius-chip: 6px; /* chips, inputs, buttons */
+  --radius-node: 12px; /* nodes, photo frame, tiles */
+  --radius-media: 20px; /* large media */
+  --radius-full: 9999px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+}
+
+/* Theme-aware colours, resolved at use time. */
+@theme inline {
+  --color-page: var(--page);
+  --color-panel: var(--panel);
+  --color-rule: var(--rule);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-signal: var(--signal);
+  --color-signal-ink: var(--signal-ink);
+  --color-on-signal: var(--on-signal);
+  --font-sans: var(--font-mona);
+}
+
+@layer base {
+  /*
+   * light-dark(light, dark). The OS preference decides until the visitor picks
+   * a theme; the toggle then pins it with data-theme on <html>.
+   */
+  :root {
+    color-scheme: light dark;
+    --page: light-dark(#e6efec, #0f2a2e); /* petrol */
+    --panel: light-dark(#f4f8f6, #15363b);
+    --rule: light-dark(#9fbcb7, #2f5a60); /* connectors and decorative dividers only */
+    --ink: light-dark(#0f2a2e, #e6efec); /* dial */
+    --muted: light-dark(#4a6662, #9db4b0);
+    --signal: #ffb224; /* primary button fill */
+    --signal-ink: light-dark(#8f5d00, #ffb224); /* every other live/active use */
+    --on-signal: #0f2a2e;
+
+    --gutter: 1rem;
+    --header-h: 4rem;
+  }
+  @media (min-width: 25rem) {
+    :root {
+      --gutter: 1.25rem;
+    }
+  }
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+  }
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+  @variant md {
+    :root {
+      --gutter: 2rem;
+    }
+  }
+  @variant lg {
+    :root {
+      --gutter: 2.5rem;
+    }
+  }
+
+  html {
+    background-color: var(--page);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-stretch: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: calc(var(--header-h) + 1.5rem);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    font-weight: 400;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    @variant md {
+      font-size: 1.125rem;
+    }
+  }
+  ::selection {
+    background-color: var(--signal);
+    color: var(--on-signal);
+  }
+  :focus-visible {
+    outline: 2px solid var(--signal-ink);
+    outline-offset: 3px;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+/* ---------- type roles (docs/design-plan.md) ---------- */
+
+@utility type-display {
+  font-size: clamp(3.25rem, 9vw, 9rem);
+  line-height: 0.95;
+  font-stretch: 125%;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+@utility type-page-title {
+  font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  line-height: 1;
+  font-stretch: 118%;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+}
+@utility type-h2 {
+  font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  line-height: 1.05;
+  font-stretch: 112%;
+  font-weight: 680;
+  letter-spacing: -0.01em;
+}
+@utility type-hero-title {
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  line-height: 1.2;
+  font-stretch: 112%;
+  font-weight: 600;
+}
+@utility type-project {
+  font-size: clamp(1.5rem, 1.15rem + 1.4vw, 2.25rem);
+  line-height: 1.1;
+  font-stretch: 100%;
+  font-weight: 620;
+  letter-spacing: -0.005em;
+}
+@utility type-subhead {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-stretch: 106%;
+  font-weight: 620;
+}
+@utility type-lead {
+  font-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.375rem);
+  line-height: 1.45;
+  font-weight: 450;
+}
+@utility type-small {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  font-weight: 450;
+}
+@utility type-control {
+  font-size: 0.9375rem;
+  line-height: 1;
+  font-stretch: 104%;
+  font-weight: 560;
+}
+
+/* ---------- layout ---------- */
+
+/* Page container: 1280px of content plus side gutters. */
+@utility shell {
+  width: 100%;
+  max-width: calc(80rem + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+@utility section-gap {
+  margin-top: clamp(6rem, 4rem + 6vw, 10rem);
+}
+@utility measure {
+  max-width: 68ch;
+}
+
+/* ---------- controls ---------- */
+
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding-inline: 1.25rem;
+  border-radius: var(--radius-chip);
+  border: 1px solid transparent;
+  font-size: 0.9375rem;
+  line-height: 1;
+  font-stretch: 104%;
+  font-weight: 560;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 180ms var(--ease-out),
+    border-color 180ms var(--ease-out),
+    color 180ms var(--ease-out);
+}
+/* The one signal-filled button per screen. */
+@utility btn-primary {
+  background-color: var(--signal);
+  color: var(--on-signal);
+  &:hover {
+    background-color: color-mix(in oklab, var(--signal) 86%, white);
+  }
+}
+@utility btn-secondary {
+  border-color: var(--muted);
+  color: var(--ink);
+  &:hover {
+    border-color: var(--ink);
+  }
+}
+
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding-inline: 0.875rem;
+  border-radius: var(--radius-chip);
+  background-color: var(--panel);
+  color: var(--muted);
+  font-size: 0.9375rem;
+  line-height: 1;
+  font-stretch: 104%;
+  font-weight: 560;
+  cursor: pointer;
+  &:hover {
+    color: var(--ink);
+  }
+  &[aria-pressed='true'] {
+    color: var(--signal-ink);
+    outline: 1.5px solid var(--signal-ink);
+    outline-offset: -1.5px;
+  }
+  &[aria-pressed='true']:focus-visible {
+    outline-offset: 3px;
+    outline-width: 2px;
+  }
+}
+
+/* In-text links: underlined, never an arrow. */
+@utility link {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--muted);
+  &:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+/* ---------- content placeholders ([brackets]) ---------- */
+
+.todo {
+  outline: 1px dashed var(--signal-ink);
+  outline-offset: 1px;
+  border-radius: 2px;
+  color: var(--signal-ink);
+}

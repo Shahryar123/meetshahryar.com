@@ -1,0 +1,115 @@
+# One entry per work area. The id (cloud, security, ai, data, web, automation)
+# must match src/lib/categories.ts; it links the hero node to its row here.
+# proofProjects are file names from src/content/projects (without extension).
+
+- id: cloud
+  name: Cloud & DevOps
+  summary: AWS and Azure setups written as code, deployed by pipelines and watched by alarms.
+  tooltip: Moving apps onto AWS and Azure, with pipelines, infrastructure as code and alerts.
+  deliverables:
+    - Migrations from a VPS or another cloud to AWS and Azure
+    - CI/CD pipelines with per-environment config
+    - Infrastructure as code in Terraform and Pulumi
+    - Windows Server, IIS and .NET hosting
+    - Backups and disaster recovery
+    - Monitoring, alerting and cost reviews
+    - CDN and DNS on Akamai and Cloudflare
+  tools:
+    - AWS (VPC, EC2, RDS, S3, CodePipeline, CodeBuild, CodeDeploy, CloudWatch, SNS, Parameter Store, KMS, Route 53)
+    - Azure (Key Vault, Entra ID, Container Apps)
+    - GCP (IAM, org policies)
+    - Terraform
+    - Pulumi
+  proofProjects:
+    - vps-to-aws-migration
+    - ideali-cloud-operations
+
+- id: security
+  name: Security
+  summary: Headers, TLS, single sign-on, secrets and access design that get you through a security review.
+  tooltip: Security review fixes, SSO, secrets and access design.
+  deliverables:
+    - Security header fixes after ZAP scans
+    - SSL/TLS setup
+    - SSO with SAML and Entra ID
+    - Secrets management
+    - Access design with RBAC and SCIM
+    - SOC 2 readiness
+    - WordPress malware clean-up
+  tools:
+    - OWASP ZAP
+    - Entra ID
+    - Azure Key Vault
+    - Postman Vault
+    - AWS Parameter Store
+    - AWS KMS
+  proofProjects:
+    - key-vault-access
+    - ideali-cloud-operations
+
+- id: ai
+  name: AI & RAG
+  summary: RAG apps and agents built with LangChain and LangGraph, traced and evaluated in LangSmith, deployed on Azure.
+  tooltip: RAG assistants and agents with LangChain, LangGraph and LangSmith.
+  deliverables:
+    - RAG apps over your own documents
+    - Agents with LangChain and LangGraph
+    - Tracing and evaluation in LangSmith
+    - Deployment on Azure
+  tools:
+    - LangChain
+    - LangGraph
+    - LangSmith
+    - OpenAI models
+    - Azure Container Apps
+  proofProjects:
+    - runbook-assistant
+
+- id: data
+  name: Data
+  summary: "[One sentence on your data analysis work]"
+  tooltip: "[One line on your data analysis work]"
+  deliverables:
+    - "[typical deliverables]"
+  tools:
+    - "[your tools, e.g. Python/pandas, SQL, Power BI, Excel]"
+  proofProjects:
+    - data-analysis
+
+- id: web
+  name: Web
+  summary: Websites and web apps in .NET, React and WordPress, with the technical SEO that gets them found.
+  tooltip: Web apps and sites, plus the technical SEO behind them.
+  deliverables:
+    - Web apps in .NET/C#, React + Vite and Node/Express
+    - WordPress sites
+    - Three.js and browser AR prototypes
+    - "Technical SEO: rendering fixes, JSON-LD and Search Console"
+  tools:
+    - .NET / C#
+    - React
+    - Vite
+    - Node.js / Express
+    - PostgreSQL
+    - PHP
+    - HTML/CSS
+    - WordPress
+    - Three.js
+  proofProjects:
+    - codeon
+    - ar-try-on
+
+- id: automation
+  name: Automation & QA
+  summary: Web scraping and data extraction, mobile test automation and email automation.
+  tooltip: Scrapers, mobile test automation and email workflows.
+  deliverables:
+    - Web scraping and data extraction
+    - Mobile test automation with the Page Object Model
+    - Email automation
+  tools:
+    - Python
+    - BeautifulSoup
+    - Appium
+    - WebdriverIO
+  proofProjects: []

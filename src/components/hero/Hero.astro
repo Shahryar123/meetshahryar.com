@@ -1,0 +1,163 @@
+---
+import Download from '@lucide/astro/icons/download';
+import Diagram from './Diagram.astro';
+import T from '@/components/T.astro';
+import { getSite } from '@/lib/site';
+import { hasTodo } from '@/lib/todo';
+
+const site = await getSite();
+const timezone = hasTodo(site.timezone) ? '' : site.timezone;
+---
+
+<section class="hero shell" aria-labelledby="hero-title">
+  <div class="hero-grid">
+    <div class="hero-text">
+      <h1 id="hero-title">
+        <span class="type-display block">{site.firstName}</span>
+        <span class="sr-only">, </span>
+        <span class="type-hero-title mt-3 block md:mt-4">{site.title}</span>
+      </h1>
+      <p class="hero-value type-lead mt-6">{site.valueLine}</p>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#work">
+        See my work
+      </a>
+      <a class="btn btn-secondary" href="/cv.pdf" download>
+        <Download size={18} stroke-width={1.75} aria-hidden="true" />
+        Download CV (PDF)
+      </a>
+    </div>
+
+    <div class="hero-diagram">
+      <Diagram photoFocus={site.photoFocus.hero} />
+    </div>
+
+    <div class="hero-status type-small">
+      <p class="flex items-center gap-2.5">
+        <span class="lamp" aria-hidden="true"></span>
+        <T v={site.availability} />
+      </p>
+      <p class="text-muted">
+        {timezone ? (
+          <time class="text-ink tabular-nums" data-clock data-tz={timezone}>
+            --:--
+          </time>
+        ) : (
+          <span class="todo">[time zone]</span>
+        )}{' '}
+        in <T v={site.location.city} />
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: clamp(2rem, 1rem + 4vw, 5rem);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'text' 'diagram' 'actions' 'status';
+    row-gap: 2.25rem;
+  }
+  .hero-text {
+    grid-area: text;
+  }
+  .hero-actions {
+    grid-area: actions;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .hero-diagram {
+    grid-area: diagram;
+  }
+  .hero-status {
+    grid-area: status;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+  }
+  .hero-value {
+    max-width: 38rem;
+    text-wrap: balance;
+  }
+  .lamp {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-full);
+    background: var(--signal-ink);
+  }
+
+  @media (max-width: 39.99rem) {
+    .hero-actions .btn {
+      flex: 1 1 100%;
+    }
+  }
+
+  /* Tablet: text, CTAs, then the diagram at full width. */
+  @media (min-width: 48rem) {
+    .hero-grid {
+      grid-template-areas: 'text' 'actions' 'diagram' 'status';
+      row-gap: 2.5rem;
+    }
+  }
+
+  /* Desktop: text in columns 1–6, diagram in 7–12. */
+  @media (min-width: 75rem) {
+    .hero-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-areas:
+        'text text text text text text diagram diagram diagram diagram diagram diagram'
+        'actions actions actions actions actions actions diagram diagram diagram diagram diagram diagram'
+        'status status status status status status status status status status status status';
+      column-gap: 1.5rem;
+      row-gap: 2.5rem;
+    }
+    .hero-text {
+      align-self: end;
+    }
+    /* Two lines max: the column is 548–628px wide here, so the lead steps down to 20px. */
+    .hero-value {
+      max-width: none;
+      font-size: 1.25rem;
+    }
+    .hero-actions {
+      align-self: start;
+    }
+    .hero-diagram {
+      display: flex;
+      justify-content: flex-end;
+      align-self: center;
+    }
+  }
+</style>
+
+<script>
+  // Live local time in the configured time zone.
+  function init() {
+    const el = document.querySelector<HTMLTimeElement>('[data-clock]');
+    const timeZone = el?.dataset.tz;
+    if (!el || !timeZone) return;
+
+    let format: Intl.DateTimeFormat;
+    try {
+      format = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone });
+    } catch {
+      return; // invalid time zone name in site.yaml
+    }
+    const tick = () => {
+      const now = new Date();
+      el.textContent = format.format(now);
+      el.dateTime = now.toISOString();
+    };
+    tick();
+    const id = window.setInterval(tick, 15_000);
+    document.addEventListener('astro:before-swap', () => window.clearInterval(id), { once: true });
+  }
+  document.addEventListener('astro:page-load', init);
+</script>

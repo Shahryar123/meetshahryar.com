@@ -1,0 +1,27 @@
+# "How I work": a real sequence of 4-5 steps, in order.
+# These are drafts written from the brief. Confirm or rewrite each one.
+
+- id: look
+  order: 1
+  title: Look at what's running
+  body: "[Draft] I start with the current setup: how it's built, deployed, monitored and secured, and where it breaks."
+
+- id: plan
+  order: 2
+  title: Agree the plan
+  body: "[Draft] You get a written plan with scope, risks and cost before any work starts."
+
+- id: build
+  order: 3
+  title: Build it as code
+  body: "[Draft] Infrastructure, pipelines and config live in version control, so every change is reviewed and repeatable."
+
+- id: cut-over
+  order: 4
+  title: Cut over carefully
+  body: "[Draft] Migrations run with a tested rollback, and alarms are in place before real traffic moves."
+
+- id: hand-over
+  order: 5
+  title: Hand over
+  body: "[Draft] You get runbooks, dashboards and access you control, plus [support period] of follow-up."

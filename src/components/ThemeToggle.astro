@@ -1,0 +1,106 @@
+---
+/**
+ * Switches between light and dark. Until the visitor picks one, the OS
+ * preference decides; the choice is then saved and applied before paint
+ * by the inline script in BaseLayout.
+ */
+import Sun from '@lucide/astro/icons/sun';
+import Moon from '@lucide/astro/icons/moon';
+
+interface Props {
+  /** Show a text label next to the icon (used in the mobile menu). */
+  withLabel?: boolean;
+}
+const { withLabel = false } = Astro.props;
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  aria-label="Switch theme"
+  class:list={[
+    'inline-flex min-h-10 items-center gap-2 rounded-chip text-muted hover:text-ink',
+    withLabel ? 'btn btn-secondary' : 'min-w-10 justify-center',
+  ]}
+>
+  <span class="when-dark">
+    <Sun size={20} stroke-width={1.75} aria-hidden="true" />
+  </span>
+  <span class="when-light">
+    <Moon size={20} stroke-width={1.75} aria-hidden="true" />
+  </span>
+  {withLabel && (
+    <span data-theme-label class="text-ink">
+      Switch theme
+    </span>
+  )}
+</button>
+
+<style is:global>
+  /* The icon shows the theme you'll switch to. */
+  .when-dark,
+  .when-light {
+    display: inline-flex;
+  }
+  .when-light {
+    display: none;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .when-dark {
+      display: none;
+    }
+    :root:not([data-theme='dark']) .when-light {
+      display: inline-flex;
+    }
+  }
+  :root[data-theme='light'] .when-dark {
+    display: none;
+  }
+  :root[data-theme='light'] .when-light {
+    display: inline-flex;
+  }
+</style>
+
+<script>
+  const KEY = 'theme';
+  const media = matchMedia('(prefers-color-scheme: light)');
+
+  const current = (): 'light' | 'dark' => {
+    const set = document.documentElement.dataset.theme;
+    if (set === 'light' || set === 'dark') return set;
+    return media.matches ? 'light' : 'dark';
+  };
+
+  function sync() {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
+      button.setAttribute('aria-label', `Switch to ${next} theme`);
+      const label = button.querySelector('[data-theme-label]');
+      if (label) label.textContent = next === 'light' ? 'Light theme' : 'Dark theme';
+    });
+  }
+
+  function init() {
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const next = current() === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem(KEY, next);
+        } catch {
+          /* storage blocked: the choice lasts for this page only */
+        }
+        sync();
+      });
+    });
+    sync();
+  }
+
+  document.addEventListener('astro:page-load', init);
+  // Keep the chosen theme across view-transition navigations.
+  document.addEventListener('astro:before-swap', (event) => {
+    const theme = document.documentElement.dataset.theme;
+    if (theme) event.newDocument.documentElement.dataset.theme = theme;
+  });
+  media.addEventListener('change', sync);
+</script>

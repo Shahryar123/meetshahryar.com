@@ -1,0 +1,33 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/hero/Hero.astro';
+import Work from '@/components/sections/Work.astro';
+import Services from '@/components/sections/Services.astro';
+import Process from '@/components/sections/Process.astro';
+import Experience from '@/components/sections/Experience.astro';
+import Certifications from '@/components/sections/Certifications.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
+import About from '@/components/sections/About.astro';
+import Writing from '@/components/sections/Writing.astro';
+import Faq from '@/components/sections/Faq.astro';
+import Contact from '@/components/sections/Contact.astro';
+import { getSite } from '@/lib/site';
+import { clean } from '@/lib/todo';
+
+const site = await getSite();
+const name = [site.firstName, clean(site.surname)].filter(Boolean).join(' ');
+---
+
+<BaseLayout title={`${name}, ${site.title}`} description={site.valueLine}>
+  <Hero />
+  <Work />
+  <Services />
+  <Process />
+  <Experience />
+  <Certifications />
+  <Testimonials />
+  <About />
+  <Writing />
+  <Faq />
+  <Contact />
+</BaseLayout>

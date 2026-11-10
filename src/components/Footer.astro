@@ -1,0 +1,101 @@
+---
+import T from './T.astro';
+import { getSite } from '@/lib/site';
+import { build } from '@/lib/build';
+import { formatDay } from '@/lib/format';
+import { isEmail, isHttpUrl } from '@/lib/todo';
+
+const site = await getSite();
+const year = new Date().getFullYear();
+const commitUrl = isHttpUrl(site.links.repo)
+  ? `${site.links.repo.replace(/\/$/, '')}/commit/${build.fullSha}`
+  : undefined;
+---
+
+<footer class="shell section-gap pb-10">
+  <div class="grid grid-cols-12 gap-x-6 gap-y-10">
+    <div class="col-span-12 md:col-span-5">
+      <p class="footer-mark" aria-hidden="true">
+        S
+      </p>
+      <p class="mt-4 type-subhead">
+        {site.firstName} <T v={site.surname} />
+      </p>
+      <p class="text-muted">{site.title}</p>
+    </div>
+
+    <ul role="list" class="col-span-6 space-y-2 md:col-span-3">
+      <li>
+        <a class="link" href={site.links.github}>
+          GitHub
+        </a>
+      </li>
+      <li>
+        {isHttpUrl(site.links.linkedin) ? (
+          <a class="link" href={site.links.linkedin}>
+            LinkedIn
+          </a>
+        ) : (
+          <span>
+            LinkedIn <T v={site.links.linkedin} />
+          </span>
+        )}
+      </li>
+      <li>
+        {isEmail(site.email) ? (
+          <a class="link" href={`mailto:${site.email}`}>
+            Email
+          </a>
+        ) : (
+          <span>
+            Email <T v={site.email} />
+          </span>
+        )}
+      </li>
+    </ul>
+
+    <ul role="list" class="col-span-6 space-y-2 md:col-span-4">
+      <li>
+        <a class="link" href="/cv.pdf" download>
+          CV (PDF)
+        </a>
+      </li>
+      <li>
+        {isHttpUrl(site.links.repo) ? (
+          <a class="link" href={site.links.repo}>
+            Source for this site
+          </a>
+        ) : (
+          <span>
+            Source for this site <T v={site.links.repo} />
+          </span>
+        )}
+      </li>
+    </ul>
+  </div>
+
+  <div class="mt-16 flex flex-wrap justify-between gap-x-8 gap-y-2 type-small text-muted">
+    <p>
+      © {year} {site.firstName} <T v={site.surname} />
+    </p>
+    <p class="tabular-nums">
+      Last deployed {formatDay(build.date)}, commit{' '}
+      {commitUrl ? (
+        <a class="link" href={commitUrl}>
+          {build.commit}
+        </a>
+      ) : (
+        build.commit
+      )}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer-mark {
+    font-size: 2.5rem;
+    line-height: 1;
+    font-stretch: 125%;
+    font-weight: 800;
+  }
+</style>

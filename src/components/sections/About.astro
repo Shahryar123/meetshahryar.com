@@ -1,0 +1,83 @@
+---
+import Photo from '@/components/Photo.astro';
+import T from '@/components/T.astro';
+import { getSite } from '@/lib/site';
+
+const site = await getSite();
+const list = new Intl.ListFormat('en-GB', { type: 'conjunction' });
+---
+
+<section id="about" aria-labelledby="about-title" class="shell section-gap">
+  <div class="grid grid-cols-12 gap-x-6 gap-y-10">
+    <div class="col-span-12 sm:col-span-6 md:col-span-5 lg:col-span-4">
+      <!-- A second crop of the same photo: object-position comes from site.yaml. -->
+      <div class="about-photo">
+        <Photo
+          focus={site.photoFocus.about}
+          widths={[320, 480, 640, 960]}
+          sizes="(min-width: 64rem) 25vw, (min-width: 40rem) 45vw, 20rem"
+        />
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-7 lg:col-span-7 lg:col-start-6">
+      <h2 id="about-title" class="type-h2">
+        About
+      </h2>
+      <div class="measure mt-8 space-y-5">
+        {site.about.map((paragraph) => (
+          <p>
+            <T v={paragraph} />
+          </p>
+        ))}
+      </div>
+
+      <div class="mt-14 grid gap-10 sm:grid-cols-2">
+        <div>
+          <h3 class="type-subhead">Now</h3>
+          <dl class="mt-4 space-y-4">
+            <div>
+              <dt class="type-small text-muted">Building</dt>
+              <dd class="mt-1">
+                <ul role="list" class="space-y-1">
+                  {site.now.building.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+            <div>
+              <dt class="type-small text-muted">Learning</dt>
+              <dd class="mt-1">{list.format(site.now.learning)}</dd>
+            </div>
+          </dl>
+        </div>
+        <div>
+          <h3 class="type-subhead">Languages</h3>
+          <ul role="list" class="mt-4 space-y-1">
+            {site.languages.map((language) => (
+              <li>
+                <T v={language} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-photo {
+    max-width: 20rem;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--radius-media);
+    background: var(--panel);
+  }
+  @media (min-width: 40rem) {
+    .about-photo {
+      max-width: none;
+    }
+  }
+</style>

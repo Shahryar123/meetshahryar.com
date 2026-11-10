@@ -1,0 +1,59 @@
+# ---- dependencies ----
+node_modules/
+
+# ---- build output and generated files ----
+dist/
+.astro/
+# The CV PDF is generated from /cv in CI (phase 6), never committed.
+public/cv.pdf
+*.tsbuildinfo
+
+# ---- caches ----
+.cache/
+.eslintcache
+.prettiercache
+
+# ---- test, audit and report output ----
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.lighthouseci/
+coverage/
+
+# ---- Terraform (phase 6) ----
+# Provider downloads are large; state files can contain secrets.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+# Keep .terraform.lock.hcl committed: it pins provider versions.
+
+# ---- environment variables and secrets ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- logs ----
+*.log
+npm-debug.log*
+
+# ---- editors ----
+# Share only the extension recommendations; keep personal settings local.
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+
+# ---- operating systems ----
+.DS_Store
+Thumbs.db
+desktop.ini

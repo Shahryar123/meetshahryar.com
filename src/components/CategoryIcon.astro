@@ -1,0 +1,27 @@
+---
+import CloudCog from '@lucide/astro/icons/cloud-cog';
+import ShieldCheck from '@lucide/astro/icons/shield-check';
+import BrainCircuit from '@lucide/astro/icons/brain-circuit';
+import ChartColumn from '@lucide/astro/icons/chart-column';
+import CodeXml from '@lucide/astro/icons/code-xml';
+import Workflow from '@lucide/astro/icons/workflow';
+import type { CategoryId } from '@/lib/categories';
+
+interface Props {
+  id: CategoryId;
+  size?: number;
+  class?: string;
+}
+const { id, size = 18, class: className } = Astro.props;
+const icons = {
+  cloud: CloudCog,
+  security: ShieldCheck,
+  ai: BrainCircuit,
+  data: ChartColumn,
+  web: CodeXml,
+  automation: Workflow,
+} as const;
+const Icon = icons[id];
+---
+
+<Icon size={size} stroke-width={1.75} aria-hidden="true" class={className} />

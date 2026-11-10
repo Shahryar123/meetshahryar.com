@@ -1,0 +1,41 @@
+# The timeline shows roles by `order`: 1 is the newest.
+# Dates are YYYY-MM. end can be "present".
+# Highlights: three achievements, each with a real number.
+
+- id: alpha-mu-digital
+  order: 1
+  company: Alpha Mu Digital
+  role: DevOps Engineer
+  start: "[start, YYYY-MM]"
+  end: present
+  location: "[location]"
+  highlights:
+    - "[Achievement with a number]"
+    - "[Achievement with a number]"
+    - "[Achievement with a number]"
+  stack:
+    - "[stack]"
+
+- id: earlier-role
+  order: 2
+  company: "[Earlier company]"
+  role: "[role]"
+  start: "[start, YYYY-MM]"
+  end: "[end, YYYY-MM]"
+  location: "[location]"
+  highlights:
+    - "[Achievement with a number]"
+  stack:
+    - "[stack]"
+
+- id: freelance
+  order: 3
+  company: Freelance
+  role: "[role]"
+  start: "[start, YYYY-MM]"
+  end: "[end, YYYY-MM, or present]"
+  location: "[location]"
+  highlights:
+    - "[Achievement with a number]"
+  stack:
+    - "[stack]"

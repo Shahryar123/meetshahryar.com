@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import Plus from '@lucide/astro/icons/plus';
+import Section from '@/components/Section.astro';
+import T from '@/components/T.astro';
+import { byOrder } from '@/lib/format';
+
+const faqs = (await getCollection('faq')).sort(byOrder);
+---
+
+<Section id="faq" title="Working together">
+  <div class="faq-list">
+    {faqs.map((f) => (
+      <details class="faq">
+        <summary class="faq-q">
+          <span class="type-subhead">{f.data.question}</span>
+          <Plus size={22} stroke-width={1.75} aria-hidden="true" class="faq-toggle" />
+        </summary>
+        <p class="faq-a measure text-muted">
+          <T v={f.data.answer} />
+        </p>
+      </details>
+    ))}
+  </div>
+</Section>
+
+<style>
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 52rem;
+  }
+  .faq {
+    border-radius: var(--radius-node);
+  }
+  .faq[open] {
+    background: var(--panel);
+  }
+  .faq-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.25rem 1rem;
+    border-radius: var(--radius-node);
+    cursor: pointer;
+  }
+  .faq-q :global(.faq-toggle) {
+    flex: none;
+    color: var(--muted);
+  }
+  .faq[open] .faq-q :global(.faq-toggle) {
+    rotate: 45deg;
+  }
+  .faq-a {
+    padding: 0 1rem 1.5rem;
+  }
+  @media (min-width: 48rem) {
+    .faq-q {
+      padding: 1.5rem;
+    }
+    .faq-a {
+      padding: 0 1.5rem 1.75rem;
+    }
+  }
+</style>

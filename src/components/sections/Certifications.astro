@@ -1,0 +1,100 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Section from '@/components/Section.astro';
+import T from '@/components/T.astro';
+import { byOrder, formatMonth } from '@/lib/format';
+import { isHttpUrl } from '@/lib/todo';
+
+const certs = (await getCollection('certifications')).sort(byOrder);
+---
+
+{certs.length > 0 && (
+  <Section id="certifications" title="Certifications">
+    {/* Phase 3 turns each tile into a flip card: badge on the front, details on the back. */}
+    <ul role="list" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {certs.map((c) => (
+        <li class="cert">
+          <div class="cert-badge">
+            {c.data.badge ? (
+              <Image
+                src={c.data.badge}
+                alt=""
+                width={96}
+                height={96}
+                class="size-full object-contain"
+              />
+            ) : (
+              <span class="todo type-small">[badge]</span>
+            )}
+          </div>
+          <h3 class="type-subhead mt-5">
+            <T v={c.data.name} />
+          </h3>
+          <p class="text-muted">
+            <T v={c.data.issuer} />
+          </p>
+          <dl class="cert-facts mt-5 type-small">
+            <div>
+              <dt>Issued</dt>
+              <dd>
+                <T v={formatMonth(c.data.issueDate)} />
+              </dd>
+            </div>
+            {c.data.expiryDate && c.data.expiryDate !== 'none' && (
+              <div>
+                <dt>Expires</dt>
+                <dd>
+                  <T v={formatMonth(c.data.expiryDate)} />
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt>Credential ID</dt>
+              <dd class="break-all">
+                <T v={c.data.credentialId} />
+              </dd>
+            </div>
+          </dl>
+          <p class="mt-5">
+            {isHttpUrl(c.data.verifyUrl) ? (
+              <a class="link" href={c.data.verifyUrl}>
+                Verify<span class="sr-only"> {c.data.name}</span>
+              </a>
+            ) : (
+              <span>
+                Verify <T v={c.data.verifyUrl} />
+              </span>
+            )}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+)}
+
+<style>
+  .cert {
+    padding: 1.5rem;
+    border-radius: var(--radius-node);
+    background: var(--panel);
+  }
+  .cert-badge {
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+  .cert-facts {
+    display: grid;
+    gap: 0.375rem;
+  }
+  .cert-facts div {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .cert-facts dt {
+    color: var(--muted);
+  }
+</style>

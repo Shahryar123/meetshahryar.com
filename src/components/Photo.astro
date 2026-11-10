@@ -1,0 +1,36 @@
+---
+/**
+ * Your photo, or a visible placeholder until src/assets/me.jpg exists.
+ * Fills its container; the parent sets the size and radius.
+ */
+import { Picture } from 'astro:assets';
+import { photo, PHOTO_ALT } from '@/lib/photo';
+
+interface Props {
+  focus: string;
+  sizes: string;
+  widths: number[];
+  /** The hero copy loads first; the About copy waits until it's near. */
+  priority?: boolean;
+}
+const { focus, sizes, widths, priority = false } = Astro.props;
+---
+
+{photo ? (
+  <Picture
+    src={photo}
+    alt={PHOTO_ALT}
+    formats={['avif', 'webp']}
+    widths={widths}
+    sizes={sizes}
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : 'auto'}
+    decoding={priority ? 'sync' : 'async'}
+    class="block h-full w-full object-cover"
+    style={`object-position: ${focus}`}
+  />
+) : (
+  <div class="grid h-full w-full place-items-center bg-panel p-3 text-center">
+    <span class="todo type-small">[your photo]</span>
+  </div>
+)}

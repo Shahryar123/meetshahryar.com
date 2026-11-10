@@ -1,0 +1,13 @@
+# One entry per certification. Real ones only.
+# badge: path to the official badge image, relative to this file,
+#   e.g. ../assets/badges/aws-saa.png
+# expiryDate: YYYY-MM, or "none" if it doesn't expire.
+
+- id: certification-1
+  order: 1
+  name: "[Certification name]"
+  issuer: "[issuer]"
+  issueDate: "[issue date, YYYY-MM]"
+  expiryDate: "[expiry date, YYYY-MM]"
+  credentialId: "[credential ID]"
+  verifyUrl: "[verify URL]"
