@@ -1,67 +1,327 @@
 ---
 import { getCollection } from 'astro:content';
-import Plus from '@lucide/astro/icons/plus';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import MessageCircle from '@lucide/astro/icons/message-circle';
 import Section from '@/components/Section.astro';
 import T from '@/components/T.astro';
 import { byOrder } from '@/lib/format';
 
 const faqs = (await getCollection('faq')).sort(byOrder);
+const pad = (n: number) => String(n).padStart(2, '0');
+const total = pad(faqs.length);
 ---
 
-<Section id="faq" eyebrow="FAQ" title="Working together">
-  <div class="faq-list">
-    {faqs.map((f) => (
-      <details class="faq">
-        <summary class="faq-q">
-          <span class="type-subhead">{f.data.question}</span>
-          <Plus size={22} stroke-width={1.75} aria-hidden="true" class="faq-toggle" />
-        </summary>
-        <p class="faq-a measure text-muted">
-          <T v={f.data.answer} />
-        </p>
-      </details>
-    ))}
+<Section id="faq" eyebrow="FAQ" title="Working together" size="display">
+  <!--
+    Tabs (WAI-ARIA pattern): questions on the left, one answer card on the right.
+    Every answer is in the HTML for search engines; only the active one is shown.
+    The card and the yellow card behind it swap tilt on each change.
+  -->
+  <div class="faq" data-faq>
+    <div class="faq-questions" role="tablist" aria-label="Questions" aria-orientation="vertical">
+      {faqs.map((f, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`faq-tab-${f.id}`}
+          class="faq-q"
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-controls={`faq-panel-${f.id}`}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          <span class="faq-q-num" aria-hidden="true">
+            {pad(i + 1)}
+          </span>
+          <span class="faq-q-text">{f.data.question}</span>
+          <ArrowRight size={20} stroke-width={1.75} aria-hidden="true" class="faq-q-arrow" />
+        </button>
+      ))}
+    </div>
+
+    <div class="faq-stage" data-faq-stage data-tilt="left">
+      <div class="faq-card">
+        <div class="faq-card-inner">
+          <MessageCircle size={24} stroke-width={1.75} aria-hidden="true" class="faq-card-icon" />
+          <div class="faq-panels">
+            {faqs.map((f, i) => (
+              <div
+                role="tabpanel"
+                id={`faq-panel-${f.id}`}
+                class="faq-panel"
+                aria-labelledby={`faq-tab-${f.id}`}
+                tabindex="0"
+                data-active={i === 0 ? '' : undefined}
+              >
+                <p class="faq-panel-label">
+                  Answer {pad(i + 1)} / {total}
+                </p>
+                <h3 class="faq-panel-title mt-4">{f.data.question}</h3>
+                <p class="faq-panel-answer mt-4">
+                  <T v={f.data.answer} />
+                </p>
+              </div>
+            ))}
+          </div>
+          <div class="faq-card-foot">
+            <p class="type-small">Still have a question?</p>
+            <a class="btn btn-primary faq-cta" href="#contact">
+              Get in touch
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </Section>
 
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-faq]')) {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')!)!);
+    const stage = root.querySelector<HTMLElement>('[data-faq-stage]')!;
+
+    const select = (index: number, focus: boolean) => {
+      tabs.forEach((tab, i) => {
+        const on = i === index;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+        panels[i].toggleAttribute('data-active', on);
+      });
+      // Alternate the tilt so each change visibly swings the cards.
+      stage.dataset.tilt = index % 2 === 0 ? 'left' : 'right';
+      if (focus) tabs[index].focus();
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i, false));
+      tab.addEventListener('keydown', (e) => {
+        const last = tabs.length - 1;
+        const next =
+          e.key === 'ArrowDown' || e.key === 'ArrowRight'
+            ? (i + 1) % tabs.length
+            : e.key === 'ArrowUp' || e.key === 'ArrowLeft'
+              ? (i - 1 + tabs.length) % tabs.length
+              : e.key === 'Home'
+                ? 0
+                : e.key === 'End'
+                  ? last
+                  : null;
+        if (next === null) return;
+        e.preventDefault();
+        select(next, true);
+      });
+    });
+  }
+</script>
+
 <style>
-  .faq-list {
+  .faq {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  /* --- Questions --- */
+  .faq-questions {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    max-width: 52rem;
-  }
-  .faq {
-    border-radius: var(--radius-node);
-  }
-  .faq[open] {
-    background: var(--panel);
+    gap: 0.75rem;
   }
   .faq-q {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    padding: 1.25rem 1rem;
+    gap: 1rem;
+    width: 100%;
+    min-height: 4.25rem;
+    padding: 0.875rem 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--rule) 55%, transparent);
     border-radius: var(--radius-node);
+    background: color-mix(in oklab, var(--panel) 35%, transparent);
+    color: color-mix(in oklab, var(--ink) 78%, var(--muted));
+    text-align: left;
     cursor: pointer;
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      color 0.25s ease;
   }
-  .faq-q :global(.faq-toggle) {
+  .faq-q:hover {
+    border-color: var(--rule);
+    color: var(--ink);
+  }
+  .faq-q[aria-selected='true'] {
+    border-color: var(--ink);
+    background: light-dark(#fff, var(--panel));
+    color: var(--ink);
+    box-shadow: 0 10px 24px -14px rgb(15 42 46 / 0.35);
+  }
+  .faq-q-num {
+    flex: none;
+    min-width: 1.5rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 650;
+    transition: color 0.25s ease;
+  }
+  .faq-q[aria-selected='true'] .faq-q-num {
+    color: var(--accent);
+  }
+  .faq-q-text {
+    flex: 1;
+    font-size: 1.125rem;
+    line-height: 1.3;
+    font-stretch: 104%;
+    font-weight: 600;
+  }
+  .faq-q :global(.faq-q-arrow) {
     flex: none;
     color: var(--muted);
+    transition:
+      color 0.25s ease,
+      translate 0.25s var(--ease-out);
   }
-  .faq[open] .faq-q :global(.faq-toggle) {
-    rotate: 45deg;
+  .faq-q:hover :global(.faq-q-arrow),
+  .faq-q[aria-selected='true'] :global(.faq-q-arrow) {
+    color: var(--accent);
+    translate: 0.125rem 0;
   }
-  .faq-a {
-    padding: 0 1rem 1.5rem;
+
+  /* --- Answer card --- */
+  .faq-stage {
+    --tilt: -2deg;
+    position: relative;
+    padding: 1.5rem 0.75rem;
   }
-  @media (min-width: 48rem) {
-    .faq-q {
-      padding: 1.5rem;
+  .faq-stage[data-tilt='right'] {
+    --tilt: 2deg;
+  }
+  /* The yellow card behind: same size, tilted the other way. */
+  .faq-stage::before {
+    content: '';
+    position: absolute;
+    inset: 1.5rem 0.75rem;
+    border-radius: 1.25rem;
+    background: var(--signal);
+    rotate: calc(var(--tilt) * -1.4);
+    transition: rotate 0.6s var(--ease-out);
+  }
+  /* Painted outside the dark scheme so its colour follows the page theme. */
+  .faq-card {
+    position: relative;
+    border-radius: 1.25rem;
+    background: var(--band);
+    box-shadow: 0 28px 50px -24px rgb(15 42 46 / 0.55);
+    rotate: var(--tilt);
+    transition: rotate 0.6s var(--ease-out);
+  }
+  .faq-card-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 22rem;
+    padding: 2rem;
+    color-scheme: dark;
+    color: var(--ink);
+  }
+  .faq-card-inner :global(.faq-card-icon) {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    color: var(--muted);
+  }
+
+  /* Panels share one grid cell, so the card keeps the height of the longest answer. */
+  .faq-panels {
+    display: grid;
+    flex: 1;
+  }
+  .faq-panel {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    translate: 0 0.625rem;
+    transition:
+      opacity 0.2s ease,
+      translate 0.3s var(--ease-out),
+      visibility 0s linear 0.2s;
+  }
+  .faq-panel[data-active] {
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+    transition:
+      opacity 0.35s ease 0.12s,
+      translate 0.5s var(--ease-out) 0.12s,
+      visibility 0s;
+  }
+  .faq-panel:focus-visible {
+    outline-offset: 0.5rem;
+  }
+  .faq-panel-label {
+    padding-right: 2.5rem; /* clear of the icon */
+    color: var(--signal);
+    font-size: 0.8125rem;
+    font-stretch: 112%;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .faq-panel-title {
+    font-size: clamp(1.5rem, 1.25rem + 0.8vw, 1.875rem);
+    line-height: 1.1;
+    font-stretch: 118%;
+    font-weight: 780;
+    letter-spacing: -0.01em;
+  }
+  .faq-panel-answer {
+    color: color-mix(in oklab, var(--muted) 70%, var(--ink));
+    line-height: 1.65;
+  }
+  .faq-card-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid color-mix(in oklab, var(--rule) 70%, transparent);
+    color: var(--muted);
+  }
+  .faq-cta {
+    min-height: 2.75rem;
+    padding-inline: 1.125rem;
+  }
+
+  @media (min-width: 64rem) {
+    .faq {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 6fr);
+      gap: clamp(3rem, 6vw, 7rem);
     }
-    .faq-a {
-      padding: 0 1.5rem 1.75rem;
+    .faq-stage {
+      --tilt: -3deg;
+      padding: 2rem 1.5rem;
+    }
+    .faq-stage[data-tilt='right'] {
+      --tilt: 3deg;
+    }
+    .faq-stage::before {
+      inset: 2rem 1.5rem;
+    }
+    .faq-card-inner {
+      padding: 2.25rem 2.25rem 2rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq-q,
+    .faq-q :global(.faq-q-arrow),
+    .faq-stage::before,
+    .faq-card,
+    .faq-panel,
+    .faq-panel[data-active] {
+      transition: none;
     }
   }
 </style>

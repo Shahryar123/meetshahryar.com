@@ -11,15 +11,20 @@ interface Props {
   /** Short label above the heading, e.g. "Always learning". Shown in capitals. */
   eyebrow: string;
   intro?: string;
+  /** "display" uses the large, heavy heading (type-section-display). */
+  size?: 'default' | 'display';
   class?: string;
 }
-const { id, title, eyebrow, intro, class: className } = Astro.props;
+const { id, title, eyebrow, intro, size = 'default', class: className } = Astro.props;
 ---
 
 <section id={id} aria-labelledby={`${id}-title`} class:list={['shell section-gap', className]}>
   <hgroup>
     <Eyebrow label={eyebrow} />
-    <h2 id={`${id}-title`} class="type-h2 mt-3">
+    <h2
+      id={`${id}-title`}
+      class:list={[size === 'display' ? 'type-section-display' : 'type-h2', 'mt-3']}
+    >
       {title}
     </h2>
   </hgroup>

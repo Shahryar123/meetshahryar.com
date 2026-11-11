@@ -9,7 +9,7 @@
 - id: time-zones
   order: 2
   question: Which time zones do you cover?
-  answer: "I'm based in [city] ([UTC offset]) and overlap [how many hours] with [UK/UAE/other] working days."
+  answer: "I'm based in Karachi (UTC+05:00) and overlap [how many hours] with [UK/UAE/other] working days."
 
 - id: response-time
   order: 3
