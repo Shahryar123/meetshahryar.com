@@ -1,27 +1,28 @@
 # "How I work": a real sequence of 4-5 steps, in order.
-# These are drafts written from the brief. Confirm or rewrite each one.
+# Titles are short (the desktop layout has five narrow columns) and use the
+# terms people search for; bodies name real tools and stay one to two sentences.
 
-- id: look
+- id: audit
   order: 1
-  title: Look at what's running
-  body: "[Draft] I start with the current setup: how it's built, deployed, monitored and secured, and where it breaks."
+  title: Infrastructure audit
+  body: I review how your application is built, deployed, monitored and secured on AWS, Azure or your current server, and find what slows releases or risks uptime.
 
 - id: plan
   order: 2
-  title: Agree the plan
-  body: "[Draft] You get a written plan with scope, risks and cost before any work starts."
+  title: Plan and estimate
+  body: You get a written plan covering architecture, security, risks and estimated cloud costs, agreed before any work starts.
 
 - id: build
   order: 3
-  title: Build it as code
-  body: "[Draft] Infrastructure, pipelines and config live in version control, so every change is reviewed and repeatable."
+  title: Infrastructure as code
+  body: I write the infrastructure in Terraform or Pulumi and build CI/CD pipelines in GitHub Actions or Azure DevOps, so every change is reviewed and repeatable.
 
-- id: cut-over
+- id: migrate
   order: 4
-  title: Cut over carefully
-  body: "[Draft] Migrations run with a tested rollback, and alarms are in place before real traffic moves."
+  title: Migrate and go live
+  body: Monitoring, alerting and backups are in place before traffic moves, and every cut-over has a tested rollback plan to keep downtime to a minimum.
 
-- id: hand-over
+- id: handover
   order: 5
-  title: Hand over
-  body: "[Draft] You get runbooks, dashboards and access you control, plus [support period] of follow-up."
+  title: Handover and support
+  body: You get documentation, runbooks, dashboards and full access to your own cloud accounts, plus 30 days of follow-up support after go-live.

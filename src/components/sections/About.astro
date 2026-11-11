@@ -1,4 +1,5 @@
 ---
+import Eyebrow from '@/components/Eyebrow.astro';
 import Photo from '@/components/Photo.astro';
 import T from '@/components/T.astro';
 import { getSite } from '@/lib/site';
@@ -20,9 +21,12 @@ const list = new Intl.ListFormat('en-GB', { type: 'conjunction' });
     </div>
 
     <div class="col-span-12 md:col-span-7 lg:col-span-7 lg:col-start-6">
-      <h2 id="about-title" class="type-h2">
-        About
-      </h2>
+      <hgroup>
+        <Eyebrow label="Who I am" />
+        <h2 id="about-title" class="type-h2 mt-3">
+          About
+        </h2>
+      </hgroup>
       <div class="measure mt-8 space-y-5">
         {site.about.map((paragraph) => (
           <p>

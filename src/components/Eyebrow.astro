@@ -1,0 +1,35 @@
+---
+/**
+ * The small label above a section heading, with a short signal-yellow bar on top.
+ * Put it with its heading inside an <hgroup>, so it reads as the heading's tagline.
+ */
+interface Props {
+  label: string;
+  class?: string;
+}
+const { label, class: className } = Astro.props;
+---
+
+<p class:list={['eyebrow', className]}>{label}</p>
+
+<style>
+  .eyebrow {
+    color: var(--accent);
+    font-size: 0.875rem;
+    line-height: 1.2;
+    font-stretch: 112%;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  /* The bar is decoration, so it's drawn in CSS rather than as markup. */
+  .eyebrow::before {
+    content: '';
+    display: block;
+    width: 3.5rem;
+    height: 0.375rem;
+    margin-bottom: 0.875rem;
+    border-radius: var(--radius-full);
+    background: var(--signal);
+  }
+</style>

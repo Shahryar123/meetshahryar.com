@@ -7,7 +7,12 @@ import { byOrder } from '@/lib/format';
 const steps = (await getCollection('process')).sort(byOrder);
 ---
 
-<Section id="process" title="How I work">
+<Section
+  id="process"
+  eyebrow="My process"
+  title="How I work"
+  intro="How I take a cloud migration or DevOps project on AWS and Azure from first audit to a documented handover."
+>
   <!-- A real sequence, so the steps are numbered. -->
   <ol role="list" class="steps">
     {steps.map((step, i) => (

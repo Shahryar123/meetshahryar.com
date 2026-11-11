@@ -41,6 +41,7 @@
   --color-signal: var(--signal);
   --color-signal-ink: var(--signal-ink);
   --color-on-signal: var(--on-signal);
+  --color-accent: var(--accent);
   --font-sans: var(--font-mona);
 }
 
@@ -59,6 +60,7 @@
     --signal: #ffb224; /* primary button fill */
     --signal-ink: light-dark(#8f5d00, #ffb224); /* every other live/active use */
     --on-signal: #0f2a2e;
+    --accent: light-dark(#1f6f6a, #6cc2b8); /* section eyebrow labels: 5.1:1 / 7.2:1 on page */
 
     --gutter: 1rem;
     --header-h: 4rem;

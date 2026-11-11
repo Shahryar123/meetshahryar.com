@@ -8,7 +8,7 @@ import { byOrder } from '@/lib/format';
 const faqs = (await getCollection('faq')).sort(byOrder);
 ---
 
-<Section id="faq" title="Working together">
+<Section id="faq" eyebrow="FAQ" title="Working together">
   <div class="faq-list">
     {faqs.map((f) => (
       <details class="faq">
