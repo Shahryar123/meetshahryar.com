@@ -7,6 +7,10 @@ import { byOrder } from '@/lib/format';
 const steps = (await getCollection('process')).sort(byOrder);
 const intro =
   'How I take a cloud migration or DevOps project on AWS and Azure from first audit to a documented handover.';
+
+/** "Phase 1", "Phase 2"…: numbered in the order the phases start. */
+let phaseCount = 0;
+const phaseLabels = steps.map((s) => (s.data.phase ? `Phase ${++phaseCount} · ${s.data.phase}` : null));
 ---
 
 <!--
@@ -27,6 +31,7 @@ const intro =
     <ol role="list" class="steps" style={`--steps: ${steps.length}`}>
       {steps.map((step, i) => (
         <li class="step" style={`--i: ${i}`}>
+          {phaseLabels[i] && <p class="step-phase">{phaseLabels[i]}</p>}
           <span class="step-num" aria-hidden="true">
             {String(i + 1).padStart(2, '0')}
           </span>
@@ -67,13 +72,23 @@ const intro =
     max-width: 30rem;
     color: var(--muted);
   }
+  @media (min-width: 48rem) {
+    .process-head {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+    }
+  }
 
-  /* --- Steps: stacked with a vertical track (mobile and tablet) --- */
+  /*
+   * --- Steps, stacked (phones and tablets; and any step count other than six) ---
+   * Rings run down the left on one track; phase labels sit above steps 1 and 4.
+   */
   .steps {
     --num: 2.75rem;
-    --track-gap: 1.25rem;
+    --gap: 1.25rem;
+    --phase-h: 2rem; /* phase label row (1.25rem) + the step's row gap (0.75rem) */
     display: grid;
-    gap: var(--track-gap);
+    gap: var(--gap);
     margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
   }
   .step {
@@ -81,32 +96,39 @@ const intro =
     display: grid;
     grid-template-columns: var(--num) minmax(0, 1fr);
     column-gap: 1rem;
+    row-gap: 0.75rem;
     /* Track colour runs from signal yellow to the muted rule, step by step. */
     --from: color-mix(in oklab, var(--rule) calc(var(--i) / var(--steps) * 100%), var(--signal));
     --to: color-mix(in oklab, var(--rule) calc((var(--i) + 1) / var(--steps) * 100%), var(--signal));
   }
-  .step:not(:last-child)::before {
-    content: '';
-    position: absolute;
-    left: calc(var(--num) / 2 - 1px);
-    top: var(--num);
-    bottom: calc(-1 * var(--track-gap));
-    width: 2px;
-    background: linear-gradient(var(--from), var(--to));
+  .step-phase {
+    grid-area: 1 / 2;
+    height: 1.25rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    font-stretch: 112%;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
   .step-num {
+    position: relative; /* above the track */
+    grid-area: 1 / 1;
     display: grid;
     place-items: center;
     width: var(--num);
     height: var(--num);
     border: 2px solid var(--signal);
     border-radius: var(--radius-full);
+    background: var(--band); /* hides the track behind the ring */
     color: var(--signal);
     font-size: 1rem;
     font-stretch: 112%;
     font-weight: 700;
   }
   .step-card {
+    grid-area: 1 / 2;
     display: flex;
     flex-direction: column;
     padding: 1.25rem;
@@ -114,9 +136,32 @@ const intro =
     border-radius: var(--radius-node);
     background: var(--panel);
   }
+  .step:has(.step-phase) .step-num {
+    grid-row: 2;
+  }
+  .step:has(.step-phase) .step-card {
+    grid-row: 2;
+  }
+  /* The vertical track: through this step's ring, down to the next step. */
+  .step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--num) / 2 - 1px);
+    top: 0;
+    bottom: calc(-1 * var(--gap));
+    width: 2px;
+    background: linear-gradient(var(--from), var(--to));
+  }
+  .step:first-child::before {
+    top: calc(var(--num) / 2);
+  }
+  .step:first-child:has(.step-phase)::before {
+    top: calc(var(--phase-h) + var(--num) / 2);
+  }
+
   .step-title {
-    font-size: 1.375rem;
-    line-height: 1.05;
+    font-size: 1.25rem;
+    line-height: 1.1;
     font-stretch: 118%;
     font-weight: 750;
     letter-spacing: -0.01em;
@@ -124,7 +169,7 @@ const intro =
   .step-body {
     color: color-mix(in oklab, var(--muted) 70%, var(--ink));
     font-size: 0.9375rem;
-    line-height: 1.65;
+    line-height: 1.6;
   }
   /* What the client walks away with; pinned to the bottom so the chips line up. */
   .step-outcome {
@@ -142,37 +187,49 @@ const intro =
     white-space: nowrap;
   }
   .step-body:has(+ .step-outcome) {
-    margin-bottom: 1.5rem; /* minimum gap; the chip's auto margin takes the rest */
+    margin-bottom: 1.25rem; /* minimum gap; the chip's auto margin takes the rest */
   }
 
-  @media (min-width: 48rem) {
-    .process-head {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: end;
-    }
+  /* The last step is the goal: filled ring and a signal-yellow card. */
+  .step:last-child .step-num {
+    background: var(--signal);
+    color: var(--on-signal);
+  }
+  .step:last-child .step-card {
+    border-color: var(--signal);
+    background: var(--signal);
+    color: var(--on-signal);
+  }
+  .step:last-child .step-body {
+    color: color-mix(in oklab, var(--on-signal) 85%, var(--signal));
+  }
+  .step:last-child .step-outcome {
+    background: var(--on-signal);
+    color: var(--signal);
   }
 
   /*
-   * --- Steps: a snake on wide screens ---
-   * Two rows of three: 1 → 2 → 3, then the track turns down the right side and
-   * runs back 4 ← 5 ← 6. Only for exactly six steps; any other count keeps the
-   * stacked layout above.
+   * --- Steps on wide screens: cards around a snake-shaped track ---
+   * Row 1: cards 1 2 3, with their rings underneath, 01 → 02 → 03.
+   * The track turns down the right side, then runs back 04 ← 05 ← 06 above
+   * row 2: cards 6 5 4. Only for exactly six steps.
    */
   @media (min-width: 64rem) {
     .steps:has(> .step:nth-child(6):last-child) {
       --num: 3.375rem;
-      --turn: 2.25rem; /* room on the right for the track's U-turn */
+      --col-gap: 1.25rem;
+      --between: 1.75rem; /* extra space between the two track rows */
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      /* ring row, card row, ring row, card row */
-      grid-template-rows: var(--num) auto var(--num) auto;
-      gap: 1.25rem;
-      padding-right: var(--turn);
+      /* cards, track 1, track 2, cards */
+      grid-template-rows: auto var(--num) calc(var(--num) + var(--between)) auto;
+      gap: 1.5rem var(--col-gap);
+      padding-block: 2.5rem; /* room for the phase labels */
     }
     .steps:has(> .step:nth-child(6):last-child) .step {
       grid-row: span 2;
       grid-template-columns: none;
       grid-template-rows: subgrid;
-      row-gap: 1.25rem;
+      row-gap: normal;
     }
     .steps:has(> .step:nth-child(6):last-child) .step::before {
       display: none;
@@ -195,32 +252,93 @@ const intro =
     .steps:has(> .step:nth-child(6):last-child) .step:nth-child(6) {
       grid-area: 3 / 1 / span 2;
     }
+    /* Top row: card first, ring below. Bottom row: ring first, card below. */
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(-n + 3) .step-card {
+      grid-area: 1 / 1;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(-n + 3) .step-num {
+      grid-area: 2 / 1;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(n + 4) .step-num {
+      grid-area: 1 / 1;
+      align-self: end;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(n + 4) .step-card {
+      grid-area: 2 / 1;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step-num {
+      justify-self: center;
+      font-size: 1.0625rem;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step-card {
+      padding: 1.5rem;
+    }
+
+    /* Phase labels: above card 1, and below card 4 aligned right. */
+    .steps:has(> .step:nth-child(6):last-child) .step-phase {
+      position: absolute;
+      grid-area: auto;
+      height: auto;
+      white-space: nowrap;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(1) .step-phase {
+      bottom: calc(100% + 1rem);
+      left: 0;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(1) .step-phase::after {
+      content: ' →';
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(4) .step-phase {
+      top: calc(100% + 1rem);
+      right: 0;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(4) .step-phase::before {
+      content: '← ';
+    }
+
     /*
-     * The whole track is one box: top edge through rings 1-3, rounded right
-     * side, bottom edge back through rings 4-6. Only those three edges are
-     * drawn (a gradient masked to the padding), yellow on top fading below.
+     * The track is one box from ring 01's centre to ring 06's centre (both sit
+     * at the middle of column 1): top edge through 01-03, a half-circle turn on
+     * the right, bottom edge back through 04-06. Only those three edges are
+     * drawn: a gradient masked to the 2px padding.
      */
     .steps:has(> .step:nth-child(6):last-child)::before {
       content: '';
-      grid-area: 1 / 1 / 4 / -1;
-      margin: calc(var(--num) / 2 - 1px) calc(-1 * var(--turn)) calc(var(--num) / 2 - 1px)
-        calc(var(--num) / 2);
+      grid-area: 2 / 1 / 4 / -1;
+      /* % margins resolve against this area's width: half a column = (100% - 2 gaps) / 6 */
+      margin: calc(var(--num) / 2 - 1px) 0 calc(var(--num) / 2 - 1px)
+        calc((100% - 2 * var(--col-gap)) / 6);
       padding: 2px 2px 2px 0;
-      border-radius: 0 var(--turn) var(--turn) 0;
-      background: linear-gradient(var(--signal), color-mix(in oklab, var(--signal) 35%, var(--rule)));
+      border-radius: 0 999px 999px 0;
+      background: linear-gradient(
+        color-mix(in oklab, var(--signal) 75%, var(--rule)),
+        color-mix(in oklab, var(--signal) 40%, var(--rule))
+      );
       mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
       mask-clip: content-box, border-box;
       mask-composite: exclude;
       pointer-events: none;
     }
-    /* Rings sit on the track; the fill hides the line behind them. */
-    .steps:has(> .step:nth-child(6):last-child) .step-num {
-      position: relative;
-      background: var(--band);
-      font-size: 1.0625rem;
+    /* Arrowheads halfway between rings: → on the top track, ← on the bottom. */
+    .steps:has(> .step:nth-child(6):last-child) .step:is(:nth-child(2), :nth-child(3))::after,
+    .steps:has(> .step:nth-child(6):last-child) .step:is(:nth-child(5), :nth-child(6))::after {
+      content: '';
+      position: absolute;
+      width: 0.5rem;
+      height: 0.625rem;
+      background: var(--signal);
     }
-    .steps:has(> .step:nth-child(6):last-child) .step-card {
-      padding: 1.5rem;
+    .steps:has(> .step:nth-child(6):last-child) .step:is(:nth-child(2), :nth-child(3))::after {
+      left: calc(var(--col-gap) / -2);
+      bottom: calc(var(--num) / 2);
+      translate: -50% 50%;
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:is(:nth-child(5), :nth-child(6))::after {
+      right: calc(var(--col-gap) / -2);
+      top: calc(var(--between) + var(--num) / 2);
+      translate: 50% -50%;
+      clip-path: polygon(100% 0, 0 50%, 100% 100%);
     }
   }
 </style>

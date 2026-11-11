@@ -9,7 +9,7 @@ main:
   # Full version, used in About.
   valueLineLong: I move apps off fragile servers onto AWS and Azure setups that deploy on every push, alert before users notice, and pass security review. I also build the AI assistants and websites that run on them.
   availability: "[availability, e.g. Open to new roles]"
-  regions: "[target regions, e.g. UK, UAE, remote worldwide]"
+  regions: UK, Ireland, UAE, Saudi Arabia, Canada and Australia
   email: muhammadshahryar135@gmail.com
   location:
     city: Karachi
@@ -17,27 +17,17 @@ main:
   # IANA name, used by the live clock in the hero.
   timezone: Asia/Karachi
   utcOffset: "UTC+05:00"
-  employer: Alpha Mu Digital
+  employer: Alpha Mu Digital Ventures
   links:
     github: https://github.com/Shahryar123
     linkedin: https://www.linkedin.com/in/shahryar123
     calendly: "[Calendly URL]"
     repo: "[URL of this site's repo]"
-  languages:
-    - "[languages you speak]"
-  now:
-    building:
-      - The DevOps Runbook Assistant
-      - An AI sales assistant for British Instruments
-    learning:
-      - LangGraph
-      - LangSmith
-      - Microsoft Foundry agents
   about:
     - "[Draft, rewrite in your own words]"
-    - I'm a senior software engineer at Alpha Mu Digital, where I also look after the AWS infrastructure and CDN. I came to infrastructure from .NET and C#, so I tend to start with the application. How does it build, where do its secrets live, and what happens when the server under it goes away?
+    - I'm a senior software engineer at Alpha Mu Digital Ventures, where I also look after the AWS infrastructure and CDN. I came to infrastructure from .NET and C#, so I tend to start with the application. How does it build, where do its secrets live, and what happens when the server under it goes away?
     - I move apps off fragile servers onto AWS and Azure setups that deploy on every push, alert before users notice, and pass security review. I also build the AI assistants and websites that run on them.
   contact:
-    invitation: "Tell me what you're running and what's getting in the way. I'll reply [within one working day] with questions or a plan."
+    invitation: "Tell me what you're running and what's getting in the way. I'll reply within one working day with questions or a plan."
     budgets:
       - "[budget ranges in your currency]"

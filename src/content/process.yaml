@@ -1,11 +1,13 @@
 # "How I work": a real sequence of steps, in order.
 # Six steps fill the wide layout: two rows of three (1-2-3, then 6-5-4 back).
 # Any other count falls back to a single stacked column.
+# phase: set on the first step of each phase; shown as "Phase 1 · Plan & build".
 # Titles use the terms people search for; bodies name real tools and stay one
 # to two sentences.
 # outcome: what the client has at the end of the step, shown as a chip.
 
 - id: audit
+  phase: Plan & build
   order: 1
   title: Infrastructure audit
   body: I review how your application is built, deployed, monitored and secured on AWS, Azure or your current server, and find what slows releases or risks uptime.
@@ -24,6 +26,7 @@
   outcome: Terraform + pipelines
 
 - id: migrate
+  phase: Launch & support
   order: 4
   title: Migrate and go live
   body: Monitoring, alerting and backups are in place before traffic moves, and every cut-over has a tested rollback plan to keep downtime to a minimum.

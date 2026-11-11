@@ -1,11 +1,16 @@
 ---
+import { getCollection } from 'astro:content';
 import Eyebrow from '@/components/Eyebrow.astro';
 import Photo from '@/components/Photo.astro';
 import T from '@/components/T.astro';
+import { byOrder } from '@/lib/format';
 import { getSite } from '@/lib/site';
 
 const site = await getSite();
-const list = new Intl.ListFormat('en-GB', { type: 'conjunction' });
+// The current role comes from Experience (the newest entry still running), so the two never disagree.
+const current = (await getCollection('experience'))
+  .filter((job) => job.data.end === 'present')
+  .sort(byOrder)[0];
 ---
 
 <section id="about" aria-labelledby="about-title" class="shell section-gap">
@@ -35,42 +40,38 @@ const list = new Intl.ListFormat('en-GB', { type: 'conjunction' });
         ))}
       </div>
 
-      <div class="mt-14 grid gap-10 sm:grid-cols-2">
-        <div>
-          <h3 class="type-subhead">Now</h3>
-          <dl class="mt-4 space-y-4">
-            <div>
-              <dt class="type-small text-muted">Building</dt>
-              <dd class="mt-1">
-                <ul role="list" class="space-y-1">
-                  {site.now.building.map((item) => (
-                    <li>{item}</li>
-                  ))}
-                </ul>
-              </dd>
-            </div>
-            <div>
-              <dt class="type-small text-muted">Learning</dt>
-              <dd class="mt-1">{list.format(site.now.learning)}</dd>
-            </div>
+      {
+        current && (
+          <dl class="current mt-12">
+            <dt class="current-label">Current position</dt>
+            <dd class="mt-2">
+              <span class="type-subhead block">{current.data.role}</span>
+              <span class="text-muted">{current.data.company}</span>
+            </dd>
           </dl>
-        </div>
-        <div>
-          <h3 class="type-subhead">Languages</h3>
-          <ul role="list" class="mt-4 space-y-1">
-            {site.languages.map((language) => (
-              <li>
-                <T v={language} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+        )
+      }
     </div>
   </div>
 </section>
 
 <style>
+  /* A tile with a signal bar on the left: the one fact a recruiter scans for. */
+  .current {
+    display: inline-block;
+    padding: 1.25rem 1.5rem 1.25rem 1.25rem;
+    border-left: 4px solid var(--signal);
+    border-radius: var(--radius-node);
+    background: var(--panel);
+  }
+  .current-label {
+    color: var(--accent);
+    font-size: 0.8125rem;
+    font-stretch: 112%;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
   .about-photo {
     max-width: 20rem;
     aspect-ratio: 4 / 5;

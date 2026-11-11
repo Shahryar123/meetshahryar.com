@@ -146,6 +146,8 @@ const process = defineCollection({
     body: z.string(),
     /** What the client has at the end of the step, shown as a chip, e.g. "Written plan + costs". */
     outcome: z.string().optional(),
+    /** Set on the first step of each phase, e.g. "Plan & build"; shown as "Phase 1 · Plan & build". */
+    phase: z.string().optional(),
   }),
 });
 
@@ -183,8 +185,6 @@ const site = defineCollection({
       calendly: url,
       repo: url,
     }),
-    languages: z.array(z.string()).min(1),
-    now: z.object({ building: z.array(z.string()), learning: z.array(z.string()) }),
     about: z.array(z.string()).min(1),
     contact: z.object({
       invitation: z.string(),

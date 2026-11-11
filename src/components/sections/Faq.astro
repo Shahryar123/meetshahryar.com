@@ -5,10 +5,30 @@ import MessageCircle from '@lucide/astro/icons/message-circle';
 import Section from '@/components/Section.astro';
 import T from '@/components/T.astro';
 import { byOrder } from '@/lib/format';
+import { hasTodo } from '@/lib/todo';
 
 const faqs = (await getCollection('faq')).sort(byOrder);
 const pad = (n: number) => String(n).padStart(2, '0');
 const total = pad(faqs.length);
+
+/*
+ * schema.org FAQPage, built from the same content. Google now shows FAQ rich
+ * results only for a few authoritative sites, but Bing and AI answer engines
+ * still read it. Unfinished answers ("[...]") are left out.
+ */
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs
+    .filter((f) => !hasTodo(f.data.question) && !hasTodo(f.data.answer))
+    .map((f) => ({
+      '@type': 'Question',
+      name: f.data.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.data.answer },
+    })),
+};
+// "<" escaped so the JSON can never close the script element early.
+const faqJsonLd = JSON.stringify(faqSchema).replace(/</g, '\u003c');
 ---
 
 <Section id="faq" eyebrow="FAQ" title="Working together" size="display">
@@ -17,6 +37,11 @@ const total = pad(faqs.length);
     Every answer is in the HTML for search engines; only the active one is shown.
     The card and the yellow card behind it swap tilt on each change.
   -->
+  {
+    faqSchema.mainEntity.length > 0 && (
+      <script is:inline type="application/ld+json" set:html={faqJsonLd} />
+    )
+  }
   <div class="faq" data-faq>
     <div class="faq-questions" role="tablist" aria-label="Questions" aria-orientation="vertical">
       {faqs.map((f, i) => (
