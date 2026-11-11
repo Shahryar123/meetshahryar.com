@@ -80,6 +80,13 @@ const artWidths = [480, 720, 1000];
     position: relative;
     z-index: 1; /* the name runs over the edge of the paint */
   }
+  /*
+   * "Muhammad" is about 6.7em wide: on small phones, scale it with the screen so
+   * it fits (13.4vw), but never above the usual display size.
+   */
+  .hero-name {
+    font-size: min(13.4vw, clamp(3.25rem, 9vw, 9rem));
+  }
   .hero-role {
     font-size: clamp(1.375rem, 1rem + 1.4vw, 2.125rem);
     line-height: 1.15;
