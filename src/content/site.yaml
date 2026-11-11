@@ -37,10 +37,6 @@ main:
     - "[Draft, rewrite in your own words]"
     - I'm a DevOps engineer at Alpha Mu Digital. I came to infrastructure from .NET and C#, so I tend to start with the application. How does it build, where do its secrets live, and what happens when the server under it goes away?
     - I move apps off fragile servers onto AWS and Azure setups that deploy on every push, alert before users notice, and pass security review. I also build the AI assistants and websites that run on them.
-  # CSS object-position for each crop of src/assets/me.jpg. Keep your face in frame.
-  photoFocus:
-    hero: 50% 30%
-    about: 50% 20%
   contact:
     invitation: "Tell me what you're running and what's getting in the way. I'll reply [within one working day] with questions or a plan."
     budgets:

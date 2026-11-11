@@ -10,14 +10,20 @@
 import { getCollection } from 'astro:content';
 import CategoryIcon from '@/components/CategoryIcon.astro';
 import Photo from '@/components/Photo.astro';
+import { heroPhoto, heroPhotoOnDark } from '@/lib/photo';
 import T from '@/components/T.astro';
 import { CATEGORIES } from '@/lib/categories';
-import { NARROW, PHOTO, WIDE, WIDE_LAYOUT, narrowPath, pct } from '@/lib/diagram';
-
-interface Props {
-  photoFocus: string;
-}
-const { photoFocus } = Astro.props;
+import {
+  NARROW,
+  N_PORT_X,
+  N_PORT_Y,
+  PHOTO,
+  PHOTO_PORTS,
+  WIDE,
+  WIDE_LAYOUT,
+  narrowPath,
+  pct,
+} from '@/lib/diagram';
 
 const services = await getCollection('services');
 const nodes = CATEGORIES.map((category, index) => ({
@@ -59,14 +65,37 @@ const photoBox = [
     ))}
   </svg>
 
+  <!-- The origin node: the brush-stroke portrait, shown whole on its transparent canvas. -->
   <div class="photo-node" style={photoBox}>
-    <Photo
-      focus={photoFocus}
-      priority
-      widths={[240, 360, 480]}
-      sizes="(min-width: 48rem) 168px, 120px"
-    />
+    <div class="art art-light">
+      <Photo
+        image={heroPhoto}
+        priority
+        widths={[240, 480, 720]}
+        sizes="(min-width: 48rem) 240px, 120px"
+      />
+    </div>
+    {heroPhotoOnDark && (
+      <div class="art art-dark">
+        <Photo
+          image={heroPhotoOnDark}
+          priority
+          widths={[240, 480, 720]}
+          sizes="(min-width: 48rem) 240px, 120px"
+        />
+      </div>
+    )}
   </div>
+
+  <!-- Terminals where the connectors meet the paint. -->
+  {PHOTO_PORTS.map((p) => (
+    <span
+      class="port port-wide"
+      style={`--x:${pct(p.x, WIDE.w)};--y:${pct(p.y, WIDE.h)}`}
+      aria-hidden="true"
+    />
+  ))}
+  <span class="port port-narrow" style={`--x:${N_PORT_X}px;--y:${N_PORT_Y}px`} aria-hidden="true" />
 
   <ul role="list" class="nodes" aria-label="What I do">
     {nodes.map((n) => (
@@ -120,9 +149,43 @@ const photoBox = [
     grid-column: 1;
     width: 120px;
     height: 148px;
-    overflow: hidden;
-    border-radius: var(--radius-node);
-    background: var(--panel);
+  }
+  /* Light page: original dark paint. Dark page: the lifted copy. */
+  .art {
+    height: 100%;
+  }
+  .art-dark {
+    display: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .art-light:has(+ .art-dark) {
+      display: none;
+    }
+    :root:not([data-theme='light']) .art-dark {
+      display: block;
+    }
+  }
+  :root[data-theme='dark'] .art-light:has(+ .art-dark) {
+    display: none;
+  }
+  :root[data-theme='dark'] .art-dark {
+    display: block;
+  }
+  .port {
+    position: absolute;
+    z-index: 2;
+    left: var(--x);
+    top: var(--y);
+    width: 10px;
+    height: 10px;
+    translate: -50% -50%;
+    border: 2px solid var(--rule);
+    border-radius: var(--radius-full);
+    background: var(--page);
+    pointer-events: none;
+  }
+  .port-wide {
+    display: none;
   }
   .nodes {
     grid-row: 1;
@@ -174,8 +237,12 @@ const photoBox = [
       width: 100%;
       height: 100%;
     }
-    .links-narrow {
+    .links-narrow,
+    .port-narrow {
       display: none;
+    }
+    .port-wide {
+      display: block;
     }
     .photo-node {
       position: absolute;

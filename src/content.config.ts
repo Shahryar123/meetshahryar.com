@@ -176,7 +176,6 @@ const site = defineCollection({
     languages: z.array(z.string()).min(1),
     now: z.object({ building: z.array(z.string()), learning: z.array(z.string()) }),
     about: z.array(z.string()).min(1),
-    photoFocus: z.object({ hero: z.string(), about: z.string() }),
     contact: z.object({
       invitation: z.string(),
       budgets: z.array(z.string()).min(1),

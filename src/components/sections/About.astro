@@ -10,11 +10,10 @@ const list = new Intl.ListFormat('en-GB', { type: 'conjunction' });
 <section id="about" aria-labelledby="about-title" class="shell section-gap">
   <div class="grid grid-cols-12 gap-x-6 gap-y-10">
     <div class="col-span-12 sm:col-span-6 md:col-span-5 lg:col-span-4">
-      <!-- A second crop of the same photo: object-position comes from site.yaml. -->
+      <!-- The oval portrait (src/assets/me.png), shown whole. -->
       <div class="about-photo">
         <Photo
-          focus={site.photoFocus.about}
-          widths={[320, 480, 640, 960]}
+          widths={[320, 480, 640]}
           sizes="(min-width: 64rem) 25vw, (min-width: 40rem) 45vw, 20rem"
         />
       </div>
@@ -71,9 +70,6 @@ const list = new Intl.ListFormat('en-GB', { type: 'conjunction' });
   .about-photo {
     max-width: 20rem;
     aspect-ratio: 4 / 5;
-    overflow: hidden;
-    border-radius: var(--radius-media);
-    background: var(--panel);
   }
   @media (min-width: 40rem) {
     .about-photo {

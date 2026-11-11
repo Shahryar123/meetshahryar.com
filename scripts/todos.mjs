@@ -42,7 +42,7 @@ for (const file of walk(contentDir).filter((f) => /\.(ya?ml|mdx?)$/.test(f))) {
 const missing = [];
 const photoExts = ['jpg', 'jpeg', 'png', 'webp'];
 if (!photoExts.some((ext) => existsSync(join(root, 'src', 'assets', `me.${ext}`)))) {
-  missing.push('src/assets/me.jpg (your photo, used in the hero and About)');
+  missing.push('src/assets/me.png (your photo, used in the hero and About)');
 }
 const projectsDir = join(contentDir, 'projects');
 for (const file of readdirSync(projectsDir).filter((f) => /\.mdx?$/.test(f))) {

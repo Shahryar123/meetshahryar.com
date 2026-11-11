@@ -17,10 +17,22 @@ export const WIDE = { w: 640, h: 440 } as const;
 /** Elbow radius, matching the 12px node radius. */
 const R = 12;
 
-export const PHOTO = { x: 236, y: 115, w: 168, h: 210 } as const;
+/** The hero artwork box, matching its 1000×860 canvas, centred on (320, 220). */
+export const PHOTO = { x: 200, y: 117, w: 240, h: 206 } as const;
 const PORT_Y = PHOTO.y + PHOTO.h / 2; // 220
-const LEFT_PORT = PHOTO.x; // 236
-const RIGHT_PORT = PHOTO.x + PHOTO.w; // 404
+/**
+ * The artwork is a brush stroke on a transparent canvas. At mid-height the paint
+ * starts 7.8% in from the left and ends 12.7% in from the right, so the
+ * connectors start there, not at the empty box.
+ */
+export const PHOTO_EDGE = { left: 0.078, right: 0.127 } as const;
+const LEFT_PORT = PHOTO.x + Math.round(PHOTO.w * PHOTO_EDGE.left); // 219
+const RIGHT_PORT = PHOTO.x + PHOTO.w - Math.round(PHOTO.w * PHOTO_EDGE.right); // 410
+/** Where the connectors leave the photo: its left and right edge midpoints. */
+export const PHOTO_PORTS = [
+  { x: LEFT_PORT, y: PORT_Y },
+  { x: RIGHT_PORT, y: PORT_Y },
+] as const;
 const TRUNK_L = 192;
 const TRUNK_R = 448;
 const TOP_Y = 62;
@@ -90,8 +102,9 @@ export const NARROW = {
   row: 44,
 } as const;
 
-const N_PORT_X = NARROW.photoW; // 120
-const N_PORT_Y = 74; // centre of row 1, so the second node is a straight line
+// The artwork is contained in the 120×148 box: 120×103, vertically centred on y 74.
+export const N_PORT_X = NARROW.photoW - Math.round(NARROW.photoW * PHOTO_EDGE.right); // 105
+export const N_PORT_Y = 74; // centre of row 1, so the second node is a straight line
 const N_TRUNK = 132;
 const N_END = NARROW.w; // 144
 

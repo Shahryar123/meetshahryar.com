@@ -13,6 +13,7 @@ You need Node 22.23.4 or newer. The repo pins 24.22.2 in `.nvmrc`.
 nvm install 24.22.2     # once
 nvm use 24.22.2         # nvm-windows switches the machine-wide version; may need an admin terminal
 npm ci
+
 npm run dev             # http://localhost:4321
 ```
 
@@ -38,7 +39,7 @@ Everything on the site comes from `src/content/`. Adding a project, job or certi
 
 ### Your photo
 
-Save it as `src/assets/me.jpg`. It appears in the hero and in About, cropped differently in each. Adjust each crop with `photoFocus` in `src/content/site.yaml`, using CSS `object-position` values such as `50% 30%`.
+Save it as `src/assets/me.png` (or `.jpg` / `.webp`), not in `public/`, so Astro can resize it and serve AVIF/WebP. Use a 4:5 PNG with a transparent background (the oval portrait); it's shown whole in About. The hero uses `src/assets/shahryar-brush-dark.png` (1000×860, you on a dark brush stroke); `shahryar-brush-light.png` is a copy with lighter paint for the dark theme, where the original paint matches the page. If you replace it, keep the size ratio and update `PHOTO_EDGE` in `src/lib/diagram.ts` so the connectors still meet the paint.
 
 ### Add a featured project (gets a case study)
 
@@ -85,3 +86,6 @@ Both sections stay hidden until they have content.
 ## Deploy
 
 Not set up yet. Phase 6 adds Terraform for S3, CloudFront, ACM and Route 53, and a GitHub Actions pipeline using OIDC.
+
+$env:Path = "C:\Users\lenovo\AppData\Local\nvm\v24.22.2;" + $env:Path
+npm run dev
