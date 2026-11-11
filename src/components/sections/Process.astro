@@ -1,71 +1,197 @@
 ---
 import { getCollection } from 'astro:content';
-import Section from '@/components/Section.astro';
+import Eyebrow from '@/components/Eyebrow.astro';
 import T from '@/components/T.astro';
 import { byOrder } from '@/lib/format';
 
 const steps = (await getCollection('process')).sort(byOrder);
+const intro =
+  'How I take a cloud migration or DevOps project on AWS and Azure from first audit to a documented handover.';
 ---
 
-<Section
-  id="process"
-  eyebrow="My process"
-  title="How I work"
-  intro="How I take a cloud migration or DevOps project on AWS and Azure from first audit to a documented handover."
->
-  <!-- A real sequence, so the steps are numbered. -->
-  <ol role="list" class="steps">
-    {steps.map((step, i) => (
-      <li class="step">
-        <span class="step-num tabular-nums" aria-hidden="true">
-          {i + 1}
-        </span>
-        <h3 class="type-subhead mt-5">{step.data.title}</h3>
-        <p class="mt-2 type-small text-muted">
-          <T v={step.data.body} />
-        </p>
-      </li>
-    ))}
-  </ol>
-</Section>
+<!--
+  An always-dark band. The outer element paints the band (its colour follows the
+  page theme); inside, color-scheme is dark, so every token resolves to its dark value.
+-->
+<section id="process" aria-labelledby="process-title" class="band section-gap">
+  <div class="shell band-inner">
+    <div class="process-head">
+      <hgroup>
+        <Eyebrow label="My process" tone="signal" />
+        <h2 id="process-title" class="process-title mt-3">How I work</h2>
+      </hgroup>
+      <p class="process-intro type-lead">{intro}</p>
+    </div>
+
+    <!-- A real sequence, so the steps are numbered. -->
+    <ol role="list" class="steps" style={`--steps: ${steps.length}`}>
+      {steps.map((step, i) => (
+        <li class="step" style={`--i: ${i}`}>
+          <span class="step-num" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <div class="step-card">
+            <h3 class="step-title">{step.data.title}</h3>
+            <p class="step-body mt-3">
+              <T v={step.data.body} />
+            </p>
+            {step.data.outcome && (
+              <p class="step-outcome">
+                <span aria-hidden="true">→</span>
+                <span class="sr-only">Outcome:</span>
+                {step.data.outcome}
+              </p>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
 
 <style>
-  .steps {
+  .band {
+    background: var(--band);
+  }
+  .band-inner {
+    color-scheme: dark;
+    color: var(--ink);
+    padding-block: clamp(4rem, 3rem + 4vw, 6rem);
+  }
+
+  .process-head {
     display: grid;
-    gap: 2.5rem 1.5rem;
+    gap: 1.5rem 3rem;
+  }
+  .process-title {
+    font-size: clamp(2.75rem, 1.6rem + 3.6vw, 4.5rem);
+    line-height: 0.95;
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .process-intro {
+    max-width: 30rem;
+    color: var(--muted);
+  }
+
+  /* --- Steps: stacked with a vertical track (mobile and tablet) --- */
+  .steps {
+    --num: 2.75rem;
+    --track-gap: 1.25rem;
+    display: grid;
+    gap: var(--track-gap);
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
   }
   .step {
     position: relative;
+    display: grid;
+    grid-template-columns: var(--num) minmax(0, 1fr);
+    column-gap: 1rem;
+    /* Track colour runs from signal yellow to the muted rule, step by step. */
+    --from: color-mix(in oklab, var(--rule) calc(var(--i) / var(--steps) * 100%), var(--signal));
+    --to: color-mix(in oklab, var(--rule) calc((var(--i) + 1) / var(--steps) * 100%), var(--signal));
+  }
+  .step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--num) / 2 - 1px);
+    top: var(--num);
+    bottom: calc(-1 * var(--track-gap));
+    width: 2px;
+    background: linear-gradient(var(--from), var(--to));
   }
   .step-num {
-    display: inline-grid;
+    display: grid;
     place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: var(--radius-node);
-    background: var(--panel);
+    width: var(--num);
+    height: var(--num);
+    border: 2px solid var(--signal);
+    border-radius: var(--radius-full);
+    color: var(--signal);
     font-size: 1rem;
     font-stretch: 112%;
-    font-weight: 680;
+    font-weight: 700;
   }
-  @media (min-width: 40rem) {
-    .steps {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+  .step-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--rule) 45%, transparent);
+    border-radius: var(--radius-node);
+    background: var(--panel);
+  }
+  .step-title {
+    font-size: 1.375rem;
+    line-height: 1.05;
+    font-stretch: 118%;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+  }
+  .step-body {
+    color: color-mix(in oklab, var(--muted) 70%, var(--ink));
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+  /* What the client walks away with; pinned to the bottom so the chips line up. */
+  .step-outcome {
+    display: inline-flex;
+    align-self: flex-start;
+    gap: 0.375rem;
+    margin-top: auto;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in oklab, var(--signal) 15%, transparent);
+    color: var(--signal);
+    font-size: 0.78125rem;
+    line-height: 1.25;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+  .step-body:has(+ .step-outcome) {
+    margin-bottom: 1.5rem; /* minimum gap; the chip's auto margin takes the rest */
+  }
+
+  @media (min-width: 48rem) {
+    .process-head {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
     }
   }
-  @media (min-width: 64rem) {
+
+  /* --- Steps: five columns on a horizontal track (wide screens) --- */
+  @media (min-width: 75rem) {
     .steps {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      --num: 3.625rem;
+      grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
+      column-gap: 1.25rem;
     }
-    /* A decorative connector from each step to the next. */
-    .step:not(:last-child)::after {
+    .step {
+      grid-template-columns: none;
+      grid-template-rows: var(--num) 1fr;
+      row-gap: 1.375rem;
+    }
+    /* Each segment runs from this ring to the next; the last one runs to the edge. */
+    .step::before,
+    .step:not(:last-child)::before {
       content: '';
       position: absolute;
-      top: calc(1.375rem - 0.75px);
-      left: calc(2.75rem + 0.75rem);
-      right: calc(-1.5rem + 0.75rem);
-      height: 1.5px;
-      background: var(--rule);
+      left: var(--num);
+      right: calc(-1 * var(--track-gap));
+      top: calc(var(--num) / 2 - 1px);
+      bottom: auto;
+      width: auto;
+      height: 2px;
+      background: linear-gradient(to right, var(--from), var(--to));
+    }
+    .step:last-child::before {
+      right: 0;
+    }
+    .step-num {
+      font-size: 1.125rem;
+    }
+    .step-card {
+      padding: 1.5rem;
     }
   }
 </style>

@@ -5,12 +5,14 @@
  */
 interface Props {
   label: string;
+  /** "signal" makes the label yellow, for dark bands where the teal would be too quiet. */
+  tone?: 'accent' | 'signal';
   class?: string;
 }
-const { label, class: className } = Astro.props;
+const { label, tone = 'accent', class: className } = Astro.props;
 ---
 
-<p class:list={['eyebrow', className]}>{label}</p>
+<p class:list={['eyebrow', tone === 'signal' && 'eyebrow--signal', className]}>{label}</p>
 
 <style>
   .eyebrow {
@@ -21,6 +23,9 @@ const { label, class: className } = Astro.props;
     font-weight: 650;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+  }
+  .eyebrow--signal {
+    color: var(--signal);
   }
   /* The bar is decoration, so it's drawn in CSS rather than as markup. */
   .eyebrow::before {

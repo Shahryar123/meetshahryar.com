@@ -140,7 +140,13 @@ const faq = defineCollection({
 /** "How I work": a real sequence, so the steps are numbered. */
 const process = defineCollection({
   loader: file('./src/content/process.yaml'),
-  schema: z.object({ order: z.number().int(), title: z.string(), body: z.string() }),
+  schema: z.object({
+    order: z.number().int(),
+    title: z.string(),
+    body: z.string(),
+    /** What the client has at the end of the step, shown as a chip, e.g. "Written plan + costs". */
+    outcome: z.string().optional(),
+  }),
 });
 
 /** Technical notes in MDX. The Writing section hides itself while this is empty. */

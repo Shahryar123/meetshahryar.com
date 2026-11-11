@@ -1,28 +1,34 @@
 # "How I work": a real sequence of 4-5 steps, in order.
 # Titles are short (the desktop layout has five narrow columns) and use the
 # terms people search for; bodies name real tools and stay one to two sentences.
+# outcome: what the client has at the end of the step, shown as a chip.
 
 - id: audit
   order: 1
   title: Infrastructure audit
   body: I review how your application is built, deployed, monitored and secured on AWS, Azure or your current server, and find what slows releases or risks uptime.
+  outcome: Findings
 
 - id: plan
   order: 2
   title: Plan and estimate
   body: You get a written plan covering architecture, security, risks and estimated cloud costs, agreed before any work starts.
+  outcome: Written plan + costs
 
 - id: build
   order: 3
   title: Infrastructure as code
   body: I write the infrastructure in Terraform or Pulumi and build CI/CD pipelines in GitHub Actions or Azure DevOps, so every change is reviewed and repeatable.
+  outcome: Terraform + pipelines
 
 - id: migrate
   order: 4
   title: Migrate and go live
   body: Monitoring, alerting and backups are in place before traffic moves, and every cut-over has a tested rollback plan to keep downtime to a minimum.
+  outcome: Live, with rollback
 
 - id: handover
   order: 5
   title: Handover and support
   body: You get documentation, runbooks, dashboards and full access to your own cloud accounts, plus 30 days of follow-up support after go-live.
+  outcome: Docs + 30-day support

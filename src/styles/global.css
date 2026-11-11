@@ -61,6 +61,7 @@
     --signal-ink: light-dark(#8f5d00, #ffb224); /* every other live/active use */
     --on-signal: #0f2a2e;
     --accent: light-dark(#1f6f6a, #6cc2b8); /* section eyebrow labels: 5.1:1 / 7.2:1 on page */
+    --band: light-dark(#0f2a2e, #0a1f22); /* always-dark feature band; a shade deeper than the dark page */
 
     --gutter: 1rem;
     --header-h: 4rem;
