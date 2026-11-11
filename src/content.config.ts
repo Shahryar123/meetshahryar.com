@@ -107,11 +107,15 @@ const certifications = defineCollection({
       order: z.number().int(),
       name: z.string(),
       issuer: z.string(),
+      /** The site that issued it, when that isn't the issuer (e.g. Coursera). Cards are headed by this. */
+      platform: z.string().optional(),
       issueDate: yearMonth,
       expiryDate: yearMonth.or(z.literal('none')).optional(),
       credentialId: z.string(),
       verifyUrl: url,
       badge: image().optional(),
+      /** Scan of the certificate itself, shown as a thumbnail that links to the full image. */
+      certificate: image().optional(),
     }),
 });
 

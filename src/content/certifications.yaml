@@ -1,6 +1,8 @@
 # One entry per certification. Real ones only.
 # badge: path to the official badge image, relative to this file,
 #   e.g. ../assets/badges/aws-saa.png
+# certificate: path to a scan of the certificate, relative to this file.
+# platform: the site you got it from, only when it isn't the issuer (e.g. Coursera).
 # expiryDate: YYYY-MM, or "none" if it doesn't expire.
 # Source: resume (2026) and certificate images from the old portfolio.
 
@@ -9,18 +11,21 @@
   name: Data Ingestion with Lakeflow Connect (Knowledge Badge)
   issuer: Databricks
   issueDate: "2026-04"
-  expiryDate: "[expiry date, YYYY-MM, or none]"
-  credentialId: "[credential ID]"
-  verifyUrl: "[verify URL]"
+  expiryDate: none
+  credentialId: 8d5239d2-f40e-4b5a-acea-54a7671f7643
+  verifyUrl: https://credentials.databricks.com/8d5239d2-f40e-4b5a-acea-54a7671f7643#acc.eG1J9Emp
+  badge: "../assets/certificates/databrcks_intermediate_badge.png"
 
 - id: databricks-fundamentals
   order: 2
   name: Databricks Fundamentals (Academy Accreditation)
   issuer: Databricks
   issueDate: "2026-04"
-  expiryDate: "[expiry date, YYYY-MM, or none]"
-  credentialId: "[credential ID]"
-  verifyUrl: "[verify URL]"
+  expiryDate: none
+  credentialId: e6261e3d-19a9-449b-b194-03f84c0da5d4
+  verifyUrl: https://credentials.databricks.com/e6261e3d-19a9-449b-b194-03f84c0da5d4#acc.0qmfGejE
+  badge: "../assets/certificates/databricks_fundamentals_badge.png"
+  certificate: "../assets/certificates/Databricks_fundamentals.png"
 
 - id: udemy-aspnet-core-web-api
   order: 3
@@ -30,6 +35,7 @@
   expiryDate: none
   credentialId: UC-3bb590ea-ffb3-4b4a-b155-c80fc256759f
   verifyUrl: https://ude.my/UC-3bb590ea-ffb3-4b4a-b155-c80fc256759f
+  certificate: "../assets/certificates/DotNet.jpg"
 
 - id: freecodecamp-js
   order: 4
@@ -39,6 +45,7 @@
   expiryDate: none
   credentialId: MuhammadShahryar
   verifyUrl: https://freecodecamp.org/certification/MuhammadShahryar/javascript-algorithms-and-data-structures
+  certificate: "../assets/certificates/Javascript Certification.PNG"
 
 - id: salesforce-crm
   order: 5
@@ -48,6 +55,7 @@
   expiryDate: none
   credentialId: "[credential ID]"
   verifyUrl: "[verify URL]"
+  certificate: "../assets/certificates/Salesforce Certificate.png"
 
 - id: datacamp-git
   order: 6
@@ -57,6 +65,7 @@
   expiryDate: none
   credentialId: "14731752"
   verifyUrl: "[verify URL]"
+  certificate: "../assets/certificates/GIT.png"
 
 - id: datacamp-data-science-python
   order: 7
@@ -65,22 +74,27 @@
   issueDate: "2020-05"
   expiryDate: none
   credentialId: "12575916"
-  verifyUrl: "[verify URL]"
+  verifyUrl: https://www.datacamp.com/completed/statement-of-accomplishment/course/3b1efc517031b635db45859cd491ddf42e30b4ee
+  certificate: "../assets/certificates/DataScience Python.png"
 
 - id: aws-fundamentals-cloud-native
   order: 8
   name: "AWS Fundamentals: Going Cloud-Native"
-  issuer: AWS via Coursera
+  issuer: AWS
+  platform: Coursera
   issueDate: "2020-04"
   expiryDate: none
   credentialId: Z463CSU6AEG6
   verifyUrl: https://coursera.org/verify/Z463CSU6AEG6
+  certificate: "../assets/certificates/AWS Fundamentals.png"
 
 - id: html5-umich
   order: 9
   name: Introduction to HTML5
-  issuer: University of Michigan via Coursera
+  issuer: University of Michigan
+  platform: Coursera
   issueDate: "2020-04"
   expiryDate: none
   credentialId: XA28P2U5FWCE
   verifyUrl: https://coursera.org/verify/XA28P2U5FWCE
+  certificate: "../assets/certificates/HTML5 2.png"
