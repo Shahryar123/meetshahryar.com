@@ -1,6 +1,8 @@
-# "How I work": a real sequence of 4-5 steps, in order.
-# Titles are short (the desktop layout has five narrow columns) and use the
-# terms people search for; bodies name real tools and stay one to two sentences.
+# "How I work": a real sequence of steps, in order.
+# Six steps fill the wide layout: two rows of three (1-2-3, then 6-5-4 back).
+# Any other count falls back to a single stacked column.
+# Titles use the terms people search for; bodies name real tools and stay one
+# to two sentences.
 # outcome: what the client has at the end of the step, shown as a chip.
 
 - id: audit
@@ -29,6 +31,12 @@
 
 - id: handover
   order: 5
-  title: Handover and support
-  body: You get documentation, runbooks, dashboards and full access to your own cloud accounts, plus 30 days of follow-up support after go-live.
-  outcome: Docs + 30-day support
+  title: Handover and documentation
+  body: You get documentation, runbooks, dashboards and full access to your own cloud accounts, so your team owns the setup from day one.
+  outcome: Docs + runbooks
+
+- id: support
+  order: 6
+  title: Post-launch support
+  body: For 30 days after go-live I'm on hand to fix issues and answer your team's questions while the new setup settles in.
+  outcome: 30 days of support

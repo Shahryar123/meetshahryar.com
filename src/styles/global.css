@@ -61,7 +61,11 @@
     --signal-ink: light-dark(#8f5d00, #ffb224); /* every other live/active use */
     --on-signal: #0f2a2e;
     --accent: light-dark(#1f6f6a, #6cc2b8); /* section eyebrow labels: 5.1:1 / 7.2:1 on page */
-    --band: light-dark(#0f2a2e, #0a1f22); /* always-dark feature band; a shade deeper than the dark page */
+    /*
+     * Always-dark feature band. A plain colour per page theme (not light-dark()),
+     * so it stays the same inside the band's own dark color-scheme.
+     */
+    --band: #0f2a2e;
 
     --gutter: 1rem;
     --header-h: 4rem;
@@ -71,8 +75,14 @@
       --gutter: 1.25rem;
     }
   }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --band: #0a1f22; /* a shade deeper than the dark page */
+    }
+  }
   :root[data-theme='dark'] {
     color-scheme: dark;
+    --band: #0a1f22;
   }
   :root[data-theme='light'] {
     color-scheme: light;

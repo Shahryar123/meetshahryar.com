@@ -152,38 +152,74 @@ const intro =
     }
   }
 
-  /* --- Steps: five columns on a horizontal track (wide screens) --- */
-  @media (min-width: 75rem) {
-    .steps {
-      --num: 3.625rem;
-      grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
-      column-gap: 1.25rem;
+  /*
+   * --- Steps: a snake on wide screens ---
+   * Two rows of three: 1 → 2 → 3, then the track turns down the right side and
+   * runs back 4 ← 5 ← 6. Only for exactly six steps; any other count keeps the
+   * stacked layout above.
+   */
+  @media (min-width: 64rem) {
+    .steps:has(> .step:nth-child(6):last-child) {
+      --num: 3.375rem;
+      --turn: 2.25rem; /* room on the right for the track's U-turn */
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      /* ring row, card row, ring row, card row */
+      grid-template-rows: var(--num) auto var(--num) auto;
+      gap: 1.25rem;
+      padding-right: var(--turn);
     }
-    .step {
+    .steps:has(> .step:nth-child(6):last-child) .step {
+      grid-row: span 2;
       grid-template-columns: none;
-      grid-template-rows: var(--num) 1fr;
-      row-gap: 1.375rem;
+      grid-template-rows: subgrid;
+      row-gap: 1.25rem;
     }
-    /* Each segment runs from this ring to the next; the last one runs to the edge. */
-    .step::before,
-    .step:not(:last-child)::before {
+    .steps:has(> .step:nth-child(6):last-child) .step::before {
+      display: none;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(1) {
+      grid-area: 1 / 1 / span 2;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(2) {
+      grid-area: 1 / 2 / span 2;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(3) {
+      grid-area: 1 / 3 / span 2;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(4) {
+      grid-area: 3 / 3 / span 2;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(5) {
+      grid-area: 3 / 2 / span 2;
+    }
+    .steps:has(> .step:nth-child(6):last-child) .step:nth-child(6) {
+      grid-area: 3 / 1 / span 2;
+    }
+    /*
+     * The whole track is one box: top edge through rings 1-3, rounded right
+     * side, bottom edge back through rings 4-6. Only those three edges are
+     * drawn (a gradient masked to the padding), yellow on top fading below.
+     */
+    .steps:has(> .step:nth-child(6):last-child)::before {
       content: '';
-      position: absolute;
-      left: var(--num);
-      right: calc(-1 * var(--track-gap));
-      top: calc(var(--num) / 2 - 1px);
-      bottom: auto;
-      width: auto;
-      height: 2px;
-      background: linear-gradient(to right, var(--from), var(--to));
+      grid-area: 1 / 1 / 4 / -1;
+      margin: calc(var(--num) / 2 - 1px) calc(-1 * var(--turn)) calc(var(--num) / 2 - 1px)
+        calc(var(--num) / 2);
+      padding: 2px 2px 2px 0;
+      border-radius: 0 var(--turn) var(--turn) 0;
+      background: linear-gradient(var(--signal), color-mix(in oklab, var(--signal) 35%, var(--rule)));
+      mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+      mask-clip: content-box, border-box;
+      mask-composite: exclude;
+      pointer-events: none;
     }
-    .step:last-child::before {
-      right: 0;
+    /* Rings sit on the track; the fill hides the line behind them. */
+    .steps:has(> .step:nth-child(6):last-child) .step-num {
+      position: relative;
+      background: var(--band);
+      font-size: 1.0625rem;
     }
-    .step-num {
-      font-size: 1.125rem;
-    }
-    .step-card {
+    .steps:has(> .step:nth-child(6):last-child) .step-card {
       padding: 1.5rem;
     }
   }
