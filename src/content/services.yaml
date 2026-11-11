@@ -78,8 +78,7 @@
     - Snowflake
     - Python
     - SQL
-  proofProjects:
-    - data-analysis
+  proofProjects: []
 
 - id: web
   name: Web
