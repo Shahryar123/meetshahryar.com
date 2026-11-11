@@ -1,5 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import fastLogo from '@/assets/logos/fast-nuces.png';
 import Section from '@/components/Section.astro';
 import T from '@/components/T.astro';
 import { byOrder, formatMonth } from '@/lib/format';
@@ -32,7 +34,7 @@ const education = (await getCollection('education')).sort(byOrder);
             <T v={job.data.role} />
           </h3>
           <p class="text-muted">
-            <T v={job.data.company} />, <T v={job.data.location} />
+            <T v={job.data.company} />{job.data.location && <>, <T v={job.data.location} /></>}
           </p>
           <ul role="list" class="highlights measure mt-4 space-y-2">
             {job.data.highlights.map((h) => (
@@ -51,22 +53,48 @@ const education = (await getCollection('education')).sort(byOrder);
     ))}
   </ol>
 
-  <h3 class="type-subhead mt-20 md:mt-24">Education</h3>
-  <ul role="list" class="mt-4 space-y-4">
-    {education.map((e) => (
-      <li>
-        <p class="font-[560]">
-          <T v={e.data.degree} />
-        </p>
-        <p class="text-muted">
-          <T v={e.data.institution} />, <T v={e.data.year} />
-        </p>
-      </li>
-    ))}
-  </ul>
+  <div class="education mt-20 md:mt-24">
+    <div>
+      <!-- Same size as the section headings (e.g. Certifications). -->
+      <h3 class="type-h2">Education</h3>
+      <ul role="list" class="mt-6 space-y-4 md:mt-8">
+        {education.map((e) => (
+          <li>
+            <p class="font-[560]">
+              <T v={e.data.degree} />
+            </p>
+            <p class="text-muted">
+              <T v={e.data.institution} />, <T v={e.data.year} />
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <!-- Cropped, transparent copy of public/education.png. -->
+    <div class="edu-logo">
+      <Image src={fastLogo} alt="FAST-NUCES" widths={[224, 448]} sizes="14rem" />
+    </div>
+  </div>
 </Section>
 
 <style>
+  /* Text left, logo right; the logo drops below the text on narrow screens. */
+  .education {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .edu-logo {
+    width: min(14rem, 100%);
+  }
+  .edu-logo :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
   .timeline {
     --stage-gap: 3.5rem;
     --chip-mid: 1.375rem; /* half the 2.75rem chip */

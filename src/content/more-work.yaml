@@ -1,22 +1,50 @@
 # Smaller projects, listed under "More work". No case study pages.
 # categories use the ids in src/lib/categories.ts.
 
-- id: ai-sales-assistant
+- id: llm-eval-harness
   order: 1
+  title: Layered LLM evaluation harness
+  summary: Four layers of checks for LLM output (automated safety checks, rubric-based LLM-as-a-judge scoring, human review and statistical regression detection), with 95 automated tests and scheduled live-model evaluations in CI.
+  categories: [ai, automation]
+  year: "[year]"
+
+- id: devops-automation-platform
+  order: 2
+  title: DevOps automation platform
+  summary: A self-service React (Vite) app that provisions cloud infrastructure across environments through Pulumi, Pulumi ESC and Azure DevOps pipelines.
+  categories: [cloud]
+  year: "[year]"
+
+- id: trackiq
+  order: 3
+  title: TrackIQ
+  summary: An RFID inventory tracking platform, from manufacturing to sale, built alone in React, Node.js/Express, PostgreSQL and Docker at Alpha Mu Digital.
+  categories: [web]
+  year: 2025
+
+- id: salesfusion-crm
+  order: 4
+  title: SalesFusion CRM
+  summary: A CRM for leads, contacts and sales pipelines, with authentication, search and filtering, and an analytics dashboard. Python, Flask, SQLAlchemy and SQLite.
+  categories: [web]
+  year: "[year]"
+
+- id: ai-sales-assistant
+  order: 5
   title: AI sales assistant for British Instruments
   summary: Product finder, quote requests and handoff to a person.
   categories: [ai]
   status: "[status]"
 
 - id: mailfusion
-  order: 2
+  order: 6
   title: MailFusion
   summary: My Python app for single and bulk (CSV) email campaigns with inline images.
   categories: [automation]
   year: "[year]"
 
 - id: british-instruments
-  order: 3
+  order: 7
   title: British Instruments website
   summary: "[your role]: the site and contact form, technical SEO (a server-side rendering fix for brand pages, JSON-LD, long-form technical articles with SVG diagrams) and email marketing."
   categories: [web]
@@ -24,42 +52,42 @@
   year: "[year]"
 
 - id: azure-aws-assessment
-  order: 4
+  order: 8
   title: Azure-to-AWS lift-and-shift assessment
   summary: An ASP.NET MVC app moved onto EC2 Windows and RDS SQL Server with no code changes.
   categories: [cloud]
   year: "[year]"
 
 - id: flutter-test-automation
-  order: 5
+  order: 9
   title: Mobile test automation for a Flutter fintech app
   summary: Appium and WebdriverIO with the Page Object Model, plus an Appium vs Patrol comparison.
   categories: [automation]
   year: "[year]"
 
 - id: wordpress-sites
-  order: 6
+  order: 10
   title: Client WordPress sites
   summary: Hosting, malware incident response, DNS and firewall fixes across 30–40 sites.
   categories: [web, security]
   year: "[years]"
 
 - id: martin-sports
-  order: 7
+  order: 11
   title: Martin Sports cricket store
   summary: Design and UI.
   categories: [web]
   year: "[year]"
 
 - id: technical-seo
-  order: 8
+  order: 12
   title: Technical SEO audits
   summary: An audit for Guardian Safety Online and SEO for Fire Safety UAE.
   categories: [web]
   year: "[year]"
 
 - id: gcp-key-hardening
-  order: 9
+  order: 13
   title: GCP service-account key hardening
   summary: Service-account keys locked down with org policy constraints.
   categories: [security, cloud]

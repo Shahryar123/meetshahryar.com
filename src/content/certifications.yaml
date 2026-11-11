@@ -2,12 +2,85 @@
 # badge: path to the official badge image, relative to this file,
 #   e.g. ../assets/badges/aws-saa.png
 # expiryDate: YYYY-MM, or "none" if it doesn't expire.
+# Source: resume (2026) and certificate images from the old portfolio.
 
-- id: certification-1
+- id: databricks-lakeflow-connect
   order: 1
-  name: "[Certification name]"
-  issuer: "[issuer]"
-  issueDate: "[issue date, YYYY-MM]"
-  expiryDate: "[expiry date, YYYY-MM]"
+  name: Data Ingestion with Lakeflow Connect (Knowledge Badge)
+  issuer: Databricks
+  issueDate: "2026-04"
+  expiryDate: "[expiry date, YYYY-MM, or none]"
   credentialId: "[credential ID]"
   verifyUrl: "[verify URL]"
+
+- id: databricks-fundamentals
+  order: 2
+  name: Databricks Fundamentals (Academy Accreditation)
+  issuer: Databricks
+  issueDate: "2026-04"
+  expiryDate: "[expiry date, YYYY-MM, or none]"
+  credentialId: "[credential ID]"
+  verifyUrl: "[verify URL]"
+
+- id: udemy-aspnet-core-web-api
+  order: 3
+  name: Build ASP.NET Core Web API, Scratch to Finish (.NET 8)
+  issuer: Udemy
+  issueDate: "2025-07"
+  expiryDate: none
+  credentialId: UC-3bb590ea-ffb3-4b4a-b155-c80fc256759f
+  verifyUrl: https://ude.my/UC-3bb590ea-ffb3-4b4a-b155-c80fc256759f
+
+- id: freecodecamp-js
+  order: 4
+  name: JavaScript Algorithms and Data Structures
+  issuer: freeCodeCamp
+  issueDate: "2023-11"
+  expiryDate: none
+  credentialId: MuhammadShahryar
+  verifyUrl: https://freecodecamp.org/certification/MuhammadShahryar/javascript-algorithms-and-data-structures
+
+- id: salesforce-crm
+  order: 5
+  name: Introduction to Salesforce CRM
+  issuer: 10Pearls University
+  issueDate: "2023-02"
+  expiryDate: none
+  credentialId: "[credential ID]"
+  verifyUrl: "[verify URL]"
+
+- id: datacamp-git
+  order: 6
+  name: Introduction to Git
+  issuer: DataCamp
+  issueDate: "2020-06"
+  expiryDate: none
+  credentialId: "14731752"
+  verifyUrl: "[verify URL]"
+
+- id: datacamp-data-science-python
+  order: 7
+  name: Introduction to Data Science in Python
+  issuer: DataCamp
+  issueDate: "2020-05"
+  expiryDate: none
+  credentialId: "12575916"
+  verifyUrl: "[verify URL]"
+
+- id: aws-fundamentals-cloud-native
+  order: 8
+  name: "AWS Fundamentals: Going Cloud-Native"
+  issuer: AWS via Coursera
+  issueDate: "2020-04"
+  expiryDate: none
+  credentialId: Z463CSU6AEG6
+  verifyUrl: https://coursera.org/verify/Z463CSU6AEG6
+
+- id: html5-umich
+  order: 9
+  name: Introduction to HTML5
+  issuer: University of Michigan via Coursera
+  issueDate: "2020-04"
+  expiryDate: none
+  credentialId: XA28P2U5FWCE
+  verifyUrl: https://coursera.org/verify/XA28P2U5FWCE

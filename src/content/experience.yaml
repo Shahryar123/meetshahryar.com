@@ -1,41 +1,68 @@
 # The timeline shows roles by `order`: 1 is the newest.
 # Dates are YYYY-MM. end can be "present".
-# Highlights: three achievements, each with a real number.
+# Highlights: up to three achievements, ideally each with a real number.
+# Source: resume (2026).
 
 - id: alpha-mu-digital
   order: 1
-  company: Alpha Mu Digital
-  role: DevOps Engineer
-  start: "[start, YYYY-MM]"
+  company: Alpha Mu Digital Ventures
+  role: Senior Software Engineer
+  start: "2025-09"
   end: present
-  location: "[location]"
   highlights:
-    - "[Achievement with a number]"
-    - "[Achievement with a number]"
-    - "[Achievement with a number]"
+    - Architected and built TrackIQ, an RFID inventory tracking platform covering manufacturing to sale, as the sole engineer.
+    - Integrated handheld and desktop RFID readers with the platform for real-time inventory tracking.
+    - Built a healthcare Progressive Web App in Next.js with mrx integration and service workers for offline support.
+    - Work on the AWS infrastructure and CDN that serve the company's apps.
   stack:
-    - "[stack]"
+    - React
+    - Next.js
+    - Node.js / Express
+    - PostgreSQL
+    - Docker
+    - AWS
 
-- id: earlier-role
+- id: software-digital
   order: 2
-  company: "[Earlier company]"
-  role: "[role]"
-  start: "[start, YYYY-MM]"
-  end: "[end, YYYY-MM]"
-  location: "[location]"
+  company: Software Digital
+  role: Full Stack Developer
+  start: "2024-07"
+  end: "2025-08"
   highlights:
-    - "[Achievement with a number]"
+    - Built middleware in .NET 9 and C# for SAP Qualtrics.
+    - Wrote infrastructure as code in Pulumi (.NET) and automated multi-pipeline deployments in Azure DevOps.
+    - Supported clients directly, including Ooredoo and Etisalat.
   stack:
-    - "[stack]"
+    - .NET 9 / C#
+    - React
+    - Pulumi
+    - Azure DevOps
 
-- id: freelance
+
+- id: braincrop
   order: 3
-  company: Freelance
-  role: "[role]"
-  start: "[start, YYYY-MM]"
-  end: "[end, YYYY-MM, or present]"
-  location: "[location]"
+  company: BrainCrop Solutions
+  role: Backend Developer
+  start: "2023-05"
+  end: "2024-07"
   highlights:
-    - "[Achievement with a number]"
+    - Applied Domain-Driven Design and Clean Architecture, reducing codebase complexity by 25%.
+    - Built web applications and microservices in ASP.NET Core (.NET 8) and SQL.
+    - Containerised services with Docker for consistent, scalable deployments.
   stack:
-    - "[stack]"
+    - ASP.NET Core (.NET 8)
+    - SQL Server
+    - Docker
+
+- id: innovative
+  order: 4
+  company: Innovative Pvt. Ltd.
+  role: Junior .NET Developer
+  start: "2021-08"
+  end: "2022-06"
+  highlights:
+    - Analysed project specifications and designed solutions, improving delivery efficiency by 20%.
+    - Designed and built backend features in C#, .NET and SQL databases.
+  stack:
+    - C# / .NET
+    - SQL

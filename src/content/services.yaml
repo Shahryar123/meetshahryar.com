@@ -56,11 +56,13 @@
     - Agents with LangChain and LangGraph
     - Tracing and evaluation in LangSmith
     - Deployment on Azure
+    - LLM evaluation with LLM-as-a-judge and regression checks
   tools:
     - LangChain
     - LangGraph
     - LangSmith
-    - OpenAI models
+    - OpenAI API
+    - Anthropic Claude API
     - Azure Container Apps
   proofProjects:
     - runbook-assistant
@@ -72,7 +74,10 @@
   deliverables:
     - "[typical deliverables]"
   tools:
-    - "[your tools, e.g. Python/pandas, SQL, Power BI, Excel]"
+    - Databricks
+    - Snowflake
+    - Python
+    - SQL
   proofProjects:
     - data-analysis
 

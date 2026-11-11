@@ -20,7 +20,7 @@ const artWidths = [480, 720, 1000];
   <div class="hero-top">
     <div class="hero-text">
       <h1 id="hero-title">
-        <span class="type-display block">{site.firstName}</span>
+        <span class="hero-name type-display block">{site.firstName} {site.surname}</span>
         <span class="sr-only">, </span>
         <span class="hero-role mt-4 block">{site.title}</span>
       </h1>
@@ -29,7 +29,7 @@ const artWidths = [480, 720, 1000];
         <a class="btn btn-primary" href="#work">
           See my work
         </a>
-        <a class="btn btn-secondary" href="/cv.pdf" download>
+        <a class="btn btn-secondary" href="/Muhammad_Shahryar_Software_Engineer.pdf" download>
           <Download size={18} stroke-width={1.75} aria-hidden="true" />
           Download CV (PDF)
         </a>
@@ -137,6 +137,10 @@ const artWidths = [480, 720, 1000];
     .hero-text {
       grid-row: 1;
       grid-column: 1 / 8;
+    }
+    /* "Muhammad" is wider than one name was; keep it to the text column so it only grazes the paint. */
+    .hero-name {
+      font-size: clamp(3.25rem, 7.4vw, 7.5rem);
     }
     /* Starts one column inside the text, so the paint sits under the name's end. */
     .hero-art {

@@ -84,7 +84,7 @@ const experience = defineCollection({
     role: z.string(),
     start: yearMonth,
     end: yearMonth.or(z.literal('present')),
-    location: z.string(),
+    location: z.string().optional(),
     highlights: z.array(z.string()).min(1),
     stack: z.array(z.string()).default([]),
   }),
