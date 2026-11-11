@@ -27,6 +27,14 @@ main:
     - "[Draft, rewrite in your own words]"
     - I'm a senior software engineer at Alpha Mu Digital Ventures, where I also look after the AWS infrastructure and CDN. I came to infrastructure from .NET and C#, so I tend to start with the application. How does it build, where do its secrets live, and what happens when the server under it goes away?
     - I move apps off fragile servers onto AWS and Azure setups that deploy on every push, alert before users notice, and pass security review. I also build the AI assistants and websites that run on them.
+  # The About section is a terminal: `whoami` (from Experience), `cat about.md`
+  # (the paragraphs above), then these two.
+  clouds: [aws, azure]
+  setup:
+    deploys: on every push
+    alerts: before users notice
+    security: passes review
+    also_builds: [ai-assistants, websites]
   contact:
     invitation: "Tell me what you're running and what's getting in the way. I'll reply within one working day with questions or a plan."
     budgets:
