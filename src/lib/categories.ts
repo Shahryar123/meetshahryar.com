@@ -1,7 +1,7 @@
 /**
  * The one list of work areas. Hero nodes, service rows, work filters and
  * project tags all read from here, so their names can never drift apart.
- * Order = connection order in the hero diagram.
+ * Order = card order in the hero.
  */
 export const CATEGORIES = [
   { id: 'cloud', label: 'Cloud & DevOps' },

@@ -1,96 +1,125 @@
 ---
+/**
+ * Hero: name, title, value line and CTAs on the left; the brush-stroke portrait
+ * on the right, tucked under the end of the name. Below, one
+ * card per category, each linking to its service row.
+ */
 import Download from '@lucide/astro/icons/download';
-import Diagram from './Diagram.astro';
-import T from '@/components/T.astro';
+import CategoryIcon from '@/components/CategoryIcon.astro';
+import Photo from '@/components/Photo.astro';
+import { CATEGORIES } from '@/lib/categories';
+import { heroPhoto, heroPhotoOnDark } from '@/lib/photo';
 import { getSite } from '@/lib/site';
-import { hasTodo } from '@/lib/todo';
 
 const site = await getSite();
-const timezone = hasTodo(site.timezone) ? '' : site.timezone;
+const artSizes = '(min-width: 64rem) 46vw, (min-width: 40rem) 32rem, 92vw';
+const artWidths = [480, 720, 1000];
 ---
 
 <section class="hero shell" aria-labelledby="hero-title">
-  <div class="hero-grid">
+  <div class="hero-top">
     <div class="hero-text">
       <h1 id="hero-title">
         <span class="type-display block">{site.firstName}</span>
         <span class="sr-only">, </span>
-        <span class="type-hero-title mt-3 block md:mt-4">{site.title}</span>
+        <span class="hero-role mt-4 block">{site.title}</span>
       </h1>
       <p class="hero-value type-lead mt-6">{site.valueLine}</p>
+      <div class="hero-actions mt-8">
+        <a class="btn btn-primary" href="#work">
+          See my work
+        </a>
+        <a class="btn btn-secondary" href="/cv.pdf" download>
+          <Download size={18} stroke-width={1.75} aria-hidden="true" />
+          Download CV (PDF)
+        </a>
+      </div>
     </div>
 
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="#work">
-        See my work
-      </a>
-      <a class="btn btn-secondary" href="/cv.pdf" download>
-        <Download size={18} stroke-width={1.75} aria-hidden="true" />
-        Download CV (PDF)
-      </a>
+    <!-- Light page: original dark paint. Dark page: the copy with lifted paint. -->
+    <div class="hero-art">
+      <div class="art art-light">
+        <Photo image={heroPhoto} priority widths={artWidths} sizes={artSizes} />
+      </div>
+      {heroPhotoOnDark && (
+        <div class="art art-dark">
+          <Photo image={heroPhotoOnDark} priority widths={artWidths} sizes={artSizes} />
+        </div>
+      )}
     </div>
+  </div>
 
-    <div class="hero-diagram">
-      <Diagram />
-    </div>
-
-    <div class="hero-status type-small">
-      <p class="flex items-center gap-2.5">
-        <span class="lamp" aria-hidden="true"></span>
-        <T v={site.availability} />
-      </p>
-      <p class="text-muted">
-        {timezone ? (
-          <time class="text-ink tabular-nums" data-clock data-tz={timezone}>
-            --:--
-          </time>
-        ) : (
-          <span class="todo">[time zone]</span>
-        )}{' '}
-        in <T v={site.location.city} />
-      </p>
-    </div>
+  <div class="hero-services">
+    <ul role="list" class="cards" aria-label="What I work on">
+      {CATEGORIES.map((c) => (
+        <li>
+          <a class="card" href={`#service-${c.id}`}>
+            <span class="card-icon" aria-hidden="true">
+              <CategoryIcon id={c.id} size={20} />
+            </span>
+            <span>{c.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 
 <style>
   .hero {
-    padding-top: clamp(2rem, 1rem + 4vw, 5rem);
+    padding-top: clamp(0.5rem, 0.25rem + 1vw, 1.25rem);
   }
-  .hero-grid {
+
+  /* ---- top: stacked under 1024px, side by side above ---- */
+  .hero-top {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: 'text' 'diagram' 'actions' 'status';
-    row-gap: 2.25rem;
+    row-gap: 2rem;
   }
   .hero-text {
-    grid-area: text;
+    position: relative;
+    z-index: 1; /* the name runs over the edge of the paint */
+  }
+  .hero-role {
+    font-size: clamp(1.375rem, 1rem + 1.4vw, 2.125rem);
+    line-height: 1.15;
+    font-stretch: 118%;
+    font-weight: 680;
+  }
+  .hero-value {
+    max-width: 36rem;
+    text-wrap: pretty;
   }
   .hero-actions {
-    grid-area: actions;
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
   }
-  .hero-diagram {
-    grid-area: diagram;
+  .hero-art {
+    width: 100%;
+    max-width: 32rem;
+    margin-inline: auto;
+    aspect-ratio: 1000 / 860;
   }
-  .hero-status {
-    grid-area: status;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 0.5rem 2rem;
+  .art {
+    height: 100%;
   }
-  .hero-value {
-    max-width: 38rem;
-    text-wrap: balance;
+  .art-dark {
+    display: none;
   }
-  .lamp {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: var(--radius-full);
-    background: var(--signal-ink);
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .art-light:has(+ .art-dark) {
+      display: none;
+    }
+    :root:not([data-theme='light']) .art-dark {
+      display: block;
+    }
+  }
+  :root[data-theme='dark'] .art-light:has(+ .art-dark) {
+    display: none;
+  }
+  :root[data-theme='dark'] .art-dark {
+    display: block;
   }
 
   @media (max-width: 39.99rem) {
@@ -99,65 +128,74 @@ const timezone = hasTodo(site.timezone) ? '' : site.timezone;
     }
   }
 
-  /* Tablet: text, CTAs, then the diagram at full width. */
-  @media (min-width: 48rem) {
-    .hero-grid {
-      grid-template-areas: 'text' 'actions' 'diagram' 'status';
-      row-gap: 2.5rem;
-    }
-  }
-
-  /* Desktop: text in columns 1–6, diagram in 7–12. */
-  @media (min-width: 75rem) {
-    .hero-grid {
+  @media (min-width: 64rem) {
+    .hero-top {
       grid-template-columns: repeat(12, minmax(0, 1fr));
-      grid-template-areas:
-        'text text text text text text diagram diagram diagram diagram diagram diagram'
-        'actions actions actions actions actions actions diagram diagram diagram diagram diagram diagram'
-        'status status status status status status status status status status status status';
       column-gap: 1.5rem;
-      row-gap: 2.5rem;
+      align-items: center;
     }
     .hero-text {
-      align-self: end;
+      grid-row: 1;
+      grid-column: 1 / 8;
     }
-    /* Two lines max: the column is 548–628px wide here, so the lead steps down to 20px. */
-    .hero-value {
+    /* Starts one column inside the text, so the paint sits under the name's end. */
+    .hero-art {
+      grid-row: 1;
+      grid-column: 7 / 13;
       max-width: none;
-      font-size: 1.25rem;
+      /* Pull the image up past the transparent band above the paint. */
+      margin-top: -3rem;
     }
-    .hero-actions {
-      align-self: start;
+  }
+
+  /* ---- what I work on ---- */
+  .hero-services {
+    margin-top: clamp(1.25rem, 0.75rem + 1vw, 1.75rem);
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  @media (min-width: 40rem) {
+    .cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-    .hero-diagram {
-      display: flex;
-      justify-content: flex-end;
-      align-self: center;
+  }
+  @media (min-width: 64rem) {
+    .cards {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 1rem;
     }
+  }
+  .card {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    height: 100%;
+    min-height: 4.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-node);
+    background: var(--panel);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 1rem;
+    line-height: 1.15;
+    font-stretch: 106%;
+    font-weight: 620;
+    transition: color 180ms var(--ease-out);
+  }
+  .card:hover {
+    color: var(--signal-ink);
+  }
+  .card-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 8px;
+    background: #0f2a2e;
+    color: var(--signal);
   }
 </style>
-
-<script>
-  // Live local time in the configured time zone.
-  function init() {
-    const el = document.querySelector<HTMLTimeElement>('[data-clock]');
-    const timeZone = el?.dataset.tz;
-    if (!el || !timeZone) return;
-
-    let format: Intl.DateTimeFormat;
-    try {
-      format = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone });
-    } catch {
-      return; // invalid time zone name in site.yaml
-    }
-    const tick = () => {
-      const now = new Date();
-      el.textContent = format.format(now);
-      el.dateTime = now.toISOString();
-    };
-    tick();
-    const id = window.setInterval(tick, 15_000);
-    document.addEventListener('astro:before-swap', () => window.clearInterval(id), { once: true });
-  }
-  document.addEventListener('astro:page-load', init);
-</script>

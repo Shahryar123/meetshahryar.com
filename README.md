@@ -39,7 +39,7 @@ Everything on the site comes from `src/content/`. Adding a project, job or certi
 
 ### Your photo
 
-Save it as `src/assets/me.png` (or `.jpg` / `.webp`), not in `public/`, so Astro can resize it and serve AVIF/WebP. Use a 4:5 PNG with a transparent background (the oval portrait); it's shown whole in About. The hero uses `src/assets/shahryar-brush-dark.png` (1000×860, you on a dark brush stroke); `shahryar-brush-light.png` is a copy with lighter paint for the dark theme, where the original paint matches the page. If you replace it, keep the size ratio and update `PHOTO_EDGE` in `src/lib/diagram.ts` so the connectors still meet the paint.
+Save it as `src/assets/me.png` (or `.jpg` / `.webp`), not in `public/`, so Astro can resize it and serve AVIF/WebP. Use a 4:5 PNG with a transparent background (the oval portrait); it's shown whole in About. The hero uses `src/assets/shahryar-brush-dark.png` (1000×860, you on a dark brush stroke); `shahryar-brush-light.png` is a copy with lighter paint for the dark theme, where the original paint matches the page. If you replace it, keep the 1000×860 ratio.
 
 ### Add a featured project (gets a case study)
 
