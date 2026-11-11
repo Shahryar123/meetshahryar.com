@@ -185,11 +185,10 @@ const site = defineCollection({
       calendly: url,
       repo: url,
     }),
-    about: z.array(z.string()).min(1),
+    /** Paragraphs, or { quote } for a pull quote. */
+    about: z.array(z.string().or(z.object({ quote: z.string() }))).min(1),
     /** About terminal: `ls clouds/` lists these as folders. */
     clouds: z.array(z.string()).min(1),
-    /** About terminal: `cat setup.yml` prints these lines, in order; a list prints as [a, b]. */
-    setup: z.record(z.string(), z.string().or(z.array(z.string()))),
     contact: z.object({
       invitation: z.string(),
       budgets: z.array(z.string()).min(1),

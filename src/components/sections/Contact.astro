@@ -31,7 +31,7 @@ const errorFor = (field: string) => `${field}-error`;
 
       <p class="mt-8">
         {email ? (
-          <a class="link type-subhead" href={`mailto:${email}`}>
+          <a class="link type-subhead [overflow-wrap:anywhere]" href={`mailto:${email}`}>
             {email}
           </a>
         ) : (
@@ -55,7 +55,7 @@ const errorFor = (field: string) => `${field}-error`;
             Book a 20-minute call
           </a>
         ) : (
-          <span class="btn btn-secondary cursor-not-allowed opacity-60">
+          <span class="btn btn-secondary max-w-full cursor-not-allowed flex-wrap opacity-60">
             <CalendarIcon size={18} stroke-width={1.75} aria-hidden="true" />
             Book a 20-minute call <span class="todo">[Calendly URL]</span>
           </span>

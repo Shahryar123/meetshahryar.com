@@ -14,6 +14,8 @@ const current = (await getCollection('experience'))
   .sort(byOrder)[0];
 // Terminal user name: the surname, lower case ("shahryar").
 const user = site.surname.toLowerCase();
+// The first entry sits beside the terminal; the rest run full width below.
+const [first, ...rest] = site.about;
 ---
 
 <section id="about" aria-labelledby="about-title" class="shell section-gap">
@@ -48,63 +50,75 @@ const user = site.surname.toLowerCase();
       </div>
     </div>
 
-    <div class="col-span-12 md:col-span-7 lg:col-span-7 lg:col-start-6">
-      <hgroup>
-        <Eyebrow label="Who I am" />
-        <h2 id="about-title" class="type-h2 mt-3">
-          About
-        </h2>
-      </hgroup>
-      <!--
-        The About copy as a terminal session. All of it is real text (indexed and
-        read out normally); only the prompts, window dots and cursor are decoration.
-      -->
-      <div class="terminal mt-8" role="group" aria-label="About me">
-        <div class="terminal-bar" aria-hidden="true">
-          <span class="terminal-dot"></span>
-          <span class="terminal-dot"></span>
-          <span class="terminal-dot"></span>
-          <span class="terminal-title">{user}@cloud: ~</span>
-        </div>
-        <div class="terminal-body">
-          <p class="cmd"><span class="prompt" aria-hidden="true">$</span> whoami</p>
-          <p class="out">
-            <strong class="hl">{user}</strong>
-            {current && (
-              <>
-                {' '}
-                — {current.data.role} @ {current.data.company}
-              </>
-            )}
-          </p>
+    <!--
+      Heading and first paragraph, with a small terminal of quick facts beside
+      them on wide screens; the rest of the copy (pull quote included) below.
+    -->
+    <div class="about-main col-span-12 md:col-span-7 lg:col-span-7 lg:col-start-6">
+      <div class="about-intro">
+        <hgroup>
+          <Eyebrow label="Who I am" />
+          <h2 id="about-title" class="type-section-display mt-3">About</h2>
+        </hgroup>
+        {
+          first && (
+            <div class="about-copy mt-8">
+              {typeof first === 'string' ? (
+                <p class="about-p">
+                  <T v={first} />
+                </p>
+              ) : (
+                <p class="about-quote">{first.quote}</p>
+              )}
+            </div>
+          )
+        }
+      </div>
 
-          <p class="cmd"><span class="prompt" aria-hidden="true">$</span> cat about.md</p>
-          <div class="out prose">
-            {site.about.map((paragraph) => (
-              <p>
-                <T v={paragraph} />
-              </p>
-            ))}
+      <div class="about-term">
+        <div class="terminal" role="group" aria-label="Quick facts">
+          <div class="terminal-bar" aria-hidden="true">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-title">{user}@cloud: ~</span>
           </div>
+          <div class="terminal-body">
+            <p class="cmd"><span class="prompt" aria-hidden="true">$</span> whoami</p>
+            {
+              current && (
+                <p class="out">
+                  <strong class="hl">{current.data.role}</strong>
+                  <br />@ {current.data.company}
+                </p>
+              )
+            }
 
-          <p class="cmd"><span class="prompt" aria-hidden="true">$</span> ls clouds/</p>
-          <p class="out dirs">{site.clouds.map((c) => `${c}/`).join('  ')}</p>
+            <p class="cmd"><span class="prompt" aria-hidden="true">$</span> ls clouds/</p>
+            <p class="out dirs">{site.clouds.map((c) => `${c}/`).join(' ')}</p>
 
-          <p class="cmd"><span class="prompt" aria-hidden="true">$</span> cat setup.yml</p>
-          <dl class="out yaml">
-            {Object.entries(site.setup).map(([key, value]) => (
-              <div>
-                <dt>{key}:</dt>
-                <dd>{Array.isArray(value) ? `[${value.join(', ')}]` : value}</dd>
-              </div>
-            ))}
-          </dl>
-
-          <p class="cmd" aria-hidden="true">
-            <span class="prompt">$</span> <span class="cursor"></span>
-          </p>
+            <p class="cmd" aria-hidden="true">
+              <span class="prompt">$</span> <span class="cursor"></span>
+            </p>
+          </div>
         </div>
       </div>
+
+      {
+        rest.length > 0 && (
+          <div class="about-rest about-copy">
+            {rest.map((item) =>
+              typeof item === 'string' ? (
+                <p class="about-p">
+                  <T v={item} />
+                </p>
+              ) : (
+                <p class="about-quote">{item.quote}</p>
+              ),
+            )}
+          </div>
+        )
+      }
     </div>
   </div>
 </section>
@@ -185,6 +199,55 @@ const user = site.surname.toLowerCase();
     }
   }
 
+  /* --- Right column: copy beside the terminal on wide screens --- */
+  .about-main {
+    display: grid;
+    gap: 2.5rem;
+    grid-template-areas: 'intro' 'rest' 'term';
+  }
+  .about-intro {
+    grid-area: intro;
+  }
+  .about-rest {
+    grid-area: rest;
+  }
+  .about-term {
+    grid-area: term;
+    max-width: 24rem;
+  }
+  @media (min-width: 80rem) {
+    .about-main {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      grid-template-areas: 'intro term' 'rest rest';
+      gap: 2.5rem 2.5rem;
+      align-items: start;
+    }
+    .about-term {
+      max-width: none;
+    }
+  }
+  .about-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .about-p {
+    color: color-mix(in oklab, var(--muted) 55%, var(--ink));
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+  /* The rhetorical question, pulled out: bold, with a signal-yellow bar. */
+  .about-quote {
+    max-width: 40ch;
+    padding: 0.125rem 0 0.125rem 1.25rem;
+    border-left: 3px solid var(--signal);
+    color: var(--ink);
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+    line-height: 1.4;
+    font-stretch: 106%;
+    font-weight: 650;
+  }
+
   /* --- Terminal: always dark, whatever the page theme --- */
   .terminal {
     color-scheme: dark; /* tokens inside resolve to their dark values */
@@ -196,7 +259,12 @@ const user = site.surname.toLowerCase();
     font-family: var(--font-mono);
     font-size: 0.8125rem;
     line-height: 1.7;
+    /* A slight tilt; it straightens on hover, like the position card. */
+    rotate: 2deg;
     transition: rotate 0.5s var(--ease-out);
+  }
+  .terminal:hover {
+    rotate: 0deg;
   }
   .terminal-bar {
     display: flex;
@@ -243,24 +311,9 @@ const user = site.surname.toLowerCase();
     color: var(--ink);
     font-weight: 700;
   }
-  .prose {
-    color: color-mix(in oklab, var(--muted) 60%, var(--ink));
-  }
-  .prose p + p {
-    margin-top: 0.625rem;
-  }
   .dirs {
     color: var(--accent);
     white-space: pre;
-  }
-  .yaml dt {
-    display: inline;
-    color: var(--accent);
-  }
-  .yaml dd {
-    display: inline;
-    margin-left: 1ch;
-    color: color-mix(in oklab, var(--muted) 40%, var(--ink));
   }
   .cursor {
     display: inline-block;
@@ -276,23 +329,6 @@ const user = site.surname.toLowerCase();
     }
   }
 
-  @media (min-width: 48rem) {
-    .terminal {
-      font-size: 0.875rem;
-    }
-    .terminal-body {
-      padding: 1.5rem 1.75rem 1.75rem;
-    }
-  }
-  /* A slight tilt on wide screens; it straightens on hover. */
-  @media (min-width: 64rem) {
-    .terminal {
-      rotate: 1.5deg;
-    }
-    .terminal:hover {
-      rotate: 0deg;
-    }
-  }
   @media (prefers-reduced-motion: reduce) {
     .terminal {
       transition: none;
