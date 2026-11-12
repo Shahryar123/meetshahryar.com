@@ -3,51 +3,109 @@ import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import fastLogo from '@/assets/logos/fast-nuces.png';
 import Eyebrow from '@/components/Eyebrow.astro';
-import Section from '@/components/Section.astro';
 import T from '@/components/T.astro';
 import { byOrder, formatMonth } from '@/lib/format';
+import { hasTodo } from '@/lib/todo';
 
 // order: 1 is the newest role.
 const jobs = (await getCollection('experience')).sort(byOrder);
 const education = (await getCollection('education')).sort(byOrder);
+
+// Header stats, from the roles themselves.
+const starts = jobs.map((j) => j.data.start).filter((d) => /^\d{4}-\d{2}$/.test(d)).sort();
+const firstStart = starts[0] ? new Date(`${starts[0]}-01`) : null;
+const years = firstStart
+  ? Math.floor((Date.now() - firstStart.getTime()) / (365.25 * 24 * 3600 * 1000))
+  : null;
+
+/** "v4.0 · latest" … "v1.0 · first commit": newest role is the highest version. */
+const version = (i: number) =>
+  `v${jobs.length - i}.0` + (i === 0 ? ' · latest' : i === jobs.length - 1 ? ' · first commit' : '');
+
+/** Split a highlight so percentages can be marked: "by 25%." → ["by ", "25%", "."]. */
+const parts = (text: string) => text.split(/(\d+(?:\.\d+)?%)/);
 ---
 
-<Section id="experience" eyebrow="Career" title="Experience">
-  <!--
-    Stages of a deploy pipeline. Each stage chip is the hero's node shape and
-    holds the dates. Phase 3 draws the line on scroll and lights each chip as
-    it reaches the middle of the viewport; this is the final state.
-  -->
-  <ol role="list" class="timeline">
-    {jobs.map((job) => (
-      <li class="stage">
-        <div class="rail">
-          <p class="stage-chip type-control tabular-nums">
-            <T v={formatMonth(job.data.start)} />
-            <span aria-hidden="true">–</span>
-            <span class="sr-only">to</span>
-            <T v={formatMonth(job.data.end)} />
-          </p>
-          <span class="rail-line" aria-hidden="true" />
+<section id="experience" aria-labelledby="experience-title" class="shell section-gap">
+  <div class="exp-head">
+    <hgroup>
+      <Eyebrow label="Career" />
+      <h2 id="experience-title" class="type-section-display mt-3">Experience</h2>
+    </hgroup>
+    <dl class="exp-stats">
+      {years !== null && (
+        <div class="exp-stat">
+          <dt>years building</dt>
+          <dd>{years}+</dd>
         </div>
-        <div class="stage-body">
-          <h3 class="type-subhead">
-            <T v={job.data.role} />
-          </h3>
-          <p class="text-muted">
-            <T v={job.data.company} />{job.data.location && <>, <T v={job.data.location} /></>}
+      )}
+      <div class="exp-stat">
+        <dt>roles</dt>
+        <dd>{jobs.length}</dd>
+      </div>
+      <div class="exp-stat exp-stat--dark">
+        <dt>the path</dt>
+        <dd>.NET → Cloud</dd>
+      </div>
+    </dl>
+  </div>
+
+  <!--
+    A version history: newest role on top. The label, the dot and the card's
+    title share one top line, so they always sit level.
+  -->
+  <ol role="list" class="timeline mt-12 md:mt-16">
+    {jobs.map((job, i) => (
+      <li class:list={['stage', i === 0 && job.data.end === 'present' && 'stage--current']}>
+        <p class="stage-label">
+          <span class="stage-version">{version(i)}</span>
+          <span class="stage-dates">
+            <T v={formatMonth(job.data.start)} />
+            <span aria-hidden="true"> – </span>
+            <span class="sr-only"> to </span>
+            <T v={formatMonth(job.data.end)} />
+          </span>
+        </p>
+        <span class="stage-dot" aria-hidden="true"></span>
+        <div class="stage-card">
+          <div class="stage-title-row">
+            <h3 class="stage-title">
+              <T v={job.data.role} />
+            </h3>
+            {i === 0 && job.data.end === 'present' && (
+              <span class="stage-badge">
+                <span class="stage-badge-dot" aria-hidden="true"></span>
+                Current role
+              </span>
+            )}
+          </div>
+          <p class="stage-company">
+            <T v={job.data.company} />
+            {job.data.location && (
+              <>
+                , <T v={job.data.location} />
+              </>
+            )}
           </p>
-          <ul role="list" class="highlights measure mt-4 space-y-2">
+          <ul role="list" class="stage-highlights mt-4">
             {job.data.highlights.map((h) => (
               <li>
-                <T v={h} />
+                {hasTodo(h) ? (
+                  <T v={h} />
+                ) : (
+                  parts(h).map((part, k) => (k % 2 === 1 ? <mark class="stage-num">{part}</mark> : part))
+                )}
               </li>
             ))}
           </ul>
           {job.data.stack.length > 0 && (
-            <p class="mt-4 type-small text-muted">
-              <T v={job.data.stack.join(', ')} />
-            </p>
+            <ul role="list" class="stage-stack mt-5" aria-label="Stack">
+              {job.data.stack.map((t) => (
+                <li>
+                  <T v={t} />
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </li>
@@ -55,151 +113,303 @@ const education = (await getCollection('education')).sort(byOrder);
   </ol>
 
   <div class="education mt-20 md:mt-24">
-    <div>
-      <!-- Same size as the section headings (e.g. Certifications). -->
-      <hgroup>
-        <Eyebrow label="Background" />
-        <h3 class="type-h2 mt-3">Education</h3>
-      </hgroup>
-      <ul role="list" class="mt-6 space-y-4 md:mt-8">
-        {education.map((e) => (
-          <li>
-            <p class="font-[560]">
+    <hgroup>
+      <Eyebrow label="Background" />
+      <h3 class="type-section-display mt-3">Education</h3>
+    </hgroup>
+    <ul role="list" class="edu-list mt-8">
+      {education.map((e) => (
+        <li class="edu-row">
+          <p class="edu-year" aria-hidden="true">
+            <T v={String(e.data.year)} />
+          </p>
+          <div class="edu-text">
+            <p class="edu-degree">
               <T v={e.data.degree} />
             </p>
-            <p class="text-muted">
-              <T v={e.data.institution} />, <T v={e.data.year} />
+            <p class="edu-school mt-2">
+              <T v={e.data.institution} />
+              <span class="sr-only">, graduated {e.data.year}</span>
             </p>
-          </li>
-        ))}
-      </ul>
-    </div>
-    <!-- Cropped, transparent copy of public/education.png. -->
-    <div class="edu-logo">
-      <Image src={fastLogo} alt="FAST-NUCES" widths={[224, 448]} sizes="14rem" />
-    </div>
+          </div>
+          <!-- Cropped, transparent copy of public/education.png. -->
+          <div class="edu-logo">
+            <Image src={fastLogo} alt="FAST-NUCES" widths={[224, 448]} sizes="12rem" />
+          </div>
+        </li>
+      ))}
+    </ul>
   </div>
-</Section>
+</section>
 
 <style>
-  /* Text left, logo right; the logo drops below the text on narrow screens. */
-  .education {
-    display: flex;
-    flex-wrap: wrap;
+  /* --- Education: rules above and below, a giant outlined year, text, logo --- */
+  .edu-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem 2rem;
     align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
+    padding-block: 1.75rem;
+    border-top: 1.5px solid var(--ink);
+    border-bottom: 1px solid color-mix(in oklab, var(--rule) 60%, transparent);
+  }
+  .edu-year {
+    /* Outlined like the footer name: double stroke under a page-coloured fill hides glyph seams. */
+    color: var(--page);
+    -webkit-text-stroke: 3px var(--ink);
+    paint-order: stroke fill;
+    font-size: clamp(4.5rem, 3rem + 7vw, 8.5rem);
+    line-height: 0.85;
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .edu-degree {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    line-height: 1.1;
+    font-stretch: 118%;
+    font-weight: 800;
+  }
+  .edu-school {
+    max-width: 30rem;
+    color: var(--muted);
+    font-size: 0.9375rem;
   }
   .edu-logo {
-    width: min(14rem, 100%);
+    width: min(12rem, 100%);
   }
   .edu-logo :global(img) {
     display: block;
     width: 100%;
     height: auto;
   }
+  @media (min-width: 48rem) {
+    .edu-row {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 2.5rem;
+    }
+  }
 
+  /* --- Header: heading left, stats right --- */
+  .exp-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem 2rem;
+  }
+  .exp-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+  }
+  .exp-stat {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: center;
+    min-width: 4.5rem;
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-node);
+    background: light-dark(#fff, var(--panel));
+  }
+  .exp-stat dd {
+    font-size: 1.375rem;
+    line-height: 1.1;
+    font-stretch: 118%;
+    font-weight: 800;
+  }
+  .exp-stat dt {
+    color: var(--muted);
+    font-size: 0.6875rem;
+  }
+  .exp-stat--dark {
+    color-scheme: dark;
+    background: var(--band);
+    color: var(--ink);
+  }
+
+  /*
+   * --- Timeline ---
+   * Columns: label | rail | card. Every row's label, dot and card title start at
+   * the same line: the card's top padding (--pad), so they always sit level.
+   */
   .timeline {
-    --stage-gap: 3.5rem;
-    --chip-mid: 1.375rem; /* half the 2.75rem chip */
+    --pad: 1.5rem;
+    --title-lh: 1.75rem; /* one line of .stage-title */
+    --dot: 0.875rem;
+    --gap: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: var(--stage-gap);
+    gap: var(--gap);
   }
-
-  /* Mobile: the track runs down the left edge, each chip above its role. */
   .stage {
     position: relative;
-    padding-left: 1.75rem;
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    grid-template-areas: 'rail label' 'rail card';
+    column-gap: 0.75rem;
+    row-gap: 0.5rem;
   }
+  .stage-label {
+    grid-area: label;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+  }
+  .stage-version {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  .stage-dates {
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+  .stage-dot {
+    grid-area: rail;
+    position: relative;
+    z-index: 1;
+    justify-self: center;
+    width: var(--dot);
+    height: var(--dot);
+    margin-top: calc((1.25rem - var(--dot)) / 2); /* level with the label line */
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-full);
+    background: var(--page);
+  }
+  .stage--current .stage-dot {
+    border-color: var(--on-signal);
+    background: var(--signal);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--signal) 30%, transparent);
+  }
+  /* The rail: from this dot down to the next one. */
   .stage:not(:last-child)::before {
     content: '';
     position: absolute;
-    left: 0.375rem;
-    top: var(--chip-mid);
-    bottom: calc(-1 * var(--stage-gap) - var(--chip-mid));
-    width: 1.5px;
-    background: var(--muted);
-  }
-  .stage-chip {
-    position: relative;
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.4em;
-    min-height: 2.75rem;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-node);
-    background: var(--panel);
-  }
-  .stage-chip::before {
-    content: '';
-    position: absolute;
-    top: calc(var(--chip-mid) - 0.75px);
-    right: 100%;
-    width: calc(1.75rem - 0.375rem);
-    height: 1.5px;
-    background: var(--rule);
-  }
-  .rail-line {
-    display: none;
-  }
-  .stage-body {
-    margin-top: 1rem;
-  }
-  .highlights li {
-    position: relative;
-    padding-left: 1.125rem;
-  }
-  .highlights li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.68em;
-    width: 0.375rem;
-    height: 0.375rem;
-    border-radius: 1.5px;
-    background: var(--muted);
+    left: calc(0.75rem - 1px);
+    top: 0.625rem;
+    bottom: calc(-1 * var(--gap) - 0.625rem);
+    width: 2px;
+    background: color-mix(in oklab, var(--rule) 80%, transparent);
   }
 
-  /* Desktop: chip column on the left, a line from each chip to the next. */
+  .stage-card {
+    grid-area: card;
+    padding: var(--pad);
+    border-radius: 1rem;
+    background: light-dark(#fff, var(--panel));
+    box-shadow: 0 14px 30px -24px rgb(15 42 46 / 0.4);
+  }
+  .stage--current .stage-card {
+    color-scheme: dark;
+    background: var(--band);
+    color: var(--ink);
+  }
+  .stage-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+  .stage-title {
+    font-size: 1.375rem;
+    line-height: var(--title-lh);
+    font-stretch: 118%;
+    font-weight: 780;
+  }
+  .stage-company {
+    color: var(--accent);
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+  .stage--current .stage-company {
+    color: var(--signal);
+  }
+  .stage-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.625rem;
+    border: 1px solid color-mix(in oklab, #3ecf8e 45%, transparent);
+    border-radius: var(--radius-full);
+    color: #7fe0b4;
+    font-size: 0.75rem;
+    font-weight: 650;
+  }
+  .stage-badge-dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: var(--radius-full);
+    background: #3ecf8e;
+  }
+  .stage-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .stage-highlights li {
+    position: relative;
+    padding-left: 1.125rem;
+    color: color-mix(in oklab, var(--muted) 45%, var(--ink));
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+  .stage-highlights li::before {
+    content: '';
+    position: absolute;
+    left: 0.125rem;
+    top: 0.6em;
+    width: 0.4rem;
+    height: 0.4rem;
+    rotate: 45deg;
+    background: var(--accent);
+  }
+  .stage--current .stage-highlights li::before {
+    background: var(--signal);
+  }
+  .stage-num {
+    padding: 0.05em 0.3em;
+    border-radius: 0.3em;
+    background: var(--signal);
+    color: var(--on-signal);
+    font-weight: 700;
+  }
+  .stage-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .stage-stack li {
+    padding: 0.25rem 0.55rem;
+    border: 1px solid color-mix(in oklab, var(--rule) 70%, transparent);
+    border-radius: 0.375rem;
+    background: color-mix(in oklab, var(--panel) 70%, transparent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  /* Wide: label column on the left, aligned with the card's title line. */
   @media (min-width: 48rem) {
     .stage {
-      display: grid;
-      grid-template-columns: 14rem minmax(0, 1fr);
-      column-gap: 2rem;
-      padding-left: 0;
+      grid-template-columns: 9.5rem 1.5rem minmax(0, 1fr);
+      grid-template-areas: 'label rail card';
+      column-gap: 1.25rem;
+    }
+    .stage-label {
+      flex-direction: column;
+      gap: 0.25rem;
+      padding-top: var(--pad);
+    }
+    .stage-dot {
+      /* centred on the card's first title line */
+      margin-top: calc(var(--pad) + (var(--title-lh) - var(--dot)) / 2);
     }
     .stage:not(:last-child)::before {
-      display: none;
-    }
-    .rail {
-      display: flex;
-      flex-direction: column;
-    }
-    .stage-chip {
-      justify-content: center;
-      text-align: center;
-    }
-    .stage-chip::before {
-      right: auto;
-      left: 100%;
-      top: calc(50% - 0.75px);
-      width: 1.25rem; /* stops short of the role title */
-    }
-    .rail-line {
-      display: block;
-      flex: 1;
-      align-self: center;
-      width: 1.5px;
-      margin-bottom: calc(-1 * var(--stage-gap));
-      background: var(--muted);
-    }
-    .stage:last-child .rail-line {
-      display: none;
-    }
-    .stage-body {
-      margin-top: 0.5rem;
+      left: calc(9.5rem + 1.25rem + 0.75rem - 1px);
+      top: calc(var(--pad) + var(--title-lh) / 2);
+      bottom: calc(-1 * var(--gap) - var(--pad) - var(--title-lh) / 2);
     }
   }
 </style>
