@@ -1,4 +1,7 @@
 ---
+import ArrowUp from '@lucide/astro/icons/arrow-up';
+import Download from '@lucide/astro/icons/download';
+import MailIcon from '@lucide/astro/icons/mail';
 import T from './T.astro';
 import { getSite } from '@/lib/site';
 import { build } from '@/lib/build';
@@ -10,92 +13,252 @@ const year = new Date().getFullYear();
 const commitUrl = isHttpUrl(site.links.repo)
   ? `${site.links.repo.replace(/\/$/, '')}/commit/${build.fullSha}`
   : undefined;
+const name = `${site.firstName} ${site.surname}`;
+
+/* Lucide has no brand icons, so the GitHub and LinkedIn marks are inlined (Simple Icons paths). */
+const GITHUB =
+  'M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12';
+const LINKEDIN =
+  'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z';
 ---
 
-<footer class="shell section-gap pb-10">
-  <div class="grid grid-cols-12 gap-x-6 gap-y-10">
-    <div class="col-span-12 md:col-span-5">
-      <p class="footer-mark" aria-hidden="true">
-        S
-      </p>
-      <p class="mt-4 type-subhead">
-        {site.firstName} <T v={site.surname} />
-      </p>
-      <p class="text-muted">{site.title}</p>
-    </div>
-
-    <ul role="list" class="col-span-6 space-y-2 md:col-span-3">
-      <li>
-        <a class="link" href={site.links.github}>
-          GitHub
-        </a>
-      </li>
-      <li>
-        {isHttpUrl(site.links.linkedin) ? (
-          <a class="link" href={site.links.linkedin}>
-            LinkedIn
+<!--
+  An always-dark band: links on top, the surname as giant outlined type, and the
+  copyright and deploy line underneath.
+-->
+<footer class="footer section-gap">
+  <div class="shell footer-inner">
+    <div class="footer-top">
+      <ul role="list" class="footer-links">
+        <li>
+          <a class="footer-icon icon-github" href={site.links.github} aria-label="GitHub">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+              <path d={GITHUB}></path>
+            </svg>
           </a>
-        ) : (
-          <span>
-            LinkedIn <T v={site.links.linkedin} />
-          </span>
-        )}
-      </li>
-      <li>
-        {isEmail(site.email) ? (
-          <a class="link" href={`mailto:${site.email}`}>
-            Email
-          </a>
-        ) : (
-          <span>
-            Email <T v={site.email} />
-          </span>
-        )}
-      </li>
-    </ul>
+        </li>
+        <li>
+          {isHttpUrl(site.links.linkedin) ? (
+            <a class="footer-icon icon-linkedin" href={site.links.linkedin} aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                <path d={LINKEDIN}></path>
+              </svg>
+            </a>
+          ) : (
+            <T v={site.links.linkedin} />
+          )}
+        </li>
+        <li>
+          {isEmail(site.email) ? (
+            <a class="footer-icon icon-email" href={`mailto:${site.email}`} aria-label="Email">
+              <MailIcon size={22} stroke-width={2} aria-hidden="true" />
+            </a>
+          ) : (
+            <T v={site.email} />
+          )}
+        </li>
+      </ul>
 
-    <ul role="list" class="col-span-6 space-y-2 md:col-span-4">
-      <li>
-        <a class="link" href="/Muhammad_Shahryar_Software_Engineer.pdf" download>
+      <div class="footer-actions">
+        <a class="footer-pill" href="/Muhammad_Shahryar_Software_Engineer.pdf" download>
+          <Download size={19} stroke-width={2} aria-hidden="true" />
           CV (PDF)
         </a>
-      </li>
-      <li>
-        {isHttpUrl(site.links.repo) ? (
-          <a class="link" href={site.links.repo}>
-            Source for this site
+        <!-- "#top" scrolls to the top in every browser, even without JavaScript. -->
+        <a class="footer-top-btn" href="#top" aria-label="Back to top" title="Back to top" data-to-top>
+          <ArrowUp size={22} stroke-width={2.25} aria-hidden="true" />
+        </a>
+      </div>
+    </div>
+
+    <p class="footer-word" aria-hidden="true">{site.surname}</p>
+
+    <div class="footer-bottom">
+      <p>© {year} {name} · {site.title}</p>
+      <p class="footer-deploy">
+        <span class="footer-dot" aria-hidden="true"></span>
+        Last deployed {formatDay(build.date)} · commit{' '}
+        {commitUrl ? (
+          <a class="link" href={commitUrl}>
+            {build.commit}
           </a>
         ) : (
-          <span>
-            Source for this site <T v={site.links.repo} />
-          </span>
+          build.commit
         )}
-      </li>
-    </ul>
-  </div>
-
-  <div class="mt-16 flex flex-wrap justify-between gap-x-8 gap-y-2 type-small text-muted">
-    <p>
-      © {year} {site.firstName} <T v={site.surname} />
-    </p>
-    <p class="tabular-nums">
-      Last deployed {formatDay(build.date)}, commit{' '}
-      {commitUrl ? (
-        <a class="link" href={commitUrl}>
-          {build.commit}
-        </a>
-      ) : (
-        build.commit
-      )}
-    </p>
+      </p>
+    </div>
   </div>
 </footer>
 
 <style>
-  .footer-mark {
-    font-size: 2.5rem;
-    line-height: 1;
+  .footer {
+    overflow: hidden; /* the giant surname runs off the right edge */
+    background: var(--band);
+  }
+  .footer-inner {
+    color-scheme: dark; /* tokens inside resolve to their dark values */
+    color: var(--ink);
+    padding-block: clamp(2.5rem, 2rem + 2vw, 3.5rem) 2rem;
+  }
+
+  .footer-top {
+    position: relative;
+    z-index: 1; /* above the giant surname */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+  }
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .footer-icon,
+  .footer-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 3rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-full);
+    color: var(--ink);
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .footer-icon {
+    width: 3rem;
+  }
+  /* Signal-yellow outline by default; fills solid yellow on hover. */
+  .footer-pill {
+    gap: 0.5rem;
+    padding-inline: 1.125rem;
+    border-color: var(--signal);
+    color: var(--signal);
+    font-size: 0.875rem;
+    font-weight: 650;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .footer-pill:hover {
+    background: var(--signal);
+    color: var(--on-signal);
+  }
+  /* Brand-coloured filled circles; each icon colour passes 4.5:1 on its fill. */
+  .footer-icon {
+    border-color: transparent;
+    transition:
+      translate 0.2s var(--ease-out),
+      filter 0.2s ease;
+  }
+  .footer-icon:hover {
+    translate: 0 -2px;
+    filter: brightness(1.1);
+  }
+  .icon-github {
+    background: #fff;
+    color: #181717;
+  }
+  .icon-linkedin {
+    background: #0a66c2;
+    color: #fff;
+  }
+  .icon-email {
+    background: var(--signal);
+    color: var(--on-signal);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .footer-icon:hover {
+      translate: none;
+    }
+  }
+  .footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .footer-top-btn {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-full);
+    background: var(--signal);
+    color: var(--on-signal);
+    transition: translate 0.2s var(--ease-out);
+  }
+  .footer-top-btn:hover {
+    translate: 0 -3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .footer-top-btn:hover {
+      translate: none;
+    }
+  }
+
+  /* The surname in giant outlined capitals; it's decoration, so it may run off the edge. */
+  .footer-word {
+    margin-block: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    /*
+     * The variable font's glyphs overlap internally, and a plain stroke would draw
+     * those seams. So: a double-width stroke painted first, then a fill in the band
+     * colour on top, which hides the seams and the stroke's inner half.
+     */
+    color: var(--band);
+    /* Brighter teal and a 2px visible line (half the stroke sits under the fill). */
+    -webkit-text-stroke: 4px color-mix(in oklab, var(--accent) 75%, var(--rule));
+    paint-order: stroke fill;
+    font-size: clamp(5rem, 19vw, 17rem);
+    line-height: 0.85;
     font-stretch: 125%;
     font-weight: 800;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    user-select: none;
+    /* Its line box is taller than the glyphs and reaches over the links above: never catch clicks. */
+    pointer-events: none;
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+  }
+  .footer-deploy {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+  }
+  /* Live status: the text says it too, so colour isn't the only signal. */
+  .footer-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-full);
+    background: #3ecf8e;
+    box-shadow: 0 0 0 3px color-mix(in oklab, #3ecf8e 25%, transparent);
   }
 </style>
+
+<script>
+  // Smooth scroll to the top (instant for reduced motion), then focus the page start.
+  document.addEventListener('astro:page-load', () => {
+    document.querySelector('[data-to-top]')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      history.replaceState(null, '', location.pathname + location.search);
+      document.querySelector<HTMLElement>('main')?.focus({ preventScroll: true });
+    });
+  });
+</script>
