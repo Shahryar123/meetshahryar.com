@@ -1,6 +1,8 @@
 ---
 import { getCollection, getEntries } from 'astro:content';
-import Plus from '@lucide/astro/icons/plus';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import ArrowUpRight from '@lucide/astro/icons/arrow-up-right';
+import Check from '@lucide/astro/icons/check';
 import Section from '@/components/Section.astro';
 import CategoryIcon from '@/components/CategoryIcon.astro';
 import T from '@/components/T.astro';
@@ -19,144 +21,414 @@ const services = await Promise.all(
     };
   }),
 );
+const pad = (n: number) => String(n).padStart(2, '0');
+const total = pad(services.length);
+
+/** "AWS (VPC, EC2, RDS)" → ["AWS VPC", "EC2", "RDS"]: one chip per tool. */
+const chips = (tools: string[]) =>
+  tools.flatMap((t) => {
+    const m = t.match(/^(.+?)\s*\((.+)\)$/);
+    if (!m) return [t];
+    const [first, ...rest] = m[2].split(',').map((x) => x.trim());
+    return [`${m[1]} ${first}`, ...rest];
+  });
 ---
 
-<Section id="services" eyebrow="What I do" title="Services">
-  <div class="service-list">
-    {services.map((s) => (
-      <details id={`service-${s.id}`} class="service" data-service>
-        <summary class="service-summary">
-          <CategoryIcon id={s.id} size={22} class="service-icon" />
-          <span class="service-name type-subhead">{s.name}</span>
-          <span class="service-blurb text-muted">
-            <T v={s.summary} />
+<Section id="services" eyebrow="What I do" title="Services" size="display">
+  <p class="services-hint" aria-hidden="true">{services.length} areas · pick one to see what's included</p>
+
+  <!--
+    Tabs (WAI-ARIA pattern): areas on the left, one dark detail panel on the right.
+    Every panel is in the HTML; only the active one shows. Links to #service-<id>
+    (the hero cards) select that area.
+  -->
+  <div class="services" data-services>
+    <div class="svc-tabs" role="tablist" aria-label="Service areas" aria-orientation="vertical">
+      {services.map((s, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`service-${s.id}`}
+          class="svc-tab"
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-controls={`service-panel-${s.id}`}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          <span class="svc-tab-icon" aria-hidden="true">
+            <CategoryIcon id={s.id} size={18} />
           </span>
-          <Plus size={22} stroke-width={1.75} aria-hidden="true" class="service-toggle" />
-        </summary>
-        <div class="service-body">
-          <div class="md:col-span-5">
-            <h4 class="type-small text-muted">Deliverables</h4>
-            <ul role="list" class="mt-3 space-y-1.5">
-              {s.deliverables.map((d) => (
-                <li>
-                  <T v={d} />
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div class="md:col-span-4">
-            <h4 class="type-small text-muted">Tools</h4>
-            <ul role="list" class="mt-3 space-y-1.5">
-              {s.tools.map((t) => (
-                <li>
-                  <T v={t} />
-                </li>
-              ))}
-            </ul>
-          </div>
-          {s.proofs.length > 0 && (
-            <div class="md:col-span-3">
-              <h4 class="type-small text-muted">
-                {s.proofs.length === 1 ? 'See the project' : 'See the projects'}
-              </h4>
-              <ul role="list" class="mt-3 space-y-1.5">
-                {s.proofs.map((p) => (
-                  <li>
-                    <a class="link" href={`/work/${p.id}/`}>
-                      <T v={p.data.title} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
+          <span class="svc-tab-text">
+            <span class="svc-tab-name">{s.name}</span>
+            <span class="svc-tab-sub">
+              <T v={s.tooltip} />
+            </span>
+          </span>
+          <ArrowRight size={16} stroke-width={2} aria-hidden="true" class="svc-tab-arrow" />
+        </button>
+      ))}
+    </div>
+
+    <div class="svc-stage">
+      {services.map((s, i) => (
+        <div
+          role="tabpanel"
+          id={`service-panel-${s.id}`}
+          class="svc-panel"
+          aria-labelledby={`service-${s.id}`}
+          tabindex="0"
+          data-active={i === 0 ? '' : undefined}
+        >
+          <p class="svc-path" aria-hidden="true">
+            <span class="svc-dot"></span>services/{s.id}.yml
+          </p>
+          <div class="svc-body">
+            <p class="svc-count">
+              {pad(i + 1)} / {total}
+            </p>
+            <h3 class="svc-title mt-2">{s.name}</h3>
+            <p class="svc-summary mt-3">
+              <T v={s.summary} />
+            </p>
+
+            <div class="svc-cols mt-8">
+              <div>
+                <h4 class="svc-label">Deliverables</h4>
+                <ul role="list" class="mt-3 space-y-2">
+                  {s.deliverables.map((d) => (
+                    <li class="svc-item">
+                      <Check size={15} stroke-width={2.5} aria-hidden="true" class="svc-check" />
+                      <span>
+                        <T v={d} />
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 class="svc-label">Tools</h4>
+                <ul role="list" class="svc-chips mt-3">
+                  {chips(s.tools).map((t) => (
+                    <li class="svc-chip">
+                      <T v={t} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          )}
+
+            {s.proofs.length > 0 && (
+              <div class="mt-8">
+                <h4 class="svc-label">{s.proofs.length === 1 ? 'See the project' : 'See the projects'}</h4>
+                <ul role="list" class="svc-proofs mt-3">
+                  {s.proofs.map((p) => (
+                    <li>
+                      <a class="svc-proof" href={`/work/${p.id}/`}>
+                        <T v={p.data.title} />
+                        <ArrowUpRight size={16} stroke-width={2} aria-hidden="true" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
-      </details>
-    ))}
+      ))}
+    </div>
   </div>
 </Section>
 
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-services]')) {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')!)!);
+
+    const select = (index: number, focus: boolean) => {
+      tabs.forEach((tab, i) => {
+        const on = i === index;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+        panels[i].toggleAttribute('data-active', on);
+      });
+      if (focus) tabs[index].focus();
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i, false));
+      tab.addEventListener('keydown', (e) => {
+        const n = tabs.length;
+        const next =
+          e.key === 'ArrowDown' || e.key === 'ArrowRight'
+            ? (i + 1) % n
+            : e.key === 'ArrowUp' || e.key === 'ArrowLeft'
+              ? (i - 1 + n) % n
+              : e.key === 'Home'
+                ? 0
+                : e.key === 'End'
+                  ? n - 1
+                  : null;
+        if (next === null) return;
+        e.preventDefault();
+        select(next, true);
+      });
+    });
+
+    // Links to #service-<id> (e.g. the hero cards) select that area.
+    const fromId = (id: string | undefined) => {
+      const i = tabs.findIndex((t) => t.id === id);
+      if (i >= 0) select(i, false);
+    };
+    fromId(decodeURIComponent(location.hash.slice(1)));
+    window.addEventListener('hashchange', () => fromId(decodeURIComponent(location.hash.slice(1))));
+    document.addEventListener('click', (event) => {
+      const link = (event.target as Element | null)?.closest?.('a[href*="#service-"]');
+      fromId(link?.getAttribute('href')?.split('#')[1]);
+    });
+  }
+</script>
+
 <style>
-  .service-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .service {
-    border-radius: var(--radius-node);
-  }
-  .service[open] {
-    background: var(--panel);
-  }
-  .service-summary {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas: 'icon name toggle' '. blurb blurb';
-    align-items: center;
-    column-gap: 1rem;
-    row-gap: 0.25rem;
-    padding: 1.25rem 1rem;
-    border-radius: var(--radius-node);
-    cursor: pointer;
-  }
-  .service-summary :global(.service-icon) {
-    grid-area: icon;
+  .services-hint {
+    margin-top: -2.5rem;
+    margin-bottom: 1.5rem;
     color: var(--muted);
+    font-size: 0.8125rem;
+    text-align: right;
   }
-  .service-name {
-    grid-area: name;
-  }
-  .service-blurb {
-    grid-area: blurb;
-  }
-  .service-summary :global(.service-toggle) {
-    grid-area: toggle;
-    color: var(--muted);
-  }
-  .service[open] .service-summary :global(.service-toggle) {
-    rotate: 45deg;
-  }
-  .service-summary:hover .service-name,
-  .service-summary:hover :global(.service-toggle) {
-    color: var(--ink);
-  }
-  .service-body {
+  .services {
     display: grid;
-    gap: 2rem 1.5rem;
-    padding: 0.5rem 1rem 2rem;
+    grid-template-columns: minmax(0, 1fr); /* lets the one-line tab subtitles truncate on phones */
+    gap: 1.5rem;
+    align-items: start;
   }
 
-  @media (min-width: 48rem) {
-    .service-summary {
-      grid-template-columns: auto minmax(0, 3fr) minmax(0, 6fr) auto;
-      grid-template-areas: 'icon name blurb toggle';
-      column-gap: 1.5rem;
-      padding: 1.5rem;
+  /* --- Tabs --- */
+  .svc-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+  .svc-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--rule) 55%, transparent);
+    border-radius: var(--radius-node);
+    background: color-mix(in oklab, var(--panel) 35%, transparent);
+    color: color-mix(in oklab, var(--ink) 80%, var(--muted));
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+  .svc-tab:hover {
+    border-color: var(--rule);
+  }
+  .svc-tab[aria-selected='true'] {
+    border-color: var(--ink);
+    background: light-dark(#fff, var(--panel));
+    color: var(--ink);
+    box-shadow: 0 10px 24px -14px rgb(15 42 46 / 0.35);
+  }
+  .svc-tab-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.625rem;
+    background: var(--panel);
+    color: var(--muted);
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+  .svc-tab[aria-selected='true'] .svc-tab-icon {
+    background: var(--signal);
+    color: var(--on-signal);
+  }
+  .svc-tab-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .svc-tab-name {
+    font-weight: 650;
+    line-height: 1.3;
+  }
+  .svc-tab-sub {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .svc-tab :global(.svc-tab-arrow) {
+    flex: none;
+    color: var(--muted);
+    transition: translate 0.25s var(--ease-out);
+  }
+  .svc-tab[aria-selected='true'] :global(.svc-tab-arrow),
+  .svc-tab:hover :global(.svc-tab-arrow) {
+    color: var(--ink);
+    translate: 0.125rem 0;
+  }
+
+  /* --- Detail panel: always dark --- */
+  .svc-stage {
+    display: grid;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    background: var(--band);
+    box-shadow: 0 30px 60px -32px rgb(15 42 46 / 0.55);
+  }
+  .svc-panel {
+    grid-area: 1 / 1;
+    color-scheme: dark;
+    color: var(--ink);
+    opacity: 0;
+    visibility: hidden;
+    translate: 0 0.5rem;
+    transition:
+      opacity 0.2s ease,
+      translate 0.3s var(--ease-out),
+      visibility 0s linear 0.2s;
+  }
+  .svc-panel[data-active] {
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+    transition:
+      opacity 0.3s ease 0.1s,
+      translate 0.45s var(--ease-out) 0.1s,
+      visibility 0s;
+  }
+  .svc-path {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--rule) 60%, transparent);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  .svc-dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: var(--radius-full);
+    background: var(--signal);
+  }
+  .svc-body {
+    padding: 1.5rem;
+  }
+  .svc-count {
+    color: var(--signal);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+  }
+  .svc-title {
+    font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
+    line-height: 1.05;
+    font-stretch: 122%;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  .svc-summary {
+    max-width: 40rem;
+    color: color-mix(in oklab, var(--muted) 60%, var(--ink));
+  }
+  .svc-cols {
+    display: grid;
+    gap: 2rem;
+  }
+  .svc-label {
+    color: var(--accent);
+    font-size: 0.6875rem;
+    font-stretch: 112%;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .svc-item {
+    display: flex;
+    gap: 0.625rem;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+  .svc-item :global(.svc-check) {
+    flex: none;
+    margin-top: 0.2rem;
+    color: var(--signal);
+  }
+  .svc-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .svc-chip {
+    padding: 0.3rem 0.625rem;
+    border: 1px solid color-mix(in oklab, var(--rule) 80%, transparent);
+    border-radius: 0.375rem;
+    background: var(--panel);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  .svc-proofs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .svc-proof {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.625rem;
+    background: var(--signal);
+    color: var(--on-signal);
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: filter 0.2s ease;
+  }
+  .svc-proof:hover {
+    filter: brightness(1.08);
+  }
+
+  @media (min-width: 40rem) {
+    .svc-cols {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     }
-    .service-body {
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      padding: 0.5rem 1.5rem 2.25rem calc(1.5rem + 22px + 1.5rem);
+    .svc-body {
+      padding: 2rem;
+    }
+  }
+  @media (min-width: 64rem) {
+    .services {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      gap: 1.5rem;
+    }
+  }
+  @media (max-width: 47.99rem) {
+    .services-hint {
+      margin-top: -1.5rem;
+      text-align: left;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .svc-tab,
+    .svc-tab-icon,
+    .svc-tab :global(.svc-tab-arrow),
+    .svc-panel,
+    .svc-panel[data-active] {
+      transition: none;
     }
   }
 </style>
-
-<script>
-  // Opening a service from a link (#service-…, e.g. a hero node) expands its row.
-  function openFromHash() {
-    const id = decodeURIComponent(location.hash.slice(1));
-    if (!id.startsWith('service-')) return;
-    const target = document.getElementById(id);
-    if (target instanceof HTMLDetailsElement) target.open = true;
-  }
-  // Module scripts run once, so these listeners are added once.
-  document.addEventListener('astro:page-load', openFromHash);
-  window.addEventListener('hashchange', openFromHash);
-  // Astro's router handles same-page #links itself, without a hashchange event,
-  // so links to a service (the hero nodes) also open it directly.
-  document.addEventListener('click', (event) => {
-    const link = (event.target as Element | null)?.closest?.('a[href*="#service-"]');
-    const id = link?.getAttribute('href')?.split('#')[1];
-    const target = id ? document.getElementById(id) : null;
-    if (target instanceof HTMLDetailsElement) target.open = true;
-  });
-</script>
