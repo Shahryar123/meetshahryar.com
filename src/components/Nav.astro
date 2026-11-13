@@ -1,7 +1,19 @@
 ---
 import MenuIcon from '@lucide/astro/icons/menu';
 import XIcon from '@lucide/astro/icons/x';
+import BrandIcon from './BrandIcon.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import { getSite } from '@/lib/site';
+import { isHttpUrl } from '@/lib/todo';
+
+const site = await getSite();
+/* Profiles, shown before the theme toggle. A link still in [brackets] is left out. */
+const socials = (
+  [
+    { href: site.links.github, label: 'GitHub', icon: 'github', size: 18 },
+    { href: site.links.linkedin, label: 'LinkedIn', icon: 'linkedin', size: 17 },
+  ] as const
+).filter((s) => isHttpUrl(s.href));
 
 const links = [
   { href: '/#work', label: 'Work' },
@@ -27,7 +39,12 @@ const links = [
       ))}
     </ul>
     <div class="ml-auto flex items-center gap-2">
-      <div class="hidden lg:block">
+      <div class="nav-pill hidden lg:flex">
+        {socials.map((s) => (
+          <a href={s.href} class="nav-icon" aria-label={s.label}>
+            <BrandIcon name={s.icon} size={s.size} />
+          </a>
+        ))}
         <ThemeToggle />
       </div>
       <a href="/#contact" class="btn btn-secondary min-h-10 px-4">
@@ -72,8 +89,13 @@ const links = [
         </li>
       ))}
     </ul>
-    <div class="mt-10">
+    <div class="mt-10 flex flex-wrap items-center gap-3">
       <ThemeToggle withLabel />
+      {socials.map((s) => (
+        <a href={s.href} class="btn btn-secondary size-12 px-0" aria-label={s.label}>
+          <BrandIcon name={s.icon} size={s.size + 2} />
+        </a>
+      ))}
     </div>
   </nav>
 </dialog>
@@ -86,6 +108,84 @@ const links = [
     font-weight: 800;
     letter-spacing: -0.02em;
     text-decoration: none;
+  }
+  /*
+   * GitHub, LinkedIn and the theme toggle share one pill: hovering (or tabbing
+   * to) any of them brings up a single green capsule behind all three. It is
+   * keyboard focus only (:focus-visible), so a mouse click doesn't leave it on.
+   * The capsule is the same deep green in both themes, so light icons and the
+   * yellow theme icon read on it either way.
+   */
+  .nav-pill {
+    --pill: #1f6f6a; /* the light theme's accent */
+    --on-pill: #e6efec;
+    position: relative;
+    align-items: center;
+    padding-inline: 0.25rem;
+  }
+  .nav-pill::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-full);
+    background: var(--pill);
+    opacity: 0;
+    scale: 0.85 0.7;
+    transition:
+      opacity 0.22s ease,
+      scale 0.35s var(--ease-out);
+  }
+  .nav-pill:is(:hover, :has(:focus-visible))::before {
+    opacity: 1;
+    scale: 1;
+  }
+  .nav-pill :global([data-theme-toggle]) {
+    position: relative; /* above the capsule */
+    border-radius: var(--radius-full);
+    transition:
+      color 0.22s ease,
+      scale 0.25s var(--ease-out);
+  }
+  .nav-icon {
+    position: relative; /* above the capsule */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    border-radius: var(--radius-full);
+    color: var(--muted);
+    transition:
+      color 0.22s ease,
+      scale 0.25s var(--ease-out);
+  }
+  /*
+   * On the capsule: light brand icons and a signal-yellow moon/sun. The toggle
+   * is ThemeToggle's markup, so it's reached with :global() (kept out of :is(),
+   * where Astro's scoping doesn't apply it).
+   */
+  .nav-pill:hover .nav-icon,
+  .nav-pill:has(:focus-visible) .nav-icon {
+    color: var(--on-pill);
+  }
+  .nav-pill:hover :global([data-theme-toggle]),
+  .nav-pill:has(:focus-visible) :global([data-theme-toggle]) {
+    color: var(--signal);
+  }
+  .nav-icon:hover,
+  .nav-pill :global([data-theme-toggle]:hover) {
+    scale: 1.1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-pill::before,
+    .nav-icon,
+    .nav-pill :global([data-theme-toggle]) {
+      transition: none;
+    }
+    .nav-icon:hover,
+    .nav-pill :global([data-theme-toggle]:hover) {
+      scale: none;
+    }
   }
   .mobile-menu {
     margin: 0;
