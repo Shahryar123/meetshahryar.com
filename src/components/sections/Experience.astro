@@ -53,64 +53,70 @@ const parts = (text: string) => text.split(/(\d+(?:\.\d+)?%)/);
   <!--
     A version history: newest role on top. The label, the dot and the card's
     title share one top line, so they always sit level.
+    While scrolling, a yellow dot runs down the rail, level with the middle of
+    the screen, leaving a yellow trail; each role's dot lights up as it passes.
   -->
-  <ol role="list" class="timeline mt-12 md:mt-16">
-    {jobs.map((job, i) => (
-      <li class:list={['stage', i === 0 && job.data.end === 'present' && 'stage--current']}>
-        <p class="stage-label">
-          <span class="stage-version">{version(i)}</span>
-          <span class="stage-dates">
-            <T v={formatMonth(job.data.start)} />
-            <span aria-hidden="true"> – </span>
-            <span class="sr-only"> to </span>
-            <T v={formatMonth(job.data.end)} />
-          </span>
-        </p>
-        <span class="stage-dot" aria-hidden="true"></span>
-        <div class="stage-card">
-          <div class="stage-title-row">
-            <h3 class="stage-title">
-              <T v={job.data.role} />
-            </h3>
-            {i === 0 && job.data.end === 'present' && (
-              <span class="stage-badge">
-                <span class="stage-badge-dot" aria-hidden="true"></span>
-                Current role
-              </span>
-            )}
-          </div>
-          <p class="stage-company">
-            <T v={job.data.company} />
-            {job.data.location && (
-              <>
-                , <T v={job.data.location} />
-              </>
-            )}
+  <div class="timeline-wrap mt-12 md:mt-16" data-timeline>
+    <span class="timeline-trail" aria-hidden="true"></span>
+    <span class="timeline-runner" aria-hidden="true"></span>
+    <ol role="list" class="timeline">
+      {jobs.map((job, i) => (
+        <li class:list={['stage', i === 0 && job.data.end === 'present' && 'stage--current']}>
+          <p class="stage-label">
+            <span class="stage-version">{version(i)}</span>
+            <span class="stage-dates">
+              <T v={formatMonth(job.data.start)} />
+              <span aria-hidden="true"> – </span>
+              <span class="sr-only"> to </span>
+              <T v={formatMonth(job.data.end)} />
+            </span>
           </p>
-          <ul role="list" class="stage-highlights mt-4">
-            {job.data.highlights.map((h) => (
-              <li>
-                {hasTodo(h) ? (
-                  <T v={h} />
-                ) : (
-                  parts(h).map((part, k) => (k % 2 === 1 ? <mark class="stage-num">{part}</mark> : part))
-                )}
-              </li>
-            ))}
-          </ul>
-          {job.data.stack.length > 0 && (
-            <ul role="list" class="stage-stack mt-5" aria-label="Stack">
-              {job.data.stack.map((t) => (
+          <span class="stage-dot" aria-hidden="true"></span>
+          <div class="stage-card">
+            <div class="stage-title-row">
+              <h3 class="stage-title">
+                <T v={job.data.role} />
+              </h3>
+              {i === 0 && job.data.end === 'present' && (
+                <span class="stage-badge">
+                  <span class="stage-badge-dot" aria-hidden="true"></span>
+                  Current role
+                </span>
+              )}
+            </div>
+            <p class="stage-company">
+              <T v={job.data.company} />
+              {job.data.location && (
+                <>
+                  , <T v={job.data.location} />
+                </>
+              )}
+            </p>
+            <ul role="list" class="stage-highlights mt-4">
+              {job.data.highlights.map((h) => (
                 <li>
-                  <T v={t} />
+                  {hasTodo(h) ? (
+                    <T v={h} />
+                  ) : (
+                    parts(h).map((part, k) => (k % 2 === 1 ? <mark class="stage-num">{part}</mark> : part))
+                  )}
                 </li>
               ))}
             </ul>
-          )}
-        </div>
-      </li>
-    ))}
-  </ol>
+            {job.data.stack.length > 0 && (
+              <ul role="list" class="stage-stack mt-5" aria-label="Stack">
+                {job.data.stack.map((t) => (
+                  <li>
+                    <T v={t} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
 
   <div class="education mt-20 md:mt-24">
     <hgroup>
@@ -283,6 +289,78 @@ const parts = (text: string) => text.split(/(\d+(?:\.\d+)?%)/);
     background: var(--signal);
     box-shadow: 0 0 0 4px color-mix(in oklab, var(--signal) 30%, transparent);
   }
+  /* Roles the moving dot has reached. */
+  .stage-dot {
+    transition: background-color 0.3s ease;
+  }
+  .stage[data-reached] .stage-dot {
+    background: var(--signal);
+  }
+
+  /*
+   * --- Scroll runner ---
+   * The script measures the rail (--x) and the first dot (--y0), and moves the
+   * runner by --y as the page scrolls. Hidden until measured (data-live).
+   */
+  .timeline-wrap {
+    position: relative;
+  }
+  .timeline-trail,
+  .timeline-runner {
+    position: absolute;
+    top: var(--y0, 0);
+    left: var(--x, 0);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .timeline-wrap[data-live] :is(.timeline-trail, .timeline-runner) {
+    opacity: 1;
+  }
+  /* Over the grey rail, under the role dots. */
+  .timeline-trail {
+    z-index: 1;
+    width: 2px;
+    height: var(--y, 0);
+    translate: -50% 0;
+    border-radius: 1px;
+    background: var(--signal);
+  }
+  .timeline-runner {
+    z-index: 2;
+    width: 1.125rem;
+    height: 1.125rem;
+    translate: -50% calc(var(--y, 0px) - 50%);
+    border: 2px solid var(--on-signal);
+    border-radius: var(--radius-full);
+    background: var(--signal);
+    box-shadow: 0 0 0 5px color-mix(in oklab, var(--signal) 30%, transparent);
+  }
+  /* A soft ping, so it reads as live. */
+  .timeline-runner::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 2px solid var(--signal);
+    border-radius: inherit;
+    animation: runner-ping 2s var(--ease-out) infinite;
+  }
+  @keyframes runner-ping {
+    from {
+      opacity: 0.55;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 2.6;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .timeline-runner::after {
+      animation: none;
+      opacity: 0;
+    }
+  }
   /* The rail: from this dot down to the next one. */
   .stage:not(:last-child)::before {
     content: '';
@@ -413,3 +491,57 @@ const parts = (text: string) => text.split(/(\d+(?:\.\d+)?%)/);
     }
   }
 </style>
+
+<script>
+  // The yellow runner: follows the middle of the screen down the rail,
+  // clamped between the first and the last role's dot.
+  function initTimeline() {
+    const wrap = document.querySelector<HTMLElement>('[data-timeline]');
+    if (!wrap) return;
+    const stages = [...wrap.querySelectorAll<HTMLElement>('.stage')];
+    const dots = stages.map((s) => s.querySelector<HTMLElement>('.stage-dot'));
+    if (stages.length < 2 || dots.some((d) => !d)) return;
+
+    // Window listeners outlive this page's DOM under the client router.
+    const lifetime = new AbortController();
+    const { signal } = lifetime;
+    document.addEventListener('astro:before-swap', () => lifetime.abort(), { once: true });
+
+    let ys: number[] = []; // dot centres, from the top of the wrapper
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const top = wrap.getBoundingClientRect().top;
+      const line = window.innerHeight / 2 - top;
+      const y = Math.min(ys[ys.length - 1], Math.max(ys[0], line));
+      wrap.style.setProperty('--y', `${y - ys[0]}px`);
+      stages.forEach((s, i) => s.toggleAttribute('data-reached', y >= ys[i] - 1));
+    };
+
+    const measure = () => {
+      const box = wrap.getBoundingClientRect();
+      const rects = dots.map((d) => d!.getBoundingClientRect());
+      ys = rects.map((r) => r.top + r.height / 2 - box.top);
+      wrap.style.setProperty('--x', `${rects[0].left + rects[0].width / 2 - box.left}px`);
+      wrap.style.setProperty('--y0', `${ys[0]}px`);
+      update();
+    };
+
+    measure();
+    wrap.dataset.live = '';
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!frame) frame = requestAnimationFrame(update);
+      },
+      { passive: true, signal },
+    );
+    window.addEventListener('resize', measure, { signal });
+    // Fonts arriving or cards reflowing move the dots.
+    const sizes = new ResizeObserver(() => measure());
+    sizes.observe(wrap);
+    signal.addEventListener('abort', () => sizes.disconnect());
+  }
+  document.addEventListener('astro:page-load', initTimeline);
+</script>
