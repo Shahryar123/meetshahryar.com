@@ -59,6 +59,32 @@ const { withLabel = false } = Astro.props;
   :root[data-theme='light'] .when-light {
     display: inline-flex;
   }
+
+  /*
+   * Theme switch: a view transition where the new theme comes down from the
+   * top behind a soft edge, over a still snapshot of the old one.
+   * The mask is 2.25× the page tall: opaque top, a 0.25-page soft band,
+   * transparent bottom. Sliding it from bottom-aligned to top-aligned sweeps
+   * the band down the screen. Scoped to data-theme-switch, so Astro's page
+   * navigation transitions are untouched.
+   */
+  html[data-theme-switch]::view-transition-old(root) {
+    animation: none;
+  }
+  html[data-theme-switch]::view-transition-new(root) {
+    animation: theme-sweep-down 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+    mask-image: linear-gradient(to bottom, #000 44.5%, transparent 55.5%);
+    mask-size: 100% 225%;
+    mask-repeat: no-repeat;
+  }
+  @keyframes theme-sweep-down {
+    from {
+      mask-position: 0 100%;
+    }
+    to {
+      mask-position: 0 0;
+    }
+  }
 </style>
 
 <script>
@@ -80,17 +106,33 @@ const { withLabel = false } = Astro.props;
     });
   }
 
+  function apply(theme: 'light' | 'dark') {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem(KEY, theme);
+    } catch {
+      /* storage blocked: the choice lasts for this page only */
+    }
+    sync();
+  }
+
   function init() {
     document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
       button.addEventListener('click', () => {
         const next = current() === 'dark' ? 'light' : 'dark';
-        document.documentElement.dataset.theme = next;
-        try {
-          localStorage.setItem(KEY, next);
-        } catch {
-          /* storage blocked: the choice lasts for this page only */
+        const root = document.documentElement;
+        const animate =
+          'startViewTransition' in document &&
+          !matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!animate) {
+          apply(next);
+          return;
         }
-        sync();
+        // The new theme sweeps down from the top (styles above). Browsers
+        // without view transitions, and reduced motion, switch instantly.
+        root.dataset.themeSwitch = `to-${next}`;
+        const transition = document.startViewTransition(() => apply(next));
+        transition.finished.finally(() => delete root.dataset.themeSwitch);
       });
     });
     sync();

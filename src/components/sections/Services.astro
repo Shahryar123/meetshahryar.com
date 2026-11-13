@@ -9,7 +9,7 @@ import T from '@/components/T.astro';
 import { CATEGORIES, type CategoryId } from '@/lib/categories';
 
 const entries = await getCollection('services');
-// Same order as the hero nodes.
+// Same order as CATEGORIES.
 const services = await Promise.all(
   CATEGORIES.map(async (c) => {
     const entry = entries.find((s) => s.id === c.id);
@@ -40,7 +40,7 @@ const chips = (tools: string[]) =>
   <!--
     Tabs (WAI-ARIA pattern): areas on the left, one dark detail panel on the right.
     Every panel is in the HTML; only the active one shows. Links to #service-<id>
-    (the hero cards) select that area.
+    select that area.
   -->
   <div class="services" data-services>
     <div class="svc-tabs" role="tablist" aria-label="Service areas" aria-orientation="vertical">
@@ -173,7 +173,7 @@ const chips = (tools: string[]) =>
       });
     });
 
-    // Links to #service-<id> (e.g. the hero cards) select that area.
+    // Links to #service-<id> select that area.
     const fromId = (id: string | undefined) => {
       const i = tabs.findIndex((t) => t.id === id);
       if (i >= 0) select(i, false);

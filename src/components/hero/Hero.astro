@@ -1,13 +1,10 @@
 ---
 /**
  * Hero: name, title, value line and CTAs on the left; the brush-stroke portrait
- * on the right, tucked under the end of the name. Below, one
- * card per category, each linking to its service row.
+ * on the right, tucked under the end of the name.
  */
 import Download from '@lucide/astro/icons/download';
-import CategoryIcon from '@/components/CategoryIcon.astro';
 import Photo from '@/components/Photo.astro';
-import { CATEGORIES } from '@/lib/categories';
 import { heroPhoto, heroPhotoOnDark } from '@/lib/photo';
 import { getSite } from '@/lib/site';
 
@@ -49,20 +46,6 @@ const artWidths = [480, 720, 1000];
     </div>
   </div>
 
-  <div class="hero-services">
-    <ul role="list" class="cards" aria-label="What I work on">
-      {CATEGORIES.map((c) => (
-        <li>
-          <a class="card" href={`#service-${c.id}`}>
-            <span class="card-icon" aria-hidden="true">
-              <CategoryIcon id={c.id} size={20} />
-            </span>
-            <span>{c.label}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
-  </div>
 </section>
 
 <style>
@@ -159,54 +142,4 @@ const artWidths = [480, 720, 1000];
     }
   }
 
-  /* ---- what I work on ---- */
-  .hero-services {
-    margin-top: clamp(1.25rem, 0.75rem + 1vw, 1.75rem);
-  }
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-  }
-  @media (min-width: 40rem) {
-    .cards {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 64rem) {
-    .cards {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 1rem;
-    }
-  }
-  .card {
-    display: flex;
-    align-items: center;
-    gap: 0.875rem;
-    height: 100%;
-    min-height: 4.75rem;
-    padding: 1rem 1.25rem;
-    border-radius: var(--radius-node);
-    background: var(--panel);
-    color: var(--ink);
-    text-decoration: none;
-    font-size: 1rem;
-    line-height: 1.15;
-    font-stretch: 106%;
-    font-weight: 620;
-    transition: color 180ms var(--ease-out);
-  }
-  .card:hover {
-    color: var(--signal-ink);
-  }
-  .card-icon {
-    display: grid;
-    flex: none;
-    place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 8px;
-    background: #0f2a2e;
-    color: var(--signal);
-  }
 </style>

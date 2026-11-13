@@ -83,7 +83,7 @@ const services = defineCollection({
     // The entry id must be a category id (cloud, security, ai, data, web, automation).
     name: z.string(),
     summary: z.string(),
-    /** One line, shown when a hero node is hovered or focused. */
+    /** One line, shown under the area's name in the Services tabs. */
     tooltip: z.string(),
     deliverables: z.array(z.string()).min(1),
     tools: z.array(z.string()).min(1),
