@@ -4,13 +4,10 @@ import { getCollection } from 'astro:content';
 import Section from '@/components/Section.astro';
 import T from '@/components/T.astro';
 import { CATEGORIES } from '@/lib/categories';
-import { isHttpUrl } from '@/lib/todo';
-import { byOrder } from '@/lib/format';
 
 const projects = (await getCollection('projects', (p) => p.data.featured)).sort(
   (a, b) => a.data.order - b.data.order,
 );
-const moreWork = (await getCollection('moreWork')).sort(byOrder);
 const usedCategories = CATEGORIES.filter((c) =>
   projects.some((p) => p.data.categories.includes(c.id)),
 );
@@ -57,31 +54,6 @@ const usedCategories = CATEGORIES.filter((c) =>
             <T v={p.data.year} />
           </p>
         </a>
-      </li>
-    ))}
-  </ul>
-
-  <h3 class="type-subhead mt-20 md:mt-24">More work</h3>
-  <ul role="list" class="mt-4">
-    {moreWork.map((item) => (
-      <li class="more-row">
-        <div class="more-main">
-          <p class="font-[560]">
-            {isHttpUrl(item.data.url) ? (
-              <a class="link" href={item.data.url}>
-                {item.data.title}
-              </a>
-            ) : (
-              item.data.title
-            )}
-          </p>
-          <p class="type-small text-muted">
-            <T v={item.data.summary} />
-          </p>
-        </div>
-        <p class="more-meta type-small text-muted tabular-nums">
-          <T v={item.data.status ?? item.data.year ?? ''} />
-        </p>
       </li>
     ))}
   </ul>
@@ -140,28 +112,6 @@ const usedCategories = CATEGORIES.filter((c) =>
   @media (hover: none) and (min-width: 48rem) {
     .work-cover {
       display: block;
-    }
-  }
-
-  .more-row {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: 1.5rem;
-    padding-block: 0.875rem;
-  }
-  .more-main {
-    grid-column: 1 / span 9;
-  }
-  .more-meta {
-    grid-column: 10 / -1;
-    text-align: right;
-  }
-  @media (min-width: 48rem) {
-    .more-main {
-      grid-column: 1 / span 9;
-    }
-    .more-meta {
-      grid-column: 12 / span 1;
     }
   }
 </style>

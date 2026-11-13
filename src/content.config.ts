@@ -2,6 +2,7 @@ import { defineCollection, reference } from 'astro:content';
 import { file, glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { CATEGORY_IDS } from './lib/categories';
+import { MORE_WORK_GROUP_IDS, WORK_ICONS } from './lib/more-work';
 
 /**
  * A placeholder for content you haven't written yet, e.g. "[year]".
@@ -48,7 +49,7 @@ const projects = defineCollection({
     }),
 });
 
-/** Smaller projects, listed under "More work" without a case study. */
+/** Smaller projects, shown as expanding panels under "More work", without a case study. */
 const moreWork = defineCollection({
   loader: file('./src/content/more-work.yaml'),
   schema: z.object({
@@ -56,6 +57,15 @@ const moreWork = defineCollection({
     title: z.string(),
     summary: z.string(),
     categories: z.array(category).min(1),
+    /** Which row the panel sits in (src/lib/more-work.ts). */
+    group: z.enum(MORE_WORK_GROUP_IDS),
+    /** One or two words after the number on the open panel, e.g. "DevOps" → "01 / 13 · DevOps". */
+    kind: z.string(),
+    icon: z.enum(WORK_ICONS),
+    /** Tools, one chip each. Leave empty when there's nothing specific to name. */
+    stack: z.array(z.string()).default([]),
+    /** The panel shown open when the page loads (one per row; otherwise the row's first). */
+    open: z.boolean().default(false),
     year: z.number().int().or(todo).optional(),
     status: z.string().optional(),
     url: url.optional(),

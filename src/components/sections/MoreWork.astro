@@ -1,0 +1,651 @@
+---
+import { getCollection } from 'astro:content';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import ArrowUpRight from '@lucide/astro/icons/arrow-up-right';
+import Section from '@/components/Section.astro';
+import T from '@/components/T.astro';
+import WorkIcon from '@/components/WorkIcon.astro';
+import { byOrder } from '@/lib/format';
+import { MORE_WORK_GROUPS } from '@/lib/more-work';
+import { isHttpUrl } from '@/lib/todo';
+
+const items = (await getCollection('moreWork')).sort(byOrder);
+const pad = (n: number) => String(n).padStart(2, '0');
+const total = pad(items.length);
+
+/*
+ * Panel colours run yellow → green → deep teal along each row, whatever its
+ * length. From index 4 on they are dark enough for light text (4.6:1 or more).
+ */
+const RAMP = ['#f6b93b', '#d6c04f', '#a2c67e', '#68b18e', '#2a8279', '#226567', '#1b4f55'];
+const LIGHT_INK_FROM = 4;
+/** Small resting tilts, so a row reads as cards laid by hand. Open panels straighten. */
+const TILTS = [-1.4, 1.1, -0.7, 1.5, -1.1, 0.8, -1.6];
+
+let num = 0;
+const rows = MORE_WORK_GROUPS.map((group) => {
+  const list = items.filter((p) => p.data.group === group.id);
+  const openAt = Math.max(
+    0,
+    list.findIndex((p) => p.data.open),
+  );
+  const panels = list.map((p, i) => {
+    const k = list.length === 1 ? 0 : Math.round((i * (RAMP.length - 1)) / (list.length - 1));
+    num += 1;
+    return {
+      id: p.id,
+      data: p.data,
+      num,
+      i,
+      open: i === openAt,
+      color: RAMP[k],
+      lightInk: k >= LIGHT_INK_FROM,
+      tilt: TILTS[(num - 1) % TILTS.length],
+    };
+  });
+  return { ...group, panels };
+}).filter((row) => row.panels.length > 0);
+---
+
+<Section id="more-work" eyebrow="Selected builds" title="More work" size="display">
+  <p class="mw-hint" aria-hidden="true">
+    {items.length} projects · hover or tap a panel to open it
+  </p>
+
+  <!--
+    One row of panels per group; one panel per row is open. Hover (mouse, wide
+    screens), tap or keyboard focus opens a panel. Below 64rem the rows become
+    vertical accordions. Collapsed panel bodies are inert until opened.
+  -->
+  <div class="mw" data-more-work>
+    {rows.map((row) => (
+      <div class="mw-set">
+        <h3 id={`mw-${row.id}`} class="mw-group">
+          {row.label}
+        </h3>
+        <ul role="list" class="mw-row" aria-labelledby={`mw-${row.id}`} data-mw-row>
+          {row.panels.map((p) => (
+            <li
+              class:list={['mw-panel', p.lightInk && 'mw-panel--light']}
+              style={`--c: ${p.color}; --tilt: ${p.tilt}deg; --i: ${p.i}`}
+              data-open={p.open ? '' : undefined}
+            >
+              <span class="mw-badge" aria-hidden="true">
+                {pad(p.num)}
+              </span>
+              <div class="mw-card">
+                <button
+                  type="button"
+                  class="mw-face"
+                  aria-expanded={p.open ? 'true' : 'false'}
+                  aria-controls={`mw-body-${p.id}`}
+                >
+                  <span class="mw-icon" aria-hidden="true">
+                    <WorkIcon id={p.data.icon} />
+                  </span>
+                  <span class="mw-num" aria-hidden="true">
+                    {pad(p.num)}
+                  </span>
+                  <span class="mw-name">{p.data.title}</span>
+                </button>
+
+                <div id={`mw-body-${p.id}`} class="mw-body" inert={!p.open}>
+                  <div class="mw-sheet">
+                    <div class="mw-bar">
+                      <span class="mw-path" aria-hidden="true">
+                        <span class="mw-dot" />
+                        <span class="mw-file">projects/{p.id}.md</span>
+                      </span>
+                      <span class="mw-when">
+                        <T v={p.data.status ?? p.data.year ?? ''} />
+                      </span>
+                    </div>
+                    <div class="mw-content">
+                      <p class="mw-count">
+                        {pad(p.num)} / {total} · {p.data.kind}
+                      </p>
+                      <h4 class="mw-title">{p.data.title}</h4>
+                      <p class="mw-summary">
+                        <T v={p.data.summary} />
+                      </p>
+                      {p.data.stack.length > 0 && (
+                        <ul role="list" class="mw-chips" aria-label="Tools">
+                          {p.data.stack.map((tool) => (
+                            <li class="mw-chip">{tool}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {isHttpUrl(p.data.url) ? (
+                        <a class="mw-cta" href={p.data.url} target="_blank" rel="noopener">
+                          View project
+                          <ArrowUpRight size={14} stroke-width={2.25} aria-hidden="true" />
+                          <span class="sr-only">(opens in a new tab)</span>
+                        </a>
+                      ) : (
+                        <a class="mw-cta mw-cta--quiet" href="#contact">
+                          Ask me about it
+                          <ArrowRight size={14} stroke-width={2.25} aria-hidden="true" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</Section>
+
+<style>
+  .mw-hint {
+    margin-top: -2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    text-align: right;
+  }
+  @media (max-width: 47.99rem) {
+    .mw-hint {
+      margin-top: -1.5rem;
+      text-align: left;
+    }
+  }
+
+  .mw {
+    --dur: 0.7s; /* panel open/close */
+    display: grid;
+    gap: 2.5rem;
+  }
+  .mw-group {
+    color: var(--ink);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    font-stretch: 112%;
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- Phones and tablets: a vertical accordion ---------- */
+
+  .mw-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin-top: 1rem;
+  }
+  .mw-panel {
+    --ink-c: #0f2a2e;
+    --rd: calc(var(--i) * 70ms); /* entrance stagger */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition:
+      flex-grow var(--dur) var(--ease-out),
+      flex-basis var(--dur) var(--ease-out),
+      opacity 0.6s ease var(--rd),
+      translate 0.9s var(--ease-out) var(--rd);
+  }
+  .mw-panel--light {
+    --ink-c: #f4f8f6;
+  }
+  .mw-badge {
+    display: none;
+  }
+
+  .mw-card {
+    position: relative;
+    z-index: 1; /* over the badge stem */
+    display: grid;
+    grid-template-columns: minmax(0, 1fr); /* the wide sheet must not widen the face */
+    flex: 1;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: var(--c);
+    color: var(--ink-c);
+    box-shadow: 0 14px 26px -20px rgb(15 42 46 / 0.55);
+    transition:
+      background-color 0.55s var(--ease-out),
+      box-shadow 0.55s var(--ease-out),
+      rotate var(--dur) var(--ease-out),
+      translate var(--dur) var(--ease-out);
+  }
+  .mw-panel[data-open] .mw-card {
+    background: var(--band);
+    box-shadow:
+      0 34px 60px -30px rgb(15 42 46 / 0.65),
+      inset 0 0 0 1px light-dark(transparent, rgb(108 194 184 / 0.2));
+  }
+  .mw-panel:has(.mw-face:focus-visible) .mw-card {
+    outline: 2px solid var(--signal-ink);
+    outline-offset: 3px;
+  }
+
+  /* The collapsed face: the whole panel is the button. */
+  .mw-face {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    min-height: 4.25rem;
+    padding: 0.75rem 1rem;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: opacity 0.35s ease 0.22s;
+  }
+  .mw-face:focus-visible {
+    outline: none; /* drawn on the card instead */
+  }
+  .mw-panel[data-open] .mw-face {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  .mw-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    background: #fff;
+    color: #0f2a2e;
+    box-shadow: 0 6px 12px -6px rgb(15 42 46 / 0.45);
+    transition: scale 0.45s var(--ease-out);
+  }
+  .mw-num {
+    order: -1;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    opacity: 0.8;
+  }
+  .mw-name {
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    font-stretch: 106%;
+    font-weight: 700;
+  }
+
+  /* The open sheet. Collapsed it has no height here; wide screens override. */
+  .mw-body {
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--dur) var(--ease-out);
+  }
+  .mw-panel[data-open] .mw-body {
+    grid-template-rows: 1fr;
+  }
+  .mw-sheet {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    color-scheme: dark; /* tokens resolve to their dark values on the dark sheet */
+    color: var(--ink);
+  }
+  .mw-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--rule) 60%, transparent);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+  }
+  .mw-path {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    color: var(--muted);
+  }
+  .mw-dot {
+    flex: none;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: var(--radius-full);
+    background: var(--signal);
+  }
+  .mw-file {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .mw-when {
+    flex: none;
+    color: var(--signal);
+  }
+  .mw-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem 1.25rem 1.5rem;
+  }
+  .mw-count {
+    color: var(--signal);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .mw-title {
+    margin-top: 0.5rem;
+    font-size: clamp(1.375rem, 1.2rem + 0.5vw, 1.75rem);
+    line-height: 1.08;
+    font-stretch: 118%;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  .mw-summary {
+    margin-top: 0.75rem;
+    color: color-mix(in oklab, var(--muted) 65%, var(--ink));
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+  .mw-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 1rem;
+  }
+  .mw-chip {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid color-mix(in oklab, var(--rule) 80%, transparent);
+    border-radius: 0.375rem;
+    background: var(--panel);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.3;
+  }
+  .mw-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.5rem;
+    margin-top: 1.25rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    background: var(--signal);
+    color: var(--on-signal);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+      filter 0.2s ease,
+      background-color 0.2s ease;
+  }
+  .mw-cta:hover {
+    filter: brightness(1.08);
+  }
+  .mw-cta--quiet {
+    background: transparent;
+    color: var(--signal);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--signal) 55%, transparent);
+  }
+  .mw-cta--quiet:hover {
+    background: color-mix(in oklab, var(--signal) 12%, transparent);
+    filter: none;
+  }
+
+  /* Sheet contents rise in one after another once the panel opens. */
+  .mw-bar,
+  .mw-content > * {
+    opacity: 0;
+    translate: 0 0.625rem;
+    transition:
+      opacity 0.15s ease,
+      translate 0s linear 0.15s;
+  }
+  .mw-panel[data-open] :is(.mw-bar, .mw-content > *) {
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity 0.45s ease var(--d),
+      translate 0.6s var(--ease-out) var(--d);
+  }
+  .mw-bar {
+    --d: 0.16s;
+  }
+  .mw-content > :nth-child(1) {
+    --d: 0.22s;
+  }
+  .mw-content > :nth-child(2) {
+    --d: 0.27s;
+  }
+  .mw-content > :nth-child(3) {
+    --d: 0.32s;
+  }
+  .mw-content > :nth-child(4) {
+    --d: 0.37s;
+  }
+  .mw-content > :nth-child(5) {
+    --d: 0.42s;
+  }
+
+  /* Entrance: panels rise in the first time a row scrolls into view. */
+  .mw-row[data-reveal='pending'] .mw-panel {
+    opacity: 0;
+    translate: 0 2rem;
+  }
+
+  /* ---------- Wide screens: a row of tall panels, one open ---------- */
+
+  @media (min-width: 64rem) {
+    .mw {
+      grid-auto-rows: 1fr; /* both rows as tall as the taller one */
+      gap: 3rem;
+    }
+    .mw-set {
+      display: flex;
+      flex-direction: column;
+    }
+    .mw-row {
+      --open-w: clamp(19rem, 34cqi, 26rem);
+      container-type: inline-size;
+      flex: 1;
+      flex-direction: row;
+      gap: 0.75rem;
+      min-height: 27rem;
+      margin-top: 0.75rem;
+      padding-top: 5rem; /* the badges */
+    }
+    .mw-panel {
+      --stem: 0.875rem;
+      flex: 1 1 0rem;
+      min-width: 0;
+    }
+    .mw-panel:nth-child(even) {
+      --stem: 1.875rem;
+    }
+    .mw-panel[data-open] {
+      flex-grow: 0;
+      flex-basis: var(--open-w);
+    }
+
+    .mw-card {
+      border-radius: 1.125rem;
+      rotate: var(--tilt);
+    }
+    .mw-panel[data-open] .mw-card {
+      rotate: 0deg;
+      translate: 0 -0.25rem;
+    }
+    .mw-panel:not([data-open]):hover .mw-card {
+      rotate: calc(var(--tilt) * 0.4);
+      translate: 0 -0.5rem;
+      box-shadow: 0 24px 34px -22px rgb(15 42 46 / 0.6);
+    }
+    .mw-panel:not([data-open]):hover .mw-icon {
+      scale: 1.12;
+    }
+
+    /* Face: icon on top, the title running up from the bottom. */
+    .mw-face {
+      flex-direction: column;
+      gap: 1.25rem;
+      min-height: 0;
+      padding: 1.5rem 0.5rem;
+    }
+    .mw-num {
+      display: none;
+    }
+    .mw-name {
+      flex: 1 1 0;
+      min-height: 0;
+      max-width: 100%;
+      overflow: hidden;
+      font-size: 0.875rem;
+      line-height: 1.2;
+      writing-mode: vertical-rl;
+      rotate: 180deg;
+    }
+
+    /*
+     * The sheet is always laid out at the open width, so nothing reflows while
+     * a panel widens: the card just uncovers it.
+     */
+    .mw-body {
+      grid-template-rows: 1fr;
+      transition: none;
+    }
+    .mw-sheet {
+      width: var(--open-w);
+    }
+    .mw-content {
+      padding: 1.25rem 1.5rem 1.5rem;
+    }
+    .mw-content > :nth-last-child(2) {
+      margin-bottom: 1.25rem;
+    }
+    .mw-cta {
+      margin-top: auto; /* buttons line up at the bottom */
+    }
+
+    /* Number badge on a stem above each panel; stems alternate in length. */
+    .mw-badge {
+      position: absolute;
+      bottom: calc(100% + var(--stem));
+      left: 50%;
+      z-index: 0;
+      display: grid;
+      place-items: center;
+      width: 2.125rem;
+      height: 2.125rem;
+      translate: -50% 0;
+      border-radius: var(--radius-full);
+      background: var(--c);
+      color: var(--ink-c);
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      transition:
+        width 0.5s var(--ease-out),
+        height 0.5s var(--ease-out),
+        background-color 0.4s ease,
+        color 0.4s ease,
+        translate 0.5s var(--ease-out),
+        scale 0.6s var(--ease-out) calc(var(--rd) + 0.25s);
+    }
+    .mw-badge::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      width: 2px;
+      height: calc(var(--stem) + 0.75rem); /* runs on under the card */
+      translate: -50% 0;
+      background: inherit;
+    }
+    .mw-panel[data-open] .mw-badge {
+      width: 2.625rem;
+      height: 2.625rem;
+      background: light-dark(var(--band), var(--signal));
+      color: light-dark(var(--signal), var(--on-signal));
+      font-size: 0.8125rem;
+    }
+    .mw-panel:not([data-open]):hover .mw-badge {
+      translate: -50% -0.375rem;
+    }
+    .mw-row[data-reveal='pending'] .mw-badge {
+      scale: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mw-panel,
+    .mw-card,
+    .mw-face,
+    .mw-icon,
+    .mw-body,
+    .mw-badge,
+    .mw-bar,
+    .mw-content > *,
+    .mw-panel[data-open] :is(.mw-face, .mw-bar, .mw-content > *) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  function initMoreWork() {
+    const root = document.querySelector<HTMLElement>('[data-more-work]');
+    if (!root) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wide = window.matchMedia('(min-width: 64rem)');
+
+    for (const row of root.querySelectorAll<HTMLElement>('[data-mw-row]')) {
+      const panels = [...row.querySelectorAll<HTMLElement>(':scope > .mw-panel')];
+      let timer = 0;
+
+      const open = (panel: HTMLElement) => {
+        window.clearTimeout(timer);
+        if (panel.hasAttribute('data-open')) return;
+        for (const p of panels) {
+          const on = p === panel;
+          p.toggleAttribute('data-open', on);
+          p.querySelector('.mw-face')?.setAttribute('aria-expanded', String(on));
+          const body = p.querySelector<HTMLElement>('.mw-body');
+          if (body) body.inert = !on;
+        }
+      };
+
+      for (const panel of panels) {
+        const face = panel.querySelector<HTMLButtonElement>('.mw-face');
+        face?.addEventListener('click', () => open(panel));
+        face?.addEventListener('focus', () => open(panel));
+        // Hover opens after a short pause, so sweeping the mouse across a row
+        // doesn't open every panel on the way. Wide layout only: in the stacked
+        // layout, opening moves the panels under the pointer.
+        panel.addEventListener('pointerenter', (event) => {
+          if (event.pointerType !== 'mouse' || !wide.matches) return;
+          window.clearTimeout(timer);
+          timer = window.setTimeout(() => open(panel), 90);
+        });
+        panel.addEventListener('pointerleave', () => window.clearTimeout(timer));
+      }
+
+      // Entrance, for rows that start below the fold.
+      if (!reduce && row.getBoundingClientRect().top > window.innerHeight) {
+        row.dataset.reveal = 'pending';
+        const io = new IntersectionObserver(
+          (entries) => {
+            if (!entries.some((e) => e.isIntersecting)) return;
+            row.dataset.reveal = 'done';
+            io.disconnect();
+          },
+          { threshold: 0.2 },
+        );
+        io.observe(row);
+      }
+    }
+  }
+  document.addEventListener('astro:page-load', initMoreWork);
+</script>

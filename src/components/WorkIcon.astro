@@ -1,0 +1,41 @@
+---
+import Cloud from '@lucide/astro/icons/cloud';
+import ArrowRightLeft from '@lucide/astro/icons/arrow-right-left';
+import ShieldCheck from '@lucide/astro/icons/shield-check';
+import Box from '@lucide/astro/icons/box';
+import Sparkles from '@lucide/astro/icons/sparkles';
+import MessageCircleMore from '@lucide/astro/icons/message-circle-more';
+import ChartColumn from '@lucide/astro/icons/chart-column';
+import Mail from '@lucide/astro/icons/mail';
+import Globe from '@lucide/astro/icons/globe';
+import Smartphone from '@lucide/astro/icons/smartphone';
+import PenTool from '@lucide/astro/icons/pen-tool';
+import Pencil from '@lucide/astro/icons/pencil';
+import Search from '@lucide/astro/icons/search';
+import type { WorkIconId } from '@/lib/more-work';
+
+interface Props {
+  id: WorkIconId;
+  size?: number;
+  class?: string;
+}
+const { id, size = 16, class: className } = Astro.props;
+const icons = {
+  cloud: Cloud,
+  migrate: ArrowRightLeft,
+  shield: ShieldCheck,
+  box: Box,
+  sparkles: Sparkles,
+  chat: MessageCircleMore,
+  chart: ChartColumn,
+  mail: Mail,
+  globe: Globe,
+  phone: Smartphone,
+  'pen-tool': PenTool,
+  pencil: Pencil,
+  search: Search,
+} as const;
+const Icon = icons[id];
+---
+
+<Icon size={size} stroke-width={2} aria-hidden="true" class={className} />

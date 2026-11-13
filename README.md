@@ -53,7 +53,7 @@ Save it as `src/assets/me.png` (or `.jpg` / `.webp`), not in `public/`, so Astro
 
 ### Add a smaller project
 
-Add an entry to `src/content/more-work.yaml`. These are listed under "More work", without a case study.
+Add an entry to `src/content/more-work.yaml`. These are shown as expanding panels under "More work", without a case study. Each one needs a `group` (which row), a `kind` (the short label after its number), an `icon` and optionally a `stack`; the ids are in `src/lib/more-work.ts`. A "View project" button appears once `url` is a real link.
 
 ### Add a job
 

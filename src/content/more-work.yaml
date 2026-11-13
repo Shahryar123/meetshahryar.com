@@ -1,94 +1,151 @@
-# Smaller projects, listed under "More work". No case study pages.
-# categories use the ids in src/lib/categories.ts.
+# Smaller projects, shown as expanding panels under "More work". No case study pages.
+# categories use the ids in src/lib/categories.ts; group and icon use the ids in
+# src/lib/more-work.ts. Numbers on the panels follow `order`, row by row.
+# A "View project" button appears once `url` is a real link; until then the
+# panel offers "Ask me about it" (links to the contact section).
+
+# --- Row 1: Cloud, DevOps & AI ---
+
+- id: devops-automation-platform
+  order: 1
+  group: cloud-ai
+  kind: DevOps
+  icon: cloud
+  open: true
+  title: DevOps automation platform
+  summary: A self-service React (Vite) app that provisions cloud infrastructure across environments through Pulumi, Pulumi ESC and Azure DevOps pipelines.
+  stack: [React, Pulumi, Azure DevOps]
+  categories: [cloud]
+  year: "[year]"
+
+- id: azure-aws-assessment
+  order: 2
+  group: cloud-ai
+  kind: Migration
+  icon: migrate
+  title: Azure-to-AWS lift-and-shift assessment
+  summary: An ASP.NET MVC app moved onto EC2 Windows and RDS SQL Server with no code changes.
+  stack: [ASP.NET MVC, EC2, RDS SQL Server]
+  categories: [cloud]
+  year: "[year]"
+
+- id: gcp-key-hardening
+  order: 3
+  group: cloud-ai
+  kind: Security
+  icon: shield
+  title: GCP service-account key hardening
+  summary: Service-account keys locked down with org policy constraints.
+  stack: [GCP, Org policy]
+  categories: [security, cloud]
+  year: "[year]"
+
+- id: trackiq
+  order: 4
+  group: cloud-ai
+  kind: Platform
+  icon: box
+  title: TrackIQ
+  summary: An RFID inventory tracking platform, from manufacturing to sale, built alone at Alpha Mu Digital.
+  stack: [React, Node.js, Express, PostgreSQL, Docker]
+  categories: [web]
+  year: 2025
 
 - id: llm-eval-harness
-  order: 1
+  order: 5
+  group: cloud-ai
+  kind: AI
+  icon: sparkles
   title: Layered LLM evaluation harness
   summary: Four layers of checks for LLM output (automated safety checks, rubric-based LLM-as-a-judge scoring, human review and statistical regression detection), with 95 automated tests and scheduled live-model evaluations in CI.
   categories: [ai, automation]
   year: "[year]"
 
-- id: devops-automation-platform
-  order: 2
-  title: DevOps automation platform
-  summary: A self-service React (Vite) app that provisions cloud infrastructure across environments through Pulumi, Pulumi ESC and Azure DevOps pipelines.
-  categories: [cloud]
-  year: "[year]"
-
-- id: trackiq
-  order: 3
-  title: TrackIQ
-  summary: An RFID inventory tracking platform, from manufacturing to sale, built alone in React, Node.js/Express, PostgreSQL and Docker at Alpha Mu Digital.
-  categories: [web]
-  year: 2025
-
-- id: salesfusion-crm
-  order: 4
-  title: SalesFusion CRM
-  summary: A CRM for leads, contacts and sales pipelines, with authentication, search and filtering, and an analytics dashboard. Python, Flask, SQLAlchemy and SQLite.
-  categories: [web]
-  year: "[year]"
-
 - id: ai-sales-assistant
-  order: 5
+  order: 6
+  group: cloud-ai
+  kind: AI
+  icon: chat
   title: AI sales assistant for British Instruments
   summary: Product finder, quote requests and handoff to a person.
   categories: [ai]
   status: "[status]"
 
+- id: salesfusion-crm
+  order: 7
+  group: cloud-ai
+  kind: App
+  icon: chart
+  title: SalesFusion CRM
+  summary: A CRM for leads, contacts and sales pipelines, with authentication, search and filtering, and an analytics dashboard.
+  stack: [Python, Flask, SQLAlchemy, SQLite]
+  categories: [web]
+  year: "[year]"
+
+# --- Row 2: Web, Automation & SEO ---
+
 - id: mailfusion
-  order: 6
+  order: 8
+  group: web-qa
+  kind: App
+  icon: mail
   title: MailFusion
   summary: My Python app for single and bulk (CSV) email campaigns with inline images.
+  stack: [Python]
   categories: [automation]
   year: "[year]"
 
 - id: british-instruments
-  order: 7
+  order: 9
+  group: web-qa
+  kind: Web
+  icon: globe
   title: British Instruments website
   summary: "[your role]: the site and contact form, technical SEO (a server-side rendering fix for brand pages, JSON-LD, long-form technical articles with SVG diagrams) and email marketing."
+  stack: [SSR, JSON-LD, SEO]
   categories: [web]
   url: https://britishinstruments.co.uk
   year: "[year]"
 
-- id: azure-aws-assessment
-  order: 8
-  title: Azure-to-AWS lift-and-shift assessment
-  summary: An ASP.NET MVC app moved onto EC2 Windows and RDS SQL Server with no code changes.
-  categories: [cloud]
-  year: "[year]"
-
 - id: flutter-test-automation
-  order: 9
+  order: 10
+  group: web-qa
+  kind: QA
+  icon: phone
+  open: true
   title: Mobile test automation for a Flutter fintech app
   summary: Appium and WebdriverIO with the Page Object Model, plus an Appium vs Patrol comparison.
+  stack: [Appium, WebdriverIO, POM]
   categories: [automation]
   year: "[year]"
 
 - id: wordpress-sites
-  order: 10
+  order: 11
+  group: web-qa
+  kind: Web ops
+  icon: pen-tool
   title: Client WordPress sites
   summary: Hosting, malware incident response, DNS and firewall fixes across 30–40 sites.
+  stack: [WordPress, DNS]
   categories: [web, security]
   year: "[years]"
 
 - id: martin-sports
-  order: 11
+  order: 12
+  group: web-qa
+  kind: Design
+  icon: pencil
   title: Martin Sports cricket store
   summary: Design and UI.
   categories: [web]
   year: "[year]"
 
 - id: technical-seo
-  order: 12
+  order: 13
+  group: web-qa
+  kind: SEO
+  icon: search
   title: Technical SEO audits
   summary: An audit for Guardian Safety Online and SEO for Fire Safety UAE.
   categories: [web]
-  year: "[year]"
-
-- id: gcp-key-hardening
-  order: 13
-  title: GCP service-account key hardening
-  summary: Service-account keys locked down with org policy constraints.
-  categories: [security, cloud]
   year: "[year]"

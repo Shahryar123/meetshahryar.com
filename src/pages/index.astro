@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/hero/Hero.astro';
 import Work from '@/components/sections/Work.astro';
+import MoreWork from '@/components/sections/MoreWork.astro';
 import Services from '@/components/sections/Services.astro';
 import Process from '@/components/sections/Process.astro';
 import Experience from '@/components/sections/Experience.astro';
@@ -21,6 +22,7 @@ const name = [site.firstName, clean(site.surname)].filter(Boolean).join(' ');
 <BaseLayout title={`${name}, ${site.title}`} description={site.valueLine}>
   <Hero />
   <Work />
+  <MoreWork />
   <Services />
   <Process />
   <Experience />
