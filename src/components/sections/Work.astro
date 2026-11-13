@@ -79,8 +79,18 @@ const first = items[0];
   focusing a row (or hovering/tapping a ring segment) shows that project on the
   card and lifts its segment out of the ring. Phones get the rows only, with
   each summary inline.
+
+  Scroll-through: where the section fits the viewport, the script pins it
+  (data-pin) and the next (n - 1) steps of scrolling walk through the projects
+  before the page moves on. The arc on the dotted circle shows the progress.
 -->
-<section id="work" aria-labelledby="work-title" class="shell section-gap">
+<section
+  id="work"
+  aria-labelledby="work-title"
+  class="sw-track shell section-gap"
+  style={`--n: ${items.length}`}
+  data-sw-track
+>
   <div class="sw" data-sw>
     <hgroup class="sw-head">
       <Eyebrow label="Projects" />
@@ -156,6 +166,11 @@ const first = items[0];
     <div class="sw-ring" aria-hidden="true">
       <svg viewBox={`${-VIEW} ${-VIEW} ${VIEW * 2} ${VIEW * 2}`}>
         <circle class="sw-dots" r={DOT_R} />
+        <path
+          class="sw-progress"
+          d={`M0 ${-DOT_R}A${DOT_R} ${DOT_R} 0 0 1 0 ${DOT_R}`}
+          pathLength="1"
+        />
         {items.map((p) => (
           <g
             class="sw-seg"
@@ -506,6 +521,88 @@ const first = items[0];
       opacity: 0;
       scale: 0.82;
     }
+
+    /* Scroll-through progress: fills the right half of the dotted circle. */
+    .sw-progress {
+      fill: none;
+      stroke: var(--signal);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: calc(1 - var(--p, 0));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .sw-track[data-pin] .sw-progress {
+      opacity: 1;
+    }
+  }
+
+  /*
+   * Scroll-through (the script sets data-pin and the sizes): the section grows
+   * by one step per extra project while the content stays put, centred under
+   * the header.
+   */
+  .sw-track[data-pin] {
+    height: calc(var(--sw-h) + (var(--n) - 1) * var(--step));
+  }
+  .sw {
+    position: relative; /* offsetTop of the card, ring and rows is measured from here */
+  }
+  .sw-track[data-pin] .sw {
+    position: sticky;
+    top: var(--sw-top);
+  }
+
+  /*
+   * Short screens (most laptops at 125–150% scaling): a tighter layout, so the
+   * section still fits under the header and can pin.
+   */
+  @media (min-width: 64rem) and (max-height: 50rem) {
+    .sw {
+      row-gap: 1rem;
+    }
+    .sw-head h2 {
+      font-size: clamp(2.25rem, 7vh, 4.5rem);
+    }
+    .sw-card {
+      padding: 1.125rem 1.375rem 1.25rem;
+    }
+    .sw-num {
+      font-size: 2rem;
+    }
+    .sw-name {
+      margin-top: 0.5rem;
+    }
+    .sw-summary {
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    .sw-flow {
+      margin-top: 0.875rem;
+      padding: 0.5rem 0.75rem;
+    }
+    .sw-slide > :nth-last-child(2) {
+      margin-bottom: 1rem;
+    }
+    .sw-cta {
+      min-height: 2.5rem;
+    }
+    .sw-list {
+      gap: 0.5rem;
+    }
+    .sw-row {
+      min-height: 3.5rem;
+    }
+    .sw-text {
+      gap: 0.125rem;
+      padding: 0.5rem 0.875rem;
+    }
+    .sw-tab {
+      width: 2.875rem;
+      font-size: 1.0625rem;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -532,15 +629,30 @@ const first = items[0];
     const segs = [...root.querySelectorAll<SVGGElement>('[data-sw-seg]')];
     const slides = [...root.querySelectorAll<HTMLElement>('[data-sw-slide]')];
     const card = root.querySelector<HTMLElement>('[data-sw-card]');
+    const track = root.closest<HTMLElement>('[data-sw-track]');
+    const list = root.querySelector<HTMLElement>('.sw-list');
+    const ring = root.querySelector<HTMLElement>('.sw-ring');
+    const n = rows.length;
     const wide = window.matchMedia('(min-width: 64rem)');
+    const pinnable = window.matchMedia(
+      '(min-width: 64rem) and (prefers-reduced-motion: no-preference)',
+    );
+    // Window listeners outlive this page's DOM under the client router.
+    const lifetime = new AbortController();
+    const { signal } = lifetime;
+    document.addEventListener('astro:before-swap', () => lifetime.abort(), { once: true });
+
     let current = Math.max(
       0,
       rows.findIndex((row) => row.hasAttribute('data-active')),
     );
     let timer = 0;
+    let pending = -1;
+    let lastScroll = 0;
 
     const select = (index: number) => {
       window.clearTimeout(timer);
+      pending = -1;
       if (index === current) return;
       current = index;
       for (const list of [rows, segs, slides]) {
@@ -552,24 +664,105 @@ const first = items[0];
     // A short pause before switching, so moving the mouse across the list
     // doesn't flash every project on the way.
     const selectSoon = (index: number) => {
+      if (index === pending) return;
       window.clearTimeout(timer);
+      pending = index;
       timer = window.setTimeout(() => select(index), 70);
+    };
+    const cancel = () => {
+      window.clearTimeout(timer);
+      pending = -1;
+    };
+    // Only real mouse movement counts as hover. Browsers send synthetic pointer
+    // events right after a scroll, and those would fight the scroll-through.
+    const hover = (index: number) => (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse' || !wide.matches) return;
+      if (performance.now() - lastScroll < 300) return;
+      selectSoon(index);
+    };
+
+    // --- Scroll-through ---
+    let pinned = false;
+    let top = 0; // where the pinned content sits, from the viewport top
+    let step = 0; // scroll distance per project
+    let scrollIndex = -1;
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      if (!pinned || !track) return;
+      const travelled = top - track.getBoundingClientRect().top;
+      const p = Math.min(1, Math.max(0, travelled / ((n - 1) * step)));
+      root.style.setProperty('--p', p.toFixed(4));
+      // Switch only when the scroll crosses into another project's step, so a
+      // project picked by hover stays until the visitor scrolls on.
+      const index = Math.round(p * (n - 1));
+      if (index !== scrollIndex) {
+        scrollIndex = index;
+        select(index);
+      }
+    };
+
+    const layout = () => {
+      if (!track) return;
+      const html = getComputedStyle(document.documentElement);
+      const header = parseFloat(html.getPropertyValue('--header-h')) * parseFloat(html.fontSize);
+      const space = window.innerHeight - header;
+      const height = root.offsetHeight;
+      // Above the card, ring and rows there's only the heading. When the section
+      // is taller than the space, the heading may slide up behind the header,
+      // but the card, ring and rows must stay fully in view.
+      const air = 8;
+      const spare = Math.min(...[card, list, ring].map((el) => el?.offsetTop ?? 0));
+      const fits = height <= space;
+      pinned = pinnable.matches && n > 1 && (fits || height - space + air <= spare);
+      track.toggleAttribute('data-pin', pinned);
+      if (!pinned) return;
+      top = fits ? header + (space - height) / 2 : header + space - height - air;
+      step = Math.max(240, window.innerHeight * 0.45);
+      track.style.setProperty('--sw-h', `${height}px`);
+      track.style.setProperty('--sw-top', `${top}px`);
+      track.style.setProperty('--step', `${step}px`);
+      update();
+    };
+
+    // Keyboard: tabbing to a row scrolls to that project's step, so the
+    // scroll position and the shown project stay in step.
+    const scrollToStep = (index: number) => {
+      if (!pinned || !track) return;
+      const trackTop = track.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: trackTop - top + index * step, behavior: 'instant' });
     };
 
     rows.forEach((row, i) => {
-      row.addEventListener('pointerenter', (event) => {
-        if (event.pointerType === 'mouse' && wide.matches) selectSoon(i);
+      row.addEventListener('pointermove', hover(i));
+      row.addEventListener('pointerleave', cancel);
+      row.addEventListener('focus', () => {
+        select(i);
+        if (row.matches(':focus-visible')) scrollToStep(i);
       });
-      row.addEventListener('pointerleave', () => window.clearTimeout(timer));
-      row.addEventListener('focus', () => select(i));
     });
     segs.forEach((seg, i) => {
-      seg.addEventListener('pointerenter', (event) => {
-        if (event.pointerType === 'mouse') selectSoon(i);
-      });
-      seg.addEventListener('pointerleave', () => window.clearTimeout(timer));
+      seg.addEventListener('pointermove', hover(i));
+      seg.addEventListener('pointerleave', cancel);
       seg.addEventListener('click', () => select(i)); // tap on touch screens
     });
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        lastScroll = performance.now();
+        if (pinned && !frame) frame = requestAnimationFrame(update);
+      },
+      { passive: true, signal },
+    );
+    window.addEventListener('resize', layout, { signal });
+    pinnable.addEventListener('change', layout, { signal });
+    // Fonts arriving or the content changing size re-measure the section.
+    const sizes = new ResizeObserver(() => layout());
+    sizes.observe(root);
+    signal.addEventListener('abort', () => sizes.disconnect());
+    layout();
 
     // Entrance, when the section starts below the fold.
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
