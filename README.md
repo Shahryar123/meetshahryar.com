@@ -48,6 +48,8 @@ Save it as `src/assets/me.png` (or `.jpg` / `.webp`), not in `public/`, so Astro
    - `categories`: one or more category ids.
    - `order`: position in the work index.
    - `results`: real numbers only.
+   - `icon`: the icon on its ring segment in Selected work (ids in `src/lib/work-icons.ts`).
+   - `flow`: optional, 3–5 short steps shown as "A → B → C" on the Selected work card.
 3. Optional cover: save it as `src/assets/projects/<slug>.jpg`, then add `cover: ../../assets/projects/<slug>.jpg` and `coverAlt: <description>`.
 4. Confidential work: set `confidential: true` and a generic `client`, such as "Confidential retail client".
 

@@ -12,14 +12,19 @@ import Smartphone from '@lucide/astro/icons/smartphone';
 import PenTool from '@lucide/astro/icons/pen-tool';
 import Pencil from '@lucide/astro/icons/pencil';
 import Search from '@lucide/astro/icons/search';
-import type { WorkIconId } from '@/lib/more-work';
+import ScanFace from '@lucide/astro/icons/scan-face';
+import KeyRound from '@lucide/astro/icons/key-round';
+import Server from '@lucide/astro/icons/server';
+import type { WorkIconId } from '@/lib/work-icons';
 
 interface Props {
   id: WorkIconId;
   size?: number;
   class?: string;
+  /** Other SVG attributes, e.g. x/y/width/height when nested inside another SVG. */
+  [attr: string]: unknown;
 }
-const { id, size = 16, class: className } = Astro.props;
+const { id, size = 16, class: className, ...rest } = Astro.props;
 const icons = {
   cloud: Cloud,
   migrate: ArrowRightLeft,
@@ -34,8 +39,11 @@ const icons = {
   'pen-tool': PenTool,
   pencil: Pencil,
   search: Search,
+  'scan-face': ScanFace,
+  key: KeyRound,
+  server: Server,
 } as const;
 const Icon = icons[id];
 ---
 
-<Icon size={size} stroke-width={2} aria-hidden="true" class={className} />
+<Icon size={size} stroke-width={2} aria-hidden="true" class={className} {...rest} />

@@ -1,142 +1,590 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import Section from '@/components/Section.astro';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Eyebrow from '@/components/Eyebrow.astro';
 import T from '@/components/T.astro';
-import { CATEGORIES } from '@/lib/categories';
+import WorkIcon from '@/components/WorkIcon.astro';
 
 const projects = (await getCollection('projects', (p) => p.data.featured)).sort(
   (a, b) => a.data.order - b.data.order,
 );
-const usedCategories = CATEGORIES.filter((c) =>
-  projects.some((p) => p.data.categories.includes(c.id)),
-);
+const n = projects.length;
+const pad = (k: number) => String(k).padStart(2, '0');
+
+/*
+ * One colour per position: yellow → salmon → mint → teals → ink. The first
+ * three take dark text, the rest light. The ink end lifts in dark mode so it
+ * still shows against the dark page.
+ */
+const COLORS = [
+  '#f6b93b',
+  '#f0997a',
+  '#7fd1b9',
+  '#2f8f84',
+  '#236b67',
+  'light-dark(#0f2a2e, #3f6f74)',
+];
+const DARK_TEXT_BELOW = 3;
+
+/*
+ * The ring: the right half of a donut, one segment per project, drawn in a
+ * viewBox centred on the ring's centre. Angles run clockwise from 12 o'clock.
+ * Gaps between segments have a constant width (2 × GAP).
+ */
+const R = 100; // outer radius
+const r = 60; // inner radius
+const GAP = 4.5;
+const DOT_R = 52; // dotted guide circle
+const VIEW = 112; // half the viewBox: room for the active segment to pop out
+const deg = (rad: number) => (rad * 180) / Math.PI;
+const point = (rho: number, a: number) =>
+  [rho * Math.sin((a * Math.PI) / 180), -rho * Math.cos((a * Math.PI) / 180)].map((v) =>
+    Number(v.toFixed(2)),
+  );
+const mids = projects.map((_, i) => ((i + 0.5) * 180) / n);
+const sinMids = mids.map((a) => Math.sin((a * Math.PI) / 180));
+const sinMin = Math.min(...sinMids);
+const sinMax = Math.max(...sinMids);
+
+const items = projects.map((p, i) => {
+  const k = n === 1 ? 0 : Math.round((i * (COLORS.length - 1)) / (n - 1));
+  const a0 = (i * 180) / n;
+  const a1 = ((i + 1) * 180) / n;
+  const outer = deg(Math.asin(GAP / R));
+  const inner = deg(Math.asin(GAP / r));
+  const [x0, y0] = point(R, a0 + outer);
+  const [x1, y1] = point(R, a1 - outer);
+  const [x2, y2] = point(r, a1 - inner);
+  const [x3, y3] = point(r, a0 + inner);
+  const [ix, iy] = point((R + r) / 2, mids[i]);
+  return {
+    id: p.id,
+    data: p.data,
+    i,
+    color: COLORS[k],
+    ink: k < DARK_TEXT_BELOW ? '#0f2a2e' : '#f4f8f6',
+    path: `M${x0} ${y0}A${R} ${R} 0 0 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 0 0 ${x3} ${y3}Z`,
+    icon: { x: ix - 5.5, y: iy - 5.5 },
+    /** Unit vector through the segment's middle: the active one moves out along it. */
+    out: point(1, mids[i]),
+    /** 0 at the ends of the list, 1 in the middle: rows follow the ring's curve. */
+    arc: sinMax === sinMin ? 0 : Number(((sinMids[i] - sinMin) / (sinMax - sinMin)).toFixed(3)),
+  };
+});
+const first = items[0];
 ---
 
-<Section id="work" eyebrow="Projects" title="Selected work">
-  <div role="group" aria-label="Filter projects by area" class="flex flex-wrap gap-2">
-    <button type="button" class="chip" aria-pressed="true" data-filter="all">
-      All
-    </button>
-    {usedCategories.map((c) => (
-      <button type="button" class="chip" aria-pressed="false" data-filter={c.id}>
-        {c.label}
-      </button>
-    ))}
-  </div>
-  <p class="sr-only" aria-live="polite" data-filter-status></p>
+<!--
+  Rows on the right are links to the case studies. On wide screens, hovering or
+  focusing a row (or hovering/tapping a ring segment) shows that project on the
+  card and lifts its segment out of the ring. Phones get the rows only, with
+  each summary inline.
+-->
+<section id="work" aria-labelledby="work-title" class="shell section-gap">
+  <div class="sw" data-sw>
+    <hgroup class="sw-head">
+      <Eyebrow label="Projects" />
+      <h2 id="work-title" class="type-section-display mt-3">
+        Selected work
+      </h2>
+    </hgroup>
 
-  <ul role="list" class="mt-8 md:mt-10" data-work-list>
-    {projects.map((p) => (
-      <li data-categories={p.data.categories.join(' ')}>
-        <a href={`/work/${p.id}/`} class="work-row">
-          {p.data.cover && (
-            <Image
-              src={p.data.cover}
-              alt={p.data.coverAlt ?? ''}
-              widths={[400, 800]}
-              sizes="(min-width: 48rem) 0px, 100vw"
-              class="work-cover"
-            />
+    <ol role="list" class="sw-list">
+      {items.map((p) => (
+        <li
+          class="sw-item"
+          style={`--c: ${p.color}; --c-ink: ${p.ink}; --arc: ${p.arc}; --i: ${p.i}`}
+        >
+          <a
+            class="sw-row"
+            href={`/work/${p.id}/`}
+            data-sw-row
+            data-active={p.i === 0 ? '' : undefined}
+          >
+            <span class="sw-tab" aria-hidden="true">
+              {pad(p.i + 1)}
+            </span>
+            <span class="sw-text">
+              <span class="sw-title">
+                <T v={p.data.title} />
+              </span>
+              <span class="sw-meta">
+                <T v={p.data.client} /> · <T v={p.data.year} />
+              </span>
+              <span class="sw-sum">
+                <T v={p.data.summary} />
+              </span>
+            </span>
+            <ArrowRight size={16} stroke-width={2} aria-hidden="true" class="sw-go" />
+          </a>
+        </li>
+      ))}
+    </ol>
+
+    <div class="sw-card" data-sw-card style={`--c: ${first.color}`}>
+      {items.map((p) => (
+        <div class="sw-slide" data-sw-slide data-active={p.i === 0 ? '' : undefined}>
+          <p class="sw-top">
+            <span class="sw-num" aria-hidden="true">
+              {pad(p.i + 1)}
+            </span>
+            <span class="sw-who">
+              <T v={p.data.client} /> · <T v={p.data.year} />
+            </span>
+          </p>
+          <h3 class="sw-name">
+            <T v={p.data.title} />
+          </h3>
+          <p class="sw-summary">
+            <T v={p.data.summary} />
+          </p>
+          {p.data.flow.length > 0 && (
+            <ol role="list" class="sw-flow" aria-label="In short">
+              {p.data.flow.map((step) => (
+                <li>{step}</li>
+              ))}
+            </ol>
           )}
-          <div class="work-main">
-            <h3 class="type-project">
-              <T v={p.data.title} />
-            </h3>
-            <p class="mt-2 max-w-[54ch] text-muted">
-              <T v={p.data.summary} />
-            </p>
-          </div>
-          <p class="work-client type-small text-muted">
-            <T v={p.data.client} />
-          </p>
-          <p class="work-year type-small text-muted tabular-nums">
-            <T v={p.data.year} />
-          </p>
-        </a>
-      </li>
-    ))}
-  </ul>
-</Section>
+          <a class="btn btn-primary sw-cta" href={`/work/${p.id}/`}>
+            Read the case study
+            <ArrowRight size={16} stroke-width={2} aria-hidden="true" />
+          </a>
+        </div>
+      ))}
+    </div>
+
+    <div class="sw-ring" aria-hidden="true">
+      <svg viewBox={`${-VIEW} ${-VIEW} ${VIEW * 2} ${VIEW * 2}`}>
+        <circle class="sw-dots" r={DOT_R} />
+        {items.map((p) => (
+          <g
+            class="sw-seg"
+            data-sw-seg
+            data-active={p.i === 0 ? '' : undefined}
+            style={`--c: ${p.color}; --c-ink: ${p.ink}; --ux: ${p.out[0]}; --uy: ${p.out[1]}; --i: ${p.i}`}
+          >
+            <path d={p.path} />
+            <WorkIcon id={p.data.icon} size={11} x={p.icon.x} y={p.icon.y} />
+          </g>
+        ))}
+      </svg>
+    </div>
+  </div>
+</section>
 
 <style>
-  /* Rows are separated by space, never lines. */
-  .work-row {
+  /* Entrance stagger: each row and segment carries its index in --i. */
+  .sw-item,
+  .sw-seg {
+    --rd: calc(var(--i) * 70ms);
+  }
+
+  /* ---------- Rows (every width) ---------- */
+
+  .sw-list {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: 1.5rem;
-    padding-block: 1.5rem;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+  }
+  .sw-item {
+    transition:
+      opacity 0.6s ease var(--rd),
+      translate 0.8s var(--ease-out) var(--rd);
+  }
+  .sw-row {
+    display: flex;
+    align-items: stretch;
+    min-height: 4.25rem;
+    overflow: hidden;
+    border-radius: 0.875rem;
+    background: light-dark(#fff, var(--panel));
+    color: var(--ink);
     text-decoration: none;
+    box-shadow: 0 12px 26px -22px rgb(15 42 46 / 0.55);
+    transition:
+      background-color 0.45s var(--ease-out),
+      color 0.45s var(--ease-out),
+      translate 0.55s var(--ease-out),
+      box-shadow 0.45s var(--ease-out);
   }
-  .work-cover {
-    grid-column: 1 / -1;
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    height: auto;
-    margin-bottom: 1rem;
-    border-radius: var(--radius-media);
-    object-fit: cover;
+  .sw-tab {
+    display: flex;
+    flex: none;
+    align-items: flex-end;
+    width: 3.25rem;
+    padding: 0.5rem 0.625rem;
+    background: var(--c);
+    color: var(--c-ink);
+    font-size: 1.25rem;
+    line-height: 1;
+    font-stretch: 125%;
+    font-weight: 800;
   }
-  .work-main {
-    grid-column: 1 / -1;
+  .sw-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 0.875rem 1rem;
   }
-  .work-client {
-    grid-column: 1 / span 8;
-    margin-top: 0.75rem;
+  .sw-title {
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    font-stretch: 106%;
+    font-weight: 700;
   }
-  .work-year {
-    grid-column: 9 / -1;
-    margin-top: 0.75rem;
-    text-align: right;
+  .sw-meta {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    transition: color 0.45s var(--ease-out);
   }
-  @media (min-width: 48rem) {
-    .work-row {
-      padding-block: 1.75rem;
+  .sw-sum {
+    margin-top: 0.25rem;
+    color: color-mix(in oklab, var(--muted) 70%, var(--ink));
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .sw-row :global(.sw-go) {
+    flex: none;
+    align-self: center;
+    margin-right: 1rem;
+    color: var(--muted);
+    transition:
+      translate 0.35s var(--ease-out),
+      color 0.35s ease;
+  }
+  .sw-row:hover :global(.sw-go) {
+    translate: 0.25rem 0;
+    color: currentColor;
+  }
+
+  .sw-card,
+  .sw-ring {
+    display: none;
+  }
+
+  /* Entrance: rows slide in, segments sweep round, the card rises. */
+  .sw[data-reveal='pending'] .sw-item {
+    opacity: 0;
+    translate: 2rem 0;
+  }
+
+  /* ---------- Wide screens: card · ring · rows ---------- */
+
+  @media (min-width: 64rem) {
+    .sw {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(10rem, 16vw, 14.5rem) minmax(0, 1.1fr);
+      grid-template-rows: auto 1fr;
+      grid-template-areas:
+        'head ring list'
+        'card ring list';
+      gap: 2rem clamp(1.5rem, 3vw, 3rem);
     }
-    /* Touch screens see covers inline; pointer screens get the hover preview (phase 3). */
-    .work-cover {
+    .sw-head {
+      grid-area: head;
+    }
+
+    /* Rows: indented along the ring's curve; the active one goes dark and steps out. */
+    .sw-list {
+      --k: clamp(2rem, 4vw, 4rem);
+      grid-area: list;
+      align-self: center;
+      margin-top: 0;
+    }
+    .sw-item {
+      margin-left: calc(var(--arc) * var(--k));
+    }
+    .sw-sum {
       display: none;
     }
-    .work-main {
-      grid-column: 1 / span 7;
+    .sw-row[data-active] {
+      background: var(--ink);
+      color: var(--page);
+      translate: -0.75rem 0;
+      box-shadow: 0 24px 40px -24px rgb(15 42 46 / 0.7);
     }
-    .work-client {
-      grid-column: 9 / span 3;
-      margin-top: 0.5rem;
+    .sw-row[data-active] .sw-meta {
+      color: color-mix(in oklab, var(--page) 72%, var(--ink));
     }
-    .work-year {
-      grid-column: 12 / span 1;
-      margin-top: 0.5rem;
+    .sw-row[data-active] :global(.todo) {
+      color: inherit;
+      outline-color: currentColor;
+    }
+    .sw-row[data-active] :global(.sw-go) {
+      translate: 0.25rem 0;
+      color: currentColor;
+    }
+    .sw-row:not([data-active]):hover {
+      translate: -0.25rem 0;
+    }
+
+    /* Card: one slide per project, stacked, so its height never jumps. */
+    .sw-card {
+      grid-area: card;
+      position: relative;
+      z-index: 1; /* over the ring's dotted circle */
+      display: grid;
+      align-self: start;
+      padding: 1.5rem 1.75rem 1.75rem;
+      border-top: 0.3125rem solid var(--c);
+      border-radius: 1.25rem;
+      background: light-dark(#fff, var(--panel));
+      box-shadow: 0 34px 60px -36px rgb(15 42 46 / 0.5);
+      transition:
+        border-color 0.5s var(--ease-out),
+        opacity 0.7s ease 0.15s,
+        translate 0.9s var(--ease-out) 0.15s;
+    }
+    .sw[data-reveal='pending'] .sw-card {
+      opacity: 0;
+      translate: 0 1.5rem;
+    }
+    .sw-slide {
+      grid-area: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      visibility: hidden;
+      transition: visibility 0s linear 0.25s;
+    }
+    .sw-slide[data-active] {
+      visibility: visible;
+      transition: none;
+    }
+    .sw-slide > * {
+      opacity: 0;
+      translate: 0 0.75rem;
+      transition:
+        opacity 0.2s ease,
+        translate 0.25s ease;
+    }
+    .sw-slide[data-active] > * {
+      opacity: 1;
+      translate: 0 0;
+      transition:
+        opacity 0.45s ease var(--d),
+        translate 0.65s var(--ease-out) var(--d);
+    }
+    .sw-slide > :nth-child(1) {
+      --d: 0.08s;
+    }
+    .sw-slide > :nth-child(2) {
+      --d: 0.13s;
+    }
+    .sw-slide > :nth-child(3) {
+      --d: 0.18s;
+    }
+    .sw-slide > :nth-child(4) {
+      --d: 0.23s;
+    }
+    .sw-slide > :nth-child(5) {
+      --d: 0.28s;
+    }
+    .sw-slide > :nth-last-child(2) {
+      margin-bottom: 1.5rem; /* the button's auto margin takes the rest */
+    }
+    .sw-top {
+      display: flex;
+      align-self: stretch;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .sw-num {
+      font-size: clamp(2.25rem, 1.8rem + 1vw, 2.75rem);
+      line-height: 1;
+      font-stretch: 125%;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .sw-who {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-align: right;
+    }
+    .sw-name {
+      margin-top: 1rem;
+      font-size: clamp(1.25rem, 1rem + 0.6vw, 1.5rem);
+      line-height: 1.12;
+      font-stretch: 118%;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .sw-summary {
+      margin-top: 0.875rem;
+      color: color-mix(in oklab, var(--muted) 70%, var(--ink));
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+    .sw-flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-self: stretch;
+      gap: 0.25rem 0.5rem;
+      margin-top: 1.25rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.625rem;
+      background: var(--band);
+      color: #e6efec;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      line-height: 1.5;
+    }
+    .sw-flow li + li::before {
+      content: '→' / '';
+      margin-right: 0.5rem;
+      color: var(--signal);
+    }
+    .sw-cta {
+      margin-top: auto; /* buttons sit at the same height on every slide */
+    }
+
+    /*
+     * Ring: the SVG is twice the column's width and shifted left by one column,
+     * so the ring's centre sits on the column's left edge and the dotted circle
+     * runs on under the card.
+     */
+    .sw-ring {
+      grid-area: ring;
+      display: block;
+      align-self: center;
+    }
+    .sw-ring svg {
+      display: block;
+      width: 200%;
+      height: auto;
+      margin-left: -100%;
+      overflow: visible;
+    }
+    .sw-dots {
+      fill: none;
+      stroke: var(--rule);
+      stroke-width: 1.2;
+      stroke-linecap: round;
+      stroke-dasharray: 0.1 4.4;
+      pointer-events: none;
+    }
+    .sw-seg {
+      transform-origin: 0 0; /* the ring's centre */
+      cursor: pointer;
+      transition:
+        translate 0.55s var(--ease-out),
+        scale 0.8s var(--ease-out) calc(var(--rd) + 0.1s),
+        opacity 0.5s ease calc(var(--rd) + 0.1s);
+    }
+    .sw-seg path {
+      /* Same-colour stroke with round joins = softly rounded corners. */
+      fill: color-mix(in srgb, var(--c) 55%, #e6efec);
+      stroke: color-mix(in srgb, var(--c) 55%, #e6efec);
+      stroke-width: 4;
+      stroke-linejoin: round;
+      transition:
+        fill 0.45s ease,
+        stroke 0.45s ease;
+    }
+    .sw-seg :global(svg) {
+      color: var(--c-ink);
+    }
+    .sw-seg:not([data-active]):hover path {
+      fill: color-mix(in srgb, var(--c) 75%, #e6efec);
+      stroke: color-mix(in srgb, var(--c) 75%, #e6efec);
+    }
+    .sw-seg[data-active] {
+      translate: calc(var(--ux) * 8px) calc(var(--uy) * 8px);
+    }
+    .sw-seg[data-active] path {
+      fill: var(--c);
+      stroke: var(--c);
+    }
+    .sw[data-reveal='pending'] .sw-seg {
+      opacity: 0;
+      scale: 0.82;
     }
   }
-  @media (hover: none) and (min-width: 48rem) {
-    .work-cover {
-      display: block;
+
+  @media (prefers-reduced-motion: reduce) {
+    .sw-item,
+    .sw-row,
+    .sw-meta,
+    .sw-row :global(.sw-go),
+    .sw-card,
+    .sw-slide,
+    .sw-slide > *,
+    .sw-slide[data-active] > *,
+    .sw-seg,
+    .sw-seg path {
+      transition: none;
     }
   }
 </style>
 
 <script>
-  // Filter chips. Phase 3 animates the reorder with GSAP Flip.
-  function init() {
-    const chips = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
-    const rows = document.querySelectorAll<HTMLLIElement>('[data-work-list] > li');
-    const status = document.querySelector<HTMLElement>('[data-filter-status]');
-    if (!chips.length || !rows.length) return;
+  function initWork() {
+    const root = document.querySelector<HTMLElement>('[data-sw]');
+    if (!root) return;
+    const rows = [...root.querySelectorAll<HTMLAnchorElement>('[data-sw-row]')];
+    const segs = [...root.querySelectorAll<SVGGElement>('[data-sw-seg]')];
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-sw-slide]')];
+    const card = root.querySelector<HTMLElement>('[data-sw-card]');
+    const wide = window.matchMedia('(min-width: 64rem)');
+    let current = Math.max(
+      0,
+      rows.findIndex((row) => row.hasAttribute('data-active')),
+    );
+    let timer = 0;
 
-    chips.forEach((chip) => {
-      chip.addEventListener('click', () => {
-        const filter = chip.dataset.filter ?? 'all';
-        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
-        let shown = 0;
-        rows.forEach((row) => {
-          const match = filter === 'all' || row.dataset.categories?.split(' ').includes(filter);
-          row.hidden = !match;
-          if (match) shown += 1;
-        });
-        if (status) status.textContent = `${shown} ${shown === 1 ? 'project' : 'projects'}`;
+    const select = (index: number) => {
+      window.clearTimeout(timer);
+      if (index === current) return;
+      current = index;
+      for (const list of [rows, segs, slides]) {
+        list.forEach((el, k) => el.toggleAttribute('data-active', k === index));
+      }
+      const color = rows[index].parentElement?.style.getPropertyValue('--c');
+      if (card && color) card.style.setProperty('--c', color);
+    };
+    // A short pause before switching, so moving the mouse across the list
+    // doesn't flash every project on the way.
+    const selectSoon = (index: number) => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => select(index), 70);
+    };
+
+    rows.forEach((row, i) => {
+      row.addEventListener('pointerenter', (event) => {
+        if (event.pointerType === 'mouse' && wide.matches) selectSoon(i);
       });
+      row.addEventListener('pointerleave', () => window.clearTimeout(timer));
+      row.addEventListener('focus', () => select(i));
     });
+    segs.forEach((seg, i) => {
+      seg.addEventListener('pointerenter', (event) => {
+        if (event.pointerType === 'mouse') selectSoon(i);
+      });
+      seg.addEventListener('pointerleave', () => window.clearTimeout(timer));
+      seg.addEventListener('click', () => select(i)); // tap on touch screens
+    });
+
+    // Entrance, when the section starts below the fold.
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce && root.getBoundingClientRect().top > window.innerHeight) {
+      root.dataset.reveal = 'pending';
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          root.dataset.reveal = 'done';
+          io.disconnect();
+        },
+        { threshold: 0.15 },
+      );
+      io.observe(root);
+    }
   }
-  document.addEventListener('astro:page-load', init);
+  document.addEventListener('astro:page-load', initWork);
 </script>

@@ -2,7 +2,8 @@ import { defineCollection, reference } from 'astro:content';
 import { file, glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { CATEGORY_IDS } from './lib/categories';
-import { MORE_WORK_GROUP_IDS, WORK_ICONS } from './lib/more-work';
+import { MORE_WORK_GROUP_IDS } from './lib/more-work';
+import { WORK_ICONS } from './lib/work-icons';
 
 /**
  * A placeholder for content you haven't written yet, e.g. "[year]".
@@ -38,6 +39,10 @@ const projects = defineCollection({
       approach: z.array(z.string()).min(1),
       results: z.array(z.string()).default([]),
       stack: z.array(z.string()).min(1),
+      /** The work in a few short steps, shown as "A → B → C" on the Selected work card. */
+      flow: z.array(z.string()).default([]),
+      /** Shown on this project's segment of the Selected work ring. */
+      icon: z.enum(WORK_ICONS),
       links: z
         .object({ live: url.optional(), repo: url.optional(), demo: url.optional() })
         .default({}),
