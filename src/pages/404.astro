@@ -1,0 +1,29 @@
+---
+/**
+ * Served for any missing URL. On Hostinger, public/.htaccess points
+ * ErrorDocument 404 here.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Eyebrow from '@/components/Eyebrow.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="This page doesn't exist. Head back to the home page."
+  noindex
+>
+  <section aria-labelledby="nf-title" class="shell section-gap">
+    <hgroup>
+      <Eyebrow label="Error 404" />
+      <h1 id="nf-title" class="type-section-display mt-3">Page not found.</h1>
+    </hgroup>
+    <p class="type-lead mt-4 max-w-[46ch] text-muted">
+      This URL doesn't exist, or it has moved. The home page has everything: work,
+      services, experience and how to get in touch.
+    </p>
+    <div class="mt-10 flex flex-wrap gap-3">
+      <a href="/" class="btn btn-primary">Back to the home page</a>
+      <a href="/#contact" class="btn btn-secondary">Get in touch</a>
+    </div>
+  </section>
+</BaseLayout>

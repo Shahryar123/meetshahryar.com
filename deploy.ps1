@@ -65,7 +65,8 @@ $zipPath = Join-Path $distDir $zipName
 Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-$files = Get-ChildItem -LiteralPath $distDir -Recurse -File |
+# -Force so dotfiles such as .htaccess are included.
+$files = Get-ChildItem -LiteralPath $distDir -Recurse -File -Force |
   Where-Object { $_.FullName -ne $zipPath }
 
 $rootLength = $distDir.TrimEnd('\').Length + 1

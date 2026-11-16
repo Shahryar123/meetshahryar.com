@@ -1,0 +1,57 @@
+# Hostinger (LiteSpeed / Apache) config for the static Astro build.
+# Copied to the site root by `astro build`; deploy.ps1 includes it in the zip.
+
+Options -Indexes
+DirectoryIndex index.html
+
+# ---- Redirects ----
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Force HTTPS (turn on Hostinger's free SSL for the domain first).
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # www -> bare domain, to match the canonical URL.
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+  # Common misspellings of llms.txt.
+  RewriteRule ^(llm|lms)\.txt$ /llms.txt [L,R=301]
+</IfModule>
+
+# ---- Errors ----
+ErrorDocument 404 /404.html
+
+# ---- Content types ----
+AddType application/manifest+json .webmanifest
+AddType font/woff2 .woff2
+AddType image/avif .avif
+AddDefaultCharset utf-8
+AddCharset utf-8 .txt .xml .css .js
+
+# ---- Compression ----
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/xml application/javascript text/javascript application/json image/svg+xml
+</IfModule>
+
+# ---- Caching ----
+<IfModule mod_headers.c>
+  # HTML, txt and xml change on every deploy: always revalidate.
+  <FilesMatch "\.(html|txt|xml)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+
+  # Images, PDFs and the favicon in public/ keep their names: cache for a week.
+  <FilesMatch "\.(png|jpe?g|webp|avif|svg|ico|pdf)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+
+  # Security headers.
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
+</IfModule>
