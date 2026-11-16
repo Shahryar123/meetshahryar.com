@@ -36,6 +36,9 @@ override.tf.json
 # Keep .terraform.lock.hcl committed: it pins provider versions.
 
 # ---- environment variables and secrets ----
+# Contact form SMTP settings (see server/contact-config.example.php).
+contact-config.php
+contact-ratelimit/
 .env
 .env.*
 !.env.example
