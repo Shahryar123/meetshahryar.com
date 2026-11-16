@@ -5,7 +5,7 @@
  */
 import { getCollection } from 'astro:content';
 import { getSite } from '@/lib/site';
-import { categoryLabel } from '@/lib/categories';
+import { CATEGORY_IDS, categoryLabel } from '@/lib/categories';
 import { clean, hasTodo, isEmail, isHttpUrl } from '@/lib/todo';
 
 const filled = <T>(items: T[]) => items.filter((v) => !hasTodo(v));
@@ -47,11 +47,16 @@ export async function buildLlmsTxt(siteUrl: URL, full: boolean): Promise<string>
   // ---- Services ----
   line('## Services');
   line();
+  const categoryOrder = CATEGORY_IDS as readonly string[];
+  services.sort((a, b) => categoryOrder.indexOf(a.id) - categoryOrder.indexOf(b.id));
   for (const s of services) {
-    line(`- [${s.data.name}](${url('/#services')}): ${s.data.summary}`);
+    const summary = hasTodo(s.data.summary) ? '' : `: ${s.data.summary}`;
+    line(`- [${s.data.name}](${url('/#services')})${summary}`);
     if (full) {
-      line(`  - Deliverables: ${filled(s.data.deliverables).join('; ')}`);
-      line(`  - Tools: ${filled(s.data.tools).join('; ')}`);
+      const deliverables = filled(s.data.deliverables);
+      const tools = filled(s.data.tools);
+      if (deliverables.length) line(`  - Deliverables: ${deliverables.join('; ')}`);
+      if (tools.length) line(`  - Tools: ${tools.join('; ')}`);
     }
   }
   line();
@@ -61,9 +66,9 @@ export async function buildLlmsTxt(siteUrl: URL, full: boolean): Promise<string>
   line();
   for (const p of projects.sort(byOrder)) {
     const d = p.data;
-    const client = d.confidential ? 'confidential client' : d.client;
-    const year = typeof d.year === 'number' ? `, ${d.year}` : '';
-    line(`- [${d.title}](${url('/#work')}) (${client}${year}): ${d.summary}`);
+    const client = d.confidential ? 'confidential client' : clean(d.client);
+    const meta = [client, typeof d.year === 'number' ? String(d.year) : ''].filter(Boolean).join(', ');
+    line(`- [${d.title}](${url('/#work')})${meta ? ` (${meta})` : ''}: ${d.summary}`);
     if (full) {
       line(`  - Areas: ${d.categories.map(categoryLabel).join(', ')}`);
       if (!hasTodo(d.role)) line(`  - Role: ${d.role}`);
@@ -81,7 +86,9 @@ export async function buildLlmsTxt(siteUrl: URL, full: boolean): Promise<string>
     line();
     for (const m of moreWork.sort(byOrder)) {
       const stack = m.data.stack.length ? ` (${m.data.stack.join(', ')})` : '';
-      line(`- ${m.data.title}: ${m.data.summary}${stack}`);
+      // Drop inline placeholders such as "[your role]: " from the summary.
+      const summary = m.data.summary.replace(/\[[^\]\n]+\]:?\s*/g, '').trim();
+      line(`- ${m.data.title}: ${summary}${stack}`);
     }
     line();
   }
