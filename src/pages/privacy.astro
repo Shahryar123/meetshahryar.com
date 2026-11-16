@@ -1,0 +1,168 @@
+---
+/**
+ * Privacy notice. Keep it true to the code: update it (and UPDATED) whenever
+ * the site starts collecting something new, e.g. analytics or a new form field.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Eyebrow from '@/components/Eyebrow.astro';
+import { getSite } from '@/lib/site';
+import { clean, isEmail } from '@/lib/todo';
+
+/** The date this notice last changed (not the build date). */
+const UPDATED = new Date('2026-11-17T00:00:00Z');
+
+const site = await getSite();
+const name = [site.firstName, clean(site.surname)].filter(Boolean).join(' ');
+const email = isEmail(site.email) ? site.email : '';
+// Built here, not in the markup, so line wrapping can't eat the spaces.
+const owner =
+  `This site belongs to ${name}, ${site.title}, based in ${site.location.city}, ${site.location.country}. ` +
+  `I'm responsible for the data described here.` +
+  (email ? ' You can reach me at ' : '');
+const updated = UPDATED.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+---
+
+<BaseLayout
+  title={`Privacy notice · ${name}`}
+  description="What this site collects when you use the contact form, why, how long it's kept and how to have it deleted."
+>
+  <article aria-labelledby="privacy-title" class="shell section-gap">
+    <hgroup>
+      <Eyebrow label="Privacy" />
+      <h1 id="privacy-title" class="type-page-title mt-3">
+        Privacy notice
+      </h1>
+    </hgroup>
+    <p class="type-lead measure mt-5 text-muted">
+      The short version: this site has no analytics, no tracking and no cookies. The only personal
+      data it collects is what you send through the contact form, and that's used only to reply to
+      you.
+    </p>
+    <p class="type-small mt-4 text-muted">Last updated {updated}</p>
+
+    <div class="privacy measure mt-12">
+      <h2>Who's responsible</h2>
+      <p>
+        {owner}
+        {email && (
+          <a class="link" href={`mailto:${email}`}>
+            {email}
+          </a>
+        )}
+        {email && '.'}
+      </p>
+
+      <h2>What the contact form collects</h2>
+      <p>When you send a message, I receive:</p>
+      <ul>
+        <li>your name and email address</li>
+        <li>the project type and, if you pick one, the budget range</li>
+        <li>your message</li>
+        <li>your IP address and the time you sent it, so I can spot spam and abuse</li>
+      </ul>
+      <p>
+        The message arrives as an email in my inbox. It isn't stored in a database or added to a
+        mailing list, and it isn't shared with anyone or used to train AI models.
+      </p>
+      <p>
+        To stop spam, the server also counts how many messages each connection sends in an hour. For
+        that it keeps your IP address only in scrambled form (a keyed hash), which can't be turned
+        back into the address, along with the times you sent messages. Records older than an hour
+        are cleared out automatically.
+      </p>
+
+      <h2>Why I use it</h2>
+      <p>
+        Only to read your message and reply to it, and if we go ahead, to discuss and plan the work.
+        Under the UK and EU GDPR, the legal basis is taking steps you've asked for before a possible
+        contract, and my legitimate interest in answering enquiries and keeping the form free of
+        spam.
+      </p>
+
+      <h2>How long I keep it</h2>
+      <p>
+        I keep enquiries for as long as we're in touch about the work, and then for up to two years
+        so I have a record of past conversations. If we work together, project emails are kept as
+        long as the law requires for business records. You can ask me to delete your messages sooner
+        at any time.
+      </p>
+
+      <h2>Hosting and server logs</h2>
+      <p>
+        The site and its mailbox are hosted by Hostinger. Like any web host, Hostinger keeps
+        standard server logs (IP address, pages requested, browser type and time) for security and
+        to keep the service running. I don't use these logs to identify or track visitors.
+      </p>
+
+      <h2>Cookies and storage</h2>
+      <p>
+        This site sets no cookies. If you switch between light and dark mode, your choice is saved
+        in your browser's local storage so the site remembers it next time. It stays on your device,
+        and you can clear it in your browser settings.
+      </p>
+
+      <h2>Links to other sites</h2>
+      <p>
+        Links to GitHub, LinkedIn, certificate issuers and client websites take you to sites with
+        their own privacy policies. Nothing from those sites loads on this one.
+      </p>
+
+      <h2>Your rights</h2>
+      <p>
+        You can ask to see the data I hold about you, correct it, have it deleted or object to how
+        it's used.
+        {email && (
+          <>
+            {' '}
+            Email{' '}
+            <a class="link" href={`mailto:${email}`}>
+              {email}
+            </a>{' '}
+            and I'll reply within one month.
+          </>
+        )}{' '}
+        If you're in the UK or EU and unhappy with my answer, you can also complain to your data
+        protection authority, such as the ICO in the UK.
+      </p>
+
+      <h2>Changes</h2>
+      <p>
+        If this notice changes, for example because the site starts using analytics, the new version
+        will be posted here with a new date.
+      </p>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .privacy h2 {
+    margin-top: 2.75rem;
+    font-size: 1.375rem;
+    line-height: 1.25;
+    font-stretch: 108%;
+    font-weight: 650;
+  }
+  .privacy h2:first-child {
+    margin-top: 0;
+  }
+  .privacy p,
+  .privacy ul {
+    margin-top: 0.875rem;
+    line-height: 1.65;
+  }
+  .privacy ul {
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+  .privacy li + li {
+    margin-top: 0.375rem;
+  }
+  .privacy li::marker {
+    color: var(--signal-ink);
+  }
+</style>

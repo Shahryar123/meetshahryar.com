@@ -95,8 +95,16 @@ $dir = $config['rate_limit_dir'] ?? (dirname($configPath) . '/contact-ratelimit'
 if (!is_dir($dir)) @mkdir($dir, 0700, true);
 if (!is_dir($dir) || !is_writable($dir)) $dir = sys_get_temp_dir();
 
+// Delete rate-limit records older than the window (the privacy notice promises this).
+foreach (glob($dir . '/rl-*.json') ?: [] as $old) {
+    if (@filemtime($old) < time() - $window) @unlink($old);
+}
+
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-$file = $dir . '/rl-' . hash('sha256', $ip . '|contact') . '.json';
+// Keyed hash: without the secret (from the config), the file name can't be
+// turned back into an IP address by trying every possible address.
+$secret = (string) ($config['rate_limit_secret'] ?? ($config['smtp_pass'] ?? '') . '|' . __FILE__);
+$file = $dir . '/rl-' . hash_hmac('sha256', $ip, $secret) . '.json';
 $now = time();
 $fh = fopen($file, 'c+');
 if ($fh) {

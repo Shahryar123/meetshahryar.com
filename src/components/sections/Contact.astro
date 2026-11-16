@@ -237,6 +237,9 @@ const errorFor = (field: string) => `${field}-error`;
         <SendIcon size={17} stroke-width={2} aria-hidden="true" />
       </button>
       <p class="mt-3 type-small" role="status" data-form-status></p>
+      <p class="form-privacy mt-3 type-small">
+        I'll only use your details to reply. <a class="link" href="/privacy/">Privacy notice</a>
+      </p>
       <template id="cf-alert-icon">
         <CircleAlert size={18} stroke-width={1.75} aria-hidden="true" class="mt-0.5 flex-none" />
       </template>
@@ -532,6 +535,9 @@ const errorFor = (field: string) => `${field}-error`;
     color: var(--muted);
     font-family: var(--font-mono);
     font-size: 0.75rem;
+  }
+  .form-privacy {
+    color: var(--muted);
   }
   .field textarea::placeholder {
     color: color-mix(in oklab, var(--muted) 80%, transparent);

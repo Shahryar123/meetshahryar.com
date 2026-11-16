@@ -32,4 +32,8 @@ return [
 
     // At most `max` messages per IP in `window` seconds.
     'rate_limit' => ['max' => 5, 'window' => 3600],
+
+    // Optional: key for hashing IPs in the rate-limit records. Defaults to one
+    // derived from the mailbox password. Any long random string works.
+    // 'rate_limit_secret' => '',
 ];

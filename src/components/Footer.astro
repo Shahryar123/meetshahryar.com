@@ -65,7 +65,10 @@ const name = `${site.firstName} ${site.surname}`;
     <p class="footer-word" aria-hidden="true">{site.surname}</p>
 
     <div class="footer-bottom">
-      <p>© {year} {name} · {site.title}</p>
+      <p>
+        © {year} {name} · {site.title} ·{' '}
+        <a class="link" href="/privacy/">Privacy</a>
+      </p>
       <p class="footer-deploy">
         <span class="footer-dot" aria-hidden="true"></span>
         Last deployed {formatDay(build.date)} · commit{' '}
