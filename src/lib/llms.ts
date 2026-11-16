@@ -38,7 +38,9 @@ export async function buildLlmsTxt(siteUrl: URL, full: boolean): Promise<string>
 
   line(`# ${name}`);
   line();
-  line(`> ${name} is a ${site.title} based in ${site.location.city}, ${site.location.country} (${site.utcOffset}). ${site.valueLineLong}`);
+  line(
+    `> ${name} is a ${site.title} based in ${site.location.city}, ${site.location.country} (${site.utcOffset}). ${site.valueLineLong}`,
+  );
   line();
   line(`Currently at ${site.employer}. Has worked with clients in the ${site.regions}.`);
   if (!hasTodo(site.availability)) line(`Availability: ${site.availability}.`);
@@ -67,7 +69,9 @@ export async function buildLlmsTxt(siteUrl: URL, full: boolean): Promise<string>
   for (const p of projects.sort(byOrder)) {
     const d = p.data;
     const client = d.confidential ? 'confidential client' : clean(d.client);
-    const meta = [client, typeof d.year === 'number' ? String(d.year) : ''].filter(Boolean).join(', ');
+    const meta = [client, typeof d.year === 'number' ? String(d.year) : '']
+      .filter(Boolean)
+      .join(', ');
     line(`- [${d.title}](${url('/#work')})${meta ? ` (${meta})` : ''}: ${d.summary}`);
     if (full) {
       line(`  - Areas: ${d.categories.map(categoryLabel).join(', ')}`);
@@ -146,7 +150,9 @@ export async function buildLlmsTxt(siteUrl: URL, full: boolean): Promise<string>
   if (!full) {
     line('## Optional');
     line();
-    line(`- [Full version](${url('/llms-full.txt')}): every project, role highlight and FAQ answer in one file`);
+    line(
+      `- [Full version](${url('/llms-full.txt')}): every project, role highlight and FAQ answer in one file`,
+    );
     line();
   }
 

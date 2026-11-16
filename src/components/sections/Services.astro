@@ -6,6 +6,7 @@ import Check from '@lucide/astro/icons/check';
 import Section from '@/components/Section.astro';
 import CategoryIcon from '@/components/CategoryIcon.astro';
 import T from '@/components/T.astro';
+import { caseStudyHref } from '@/lib/case-studies';
 import { CATEGORIES, type CategoryId } from '@/lib/categories';
 
 const entries = await getCollection('services');
@@ -37,11 +38,11 @@ const chips = (tools: string[]) =>
 <Section id="services" eyebrow="What I do" title="Services" size="display">
   <p class="services-hint" aria-hidden="true">{services.length} areas · pick one to see what's included</p>
 
-  <!--
+  {/*
     Tabs (WAI-ARIA pattern): areas on the left, one dark detail panel on the right.
     Every panel is in the HTML; only the active one shows. Links to #service-<id>
     select that area.
-  -->
+  */}
   <div class="services" data-services>
     <div class="svc-tabs" role="tablist" aria-label="Service areas" aria-orientation="vertical">
       {services.map((s, i) => (
@@ -122,7 +123,7 @@ const chips = (tools: string[]) =>
                 <ul role="list" class="svc-proofs mt-3">
                   {s.proofs.map((p) => (
                     <li>
-                      <a class="svc-proof" href={`/work/${p.id}/`}>
+                      <a class="svc-proof" href={caseStudyHref(p.id)}>
                         <T v={p.data.title} />
                         <ArrowUpRight size={16} stroke-width={2} aria-hidden="true" />
                       </a>

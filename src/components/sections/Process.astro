@@ -13,10 +13,10 @@ let phaseCount = 0;
 const phaseLabels = steps.map((s) => (s.data.phase ? `Phase ${++phaseCount} · ${s.data.phase}` : null));
 ---
 
-<!--
+{/*
   An always-dark band. The outer element paints the band (its colour follows the
   page theme); inside, color-scheme is dark, so every token resolves to its dark value.
--->
+*/}
 <section id="process" aria-labelledby="process-title" class="band section-gap">
   <div class="shell band-inner">
     <div class="process-head">
@@ -27,7 +27,7 @@ const phaseLabels = steps.map((s) => (s.data.phase ? `Phase ${++phaseCount} · $
       <p class="process-intro type-lead">{intro}</p>
     </div>
 
-    <!-- A real sequence, so the steps are numbered. -->
+    {/* A real sequence, so the steps are numbered. */}
     <ol role="list" class="steps" style={`--steps: ${steps.length}`}>
       {steps.map((step, i) => (
         <li class="step" style={`--i: ${i}`}>

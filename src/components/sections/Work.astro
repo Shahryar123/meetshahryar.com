@@ -4,6 +4,7 @@ import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Eyebrow from '@/components/Eyebrow.astro';
 import T from '@/components/T.astro';
 import WorkIcon from '@/components/WorkIcon.astro';
+import { caseStudyHref, hasCaseStudies } from '@/lib/case-studies';
 
 const projects = (await getCollection('projects', (p) => p.data.featured)).sort(
   (a, b) => a.data.order - b.data.order,
@@ -72,9 +73,15 @@ const items = projects.map((p, i) => {
   };
 });
 const first = items[0];
+
+/*
+ * Rows link to the case studies once those pages exist. Until then they're
+ * buttons that show the project on the card, so nothing links to a 404.
+ */
+const Row = hasCaseStudies ? 'a' : 'button';
 ---
 
-<!--
+{/*
   Rows on the right are links to the case studies. On wide screens, hovering or
   focusing a row (or hovering/tapping a ring segment) shows that project on the
   card and lifts its segment out of the ring. Phones get the rows only, with
@@ -83,7 +90,7 @@ const first = items[0];
   Scroll-through: where the section fits the viewport, the script pins it
   (data-pin) and the next (n - 1) steps of scrolling walk through the projects
   before the page moves on. The arc on the dotted circle shows the progress.
--->
+*/}
 <section
   id="work"
   aria-labelledby="work-title"
@@ -105,9 +112,10 @@ const first = items[0];
           class="sw-item"
           style={`--c: ${p.color}; --c-ink: ${p.ink}; --arc: ${p.arc}; --i: ${p.i}`}
         >
-          <a
+          <Row
             class="sw-row"
-            href={`/work/${p.id}/`}
+            href={hasCaseStudies ? caseStudyHref(p.id) : undefined}
+            type={hasCaseStudies ? undefined : 'button'}
             data-sw-row
             data-active={p.i === 0 ? '' : undefined}
           >
@@ -125,8 +133,10 @@ const first = items[0];
                 <T v={p.data.summary} />
               </span>
             </span>
-            <ArrowRight size={16} stroke-width={2} aria-hidden="true" class="sw-go" />
-          </a>
+            {hasCaseStudies && (
+              <ArrowRight size={16} stroke-width={2} aria-hidden="true" class="sw-go" />
+            )}
+          </Row>
         </li>
       ))}
     </ol>
@@ -155,10 +165,12 @@ const first = items[0];
               ))}
             </ol>
           )}
-          <a class="btn btn-primary sw-cta" href={`/work/${p.id}/`}>
-            Read the case study
-            <ArrowRight size={16} stroke-width={2} aria-hidden="true" />
-          </a>
+          {hasCaseStudies && (
+            <a class="btn btn-primary sw-cta" href={caseStudyHref(p.id)}>
+              Read the case study
+              <ArrowRight size={16} stroke-width={2} aria-hidden="true" />
+            </a>
+          )}
         </div>
       ))}
     </div>
@@ -207,6 +219,13 @@ const first = items[0];
       translate 0.8s var(--ease-out) var(--rd);
   }
   .sw-row {
+    /* Resets for the <button> version (before the case-study pages exist). */
+    width: 100%;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
     display: flex;
     align-items: stretch;
     min-height: 4.25rem;
@@ -625,7 +644,7 @@ const first = items[0];
   function initWork() {
     const root = document.querySelector<HTMLElement>('[data-sw]');
     if (!root) return;
-    const rows = [...root.querySelectorAll<HTMLAnchorElement>('[data-sw-row]')];
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-sw-row]')];
     const segs = [...root.querySelectorAll<SVGGElement>('[data-sw-seg]')];
     const slides = [...root.querySelectorAll<HTMLElement>('[data-sw-slide]')];
     const card = root.querySelector<HTMLElement>('[data-sw-card]');
@@ -741,6 +760,8 @@ const first = items[0];
         select(i);
         if (row.matches(':focus-visible')) scrollToStep(i);
       });
+      // Buttons (no case-study pages yet): a click or tap shows that project.
+      if (row instanceof HTMLButtonElement) row.addEventListener('click', () => select(i));
     });
     segs.forEach((seg, i) => {
       seg.addEventListener('pointermove', hover(i));

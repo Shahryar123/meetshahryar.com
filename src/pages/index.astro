@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/hero/Hero.astro';
 import Work from '@/components/sections/Work.astro';
@@ -13,13 +14,64 @@ import Writing from '@/components/sections/Writing.astro';
 import Faq from '@/components/sections/Faq.astro';
 import Contact from '@/components/sections/Contact.astro';
 import { getSite } from '@/lib/site';
-import { clean } from '@/lib/todo';
+import { clean, hasTodo, isEmail, isHttpUrl } from '@/lib/todo';
 
 const site = await getSite();
 const name = [site.firstName, clean(site.surname)].filter(Boolean).join(' ');
+
+/*
+ * Structured data for search engines: who you are (Person) and the site itself
+ * (WebSite). Placeholders are left out until they're filled in.
+ */
+const home = new URL('/', Astro.site).toString();
+const [services, education] = await Promise.all([
+  getCollection('services'),
+  getCollection('education'),
+]);
+// Skills: the service areas plus the tools named under them, e.g. "AWS (VPC, …)" → "AWS".
+const knowsAbout = [
+  ...new Set([
+    ...services.map((s) => s.data.name),
+    ...services.flatMap((s) => s.data.tools).map((t) => t.replace(/\s*\(.*\)$/, '')),
+  ]),
+].filter((v) => !hasTodo(v));
+
+const person = {
+  '@type': 'Person',
+  '@id': `${home}#person`,
+  name,
+  jobTitle: site.title,
+  description: site.valueLineLong,
+  url: home,
+  image: new URL('/og-image.png', Astro.site).toString(),
+  ...(isEmail(site.email) && { email: `mailto:${site.email}` }),
+  worksFor: { '@type': 'Organization', name: site.employer },
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: site.location.city,
+    addressCountry: site.location.country,
+  },
+  alumniOf: education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.data.institution })),
+  knowsAbout,
+  sameAs: [site.links.github, site.links.linkedin].filter(isHttpUrl),
+};
+const website = {
+  '@type': 'WebSite',
+  '@id': `${home}#website`,
+  url: home,
+  name,
+  inLanguage: 'en-GB',
+  publisher: { '@id': `${home}#person` },
+};
+// Escape "<" so no value can close the <script> tag early.
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [person, website],
+}).replace(/</g, '\\u003c');
 ---
 
 <BaseLayout title={`${name}, ${site.title}`} description={site.valueLine}>
+  <script slot="head" is:inline type="application/ld+json" set:html={jsonLd} />
   <Hero />
   <Work />
   <MoreWork />

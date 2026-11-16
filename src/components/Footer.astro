@@ -17,10 +17,10 @@ const commitUrl = isHttpUrl(site.links.repo)
 const name = `${site.firstName} ${site.surname}`;
 ---
 
-<!--
+{/*
   An always-dark band: links on top, the surname as giant outlined type, and the
   copyright and deploy line underneath.
--->
+*/}
 <footer class="footer section-gap">
   <div class="shell footer-inner">
     <div class="footer-top">
@@ -55,7 +55,7 @@ const name = `${site.firstName} ${site.surname}`;
           <Download size={19} stroke-width={2} aria-hidden="true" />
           CV (PDF)
         </a>
-        <!-- "#top" scrolls to the top in every browser, even without JavaScript. -->
+        {/* "#top" scrolls to the top in every browser, even without JavaScript. */}
         <a class="footer-top-btn" href="#top" aria-label="Back to top" title="Back to top" data-to-top>
           <ArrowUp size={22} stroke-width={2.25} aria-hidden="true" />
         </a>

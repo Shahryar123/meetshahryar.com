@@ -28,15 +28,15 @@ const faqSchema = {
     })),
 };
 // "<" escaped so the JSON can never close the script element early.
-const faqJsonLd = JSON.stringify(faqSchema).replace(/</g, '\u003c');
+const faqJsonLd = JSON.stringify(faqSchema).replace(/</g, '\\u003c');
 ---
 
 <Section id="faq" eyebrow="FAQ" title="Working together" size="display">
-  <!--
+  {/*
     Tabs (WAI-ARIA pattern): questions on the left, one answer card on the right.
     Every answer is in the HTML for search engines; only the active one is shown.
     The card and the yellow card behind it swap tilt on each change.
-  -->
+  */}
   {
     faqSchema.mainEntity.length > 0 && (
       <script is:inline type="application/ld+json" set:html={faqJsonLd} />

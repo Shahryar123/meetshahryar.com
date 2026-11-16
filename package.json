@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "todos": "node scripts/todos.mjs",
-    "astro": "astro"
+    "astro": "astro",
+    "images": "node scripts/make-images.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "8.1.3",

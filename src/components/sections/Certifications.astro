@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Section from '@/components/Section.astro';
 import T from '@/components/T.astro';
@@ -14,9 +14,20 @@ const certs = (await getCollection('certifications'))
   .sort((a, b) => Number(hasVerifyUrl(b)) - Number(hasVerifyUrl(a)));
 
 type Cert = (typeof certs)[number];
+/** Full-size scans as WebP (the PNG originals are up to ~700 KB), capped at 2000px wide. */
+const fullScan = new Map(
+  await Promise.all(
+    certs
+      .filter((c) => c.data.certificate)
+      .map(async (c) => {
+        const src = c.data.certificate!;
+        const img = await getImage({ src, format: 'webp', width: Math.min(src.width, 2000) });
+        return [c.id, img.src] as const;
+      }),
+  ),
+);
 /** Where Verify points: the issuer's verify page, or the full certificate scan when there's no link yet. */
-const verifyHref = (c: Cert) =>
-  hasVerifyUrl(c) ? c.data.verifyUrl : c.data.certificate?.src;
+const verifyHref = (c: Cert) => (hasVerifyUrl(c) ? c.data.verifyUrl : fullScan.get(c.id));
 /** The site a certificate came from: `platform` when set (e.g. Coursera), else the issuer. */
 const platformOf = (c: Cert) => c.data.platform ?? c.data.issuer;
 const countFor = (platform: string) => certs.filter((c) => platformOf(c) === platform).length;
@@ -38,7 +49,7 @@ const monogram = (platform: string) => MONOGRAMS[platform] ?? platform.slice(0, 
       {certs.map((c) => (
         <li class="cert">
           {c.data.certificate ? (
-            <a class="cert-scan" href={c.data.certificate.src} target="_blank" rel="noopener">
+            <a class="cert-scan" href={fullScan.get(c.id)} target="_blank" rel="noopener">
               <Image
                 src={c.data.certificate}
                 alt={`${c.data.name} certificate (opens full size)`}

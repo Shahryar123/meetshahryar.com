@@ -50,12 +50,12 @@ const parts = (text: string) => text.split(/(\d+(?:\.\d+)?%)/);
     </dl>
   </div>
 
-  <!--
+  {/*
     A version history: newest role on top. The label, the dot and the card's
     title share one top line, so they always sit level.
     While scrolling, a yellow dot runs down the rail, level with the middle of
     the screen, leaving a yellow trail; each role's dot lights up as it passes.
-  -->
+  */}
   <div class="timeline-wrap mt-12 md:mt-16" data-timeline>
     <span class="timeline-trail" aria-hidden="true"></span>
     <span class="timeline-runner" aria-hidden="true"></span>
@@ -138,7 +138,7 @@ const parts = (text: string) => text.split(/(\d+(?:\.\d+)?%)/);
               <span class="sr-only">, graduated {e.data.year}</span>
             </p>
           </div>
-          <!-- Transparent copy of public/education.jpg (checkerboard removed), src/assets/logos/fast-nuces.png. -->
+          {/* FAST-NUCES logo with a transparent background: src/assets/logos/fast-nuces.png. */}
           <div class="edu-logo">
             <Image src={fastLogo} alt="FAST-NUCES" widths={[240, 480]} sizes="12rem" />
           </div>

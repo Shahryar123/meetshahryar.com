@@ -26,10 +26,10 @@ const budgets = site.contact.budgets.filter((b) => !hasTodo(b));
 const errorFor = (field: string) => `${field}-error`;
 ---
 
-<!--
+{/*
   A signal-yellow panel: the invitation and direct links on the left, the form
   on an always-dark card on the right.
--->
+*/}
 <section id="contact" aria-labelledby="contact-title" class="shell section-gap">
   <div class="contact-panel">
     <span class="contact-ring" aria-hidden="true"></span>
@@ -42,10 +42,10 @@ const errorFor = (field: string) => `${field}-error`;
           </h2>
         </hgroup>
 
-        <!--
+        {/*
           Decoration: an isometric server stack whose layers float, LEDs blink and
           a cursor orbits it. Everything stops for prefers-reduced-motion.
-        -->
+        */}
         <div class="rack-wrap" aria-hidden="true">
           <div class="rack">
             <p class="rack-badge"><span class="rack-badge-dot"></span>reply &lt; 1 working day</p>
@@ -226,7 +226,7 @@ const errorFor = (field: string) => `${field}-error`;
         </div>
       </div>
 
-      <!-- Honeypot: people never see or fill this; bots often do. -->
+      {/* Honeypot: people never see or fill this; bots often do. */}
       <div class="hp" aria-hidden="true">
         <label for="cf-website">Leave this field empty</label>
         <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" />

@@ -21,11 +21,11 @@ const [first, ...rest] = site.about;
 <section id="about" aria-labelledby="about-title" class="shell section-gap">
   <div class="grid grid-cols-12 gap-x-6 gap-y-10">
     <div class="col-span-12 sm:col-span-6 md:col-span-5 lg:col-span-4">
-      <!--
-        The About photo (src/assets/me-about-section.png, a copy of public/me-about-section.png
-        so Astro can compress it), an outline frame offset behind it, and the current
+      {/*
+        The About photo (src/assets/me-about-section.png, compressed by Astro), an
+        outline frame offset behind it, and the current
         role on a card over the corner. The frame follows the photo's own proportions.
-      -->
+      */}
       <div class="portrait">
         <span class="portrait-frame" aria-hidden="true"></span>
         <div
@@ -50,10 +50,10 @@ const [first, ...rest] = site.about;
       </div>
     </div>
 
-    <!--
+    {/*
       Heading and first paragraph, with a small terminal of quick facts beside
       them on wide screens; the rest of the copy (pull quote included) below.
-    -->
+    */}
     <div class="about-main col-span-12 md:col-span-7 lg:col-span-7 lg:col-start-6">
       <div class="about-intro">
         <hgroup>
