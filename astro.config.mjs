@@ -3,6 +3,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import cspHtaccess from './integrations/csp-htaccess.mjs';
 
 // Fontsource's Latin subset (includes General Punctuation for dashes and curly quotes).
 /** @type {[string, ...string[]]} */
@@ -31,7 +32,7 @@ const LATIN = [
 export default defineConfig({
   // TODO: confirm the production domain (taken from the original README title).
   site: 'https://meetshahryar.com',
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap(), cspHtaccess()],
   fonts: [
     {
       // Self-hosted Mona Sans with both axes: wdth 75–125, wght 200–900.
@@ -55,5 +56,11 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      // Component scripts ship as .js files, never inline: fewer CSP hashes, and
+      // the ClientRouter then has no reason to inject a data: script (blocked by the CSP).
+      // Other assets keep Vite's default limit (undefined = default).
+      assetsInlineLimit: (filePath) => (filePath.endsWith('.js') ? false : undefined),
+    },
   },
 });
