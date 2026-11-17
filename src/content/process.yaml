@@ -6,40 +6,40 @@
 # to two sentences.
 # outcome: what the client has at the end of the step, shown as a chip.
 
-- id: audit
+- id: discovery
   phase: Plan & build
   order: 1
-  title: Infrastructure audit
-  body: I review how your application is built, deployed, monitored and secured on AWS, Azure or your current server, and find what slows releases or risks uptime.
-  outcome: Findings
+  title: Discovery
+  body: We talk through your product, users and goals, and I review any existing code, infrastructure and integrations to find what to keep and what to fix.
+  outcome: Clear requirements
 
 - id: plan
   order: 2
-  title: Plan and estimate
-  body: You get a written plan covering architecture, security, risks and estimated cloud costs, agreed before any work starts.
-  outcome: Written plan + costs
+  title: Architecture and estimate
+  body: You get a written plan covering the tech stack, data model, architecture, risks and an estimate, agreed before any work starts.
+  outcome: Written plan + estimate
 
 - id: build
   order: 3
-  title: Infrastructure as code
-  body: I write the infrastructure in Terraform or Pulumi and build CI/CD pipelines in GitHub Actions or Azure DevOps, so every change is reviewed and repeatable.
-  outcome: Terraform + pipelines
+  title: Full-stack development
+  body: I build the front end, API and database in short iterations, with code reviews, automated tests and a demo you can try at the end of every sprint.
+  outcome: Working software
 
-- id: migrate
+- id: deploy
   phase: Launch & support
   order: 4
-  title: Migrate and go live
-  body: Monitoring, alerting and backups are in place before traffic moves, and every cut-over has a tested rollback plan to keep downtime to a minimum.
-  outcome: Live, with rollback
+  title: Deploy and go live
+  body: The app ships in Docker through CI/CD pipelines, with infrastructure written in Terraform, Pulumi or AWS CDK, and monitoring in place before launch.
+  outcome: Live on AWS or Azure
 
 - id: handover
   order: 5
   title: Handover and documentation
-  body: You get documentation, runbooks, dashboards and full access to your own cloud accounts, so your team owns the setup from day one.
-  outcome: Docs + runbooks
+  body: You get the source code, documentation, runbooks and full access to your own repositories and cloud accounts, so your team owns everything from day one.
+  outcome: Code + docs
 
 - id: support
   order: 6
   title: Post-launch support
-  body: For 30 days after go-live I'm on hand to fix issues and answer your team's questions while the new setup settles in.
+  body: For 30 days after launch I'm on hand to fix issues, ship small improvements and answer your team's questions.
   outcome: 30 days of support

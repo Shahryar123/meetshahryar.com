@@ -4,11 +4,11 @@
  * Order = card order in the hero.
  */
 export const CATEGORIES = [
+  { id: 'web', label: 'Full-Stack Development' },
   { id: 'cloud', label: 'Cloud & DevOps' },
-  { id: 'security', label: 'Security' },
   { id: 'ai', label: 'AI & RAG' },
-  { id: 'data', label: 'Data' },
-  { id: 'web', label: 'Web' },
+  { id: 'data', label: 'Databases & Data' },
+  { id: 'security', label: 'Security' },
   { id: 'automation', label: 'Automation & QA' },
 ] as const;
 

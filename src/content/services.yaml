@@ -1,61 +1,66 @@
-# One entry per work area. The id (cloud, security, ai, data, web, automation)
+# One entry per work area. The id (web, cloud, ai, data, security, automation)
 # must match src/lib/categories.ts; it links the hero node to its row here.
 # proofProjects are file names from src/content/projects (without extension).
 
+- id: web
+  name: Full-Stack Development
+  summary: Web apps and APIs built end to end, from React and Angular front ends to .NET, Node, Python and Java back ends.
+  tooltip: Full-stack web apps and APIs in .NET, Node, Python and Java with React and Angular.
+  deliverables:
+    - Web apps and SaaS platforms, from first design to production
+    - REST APIs and microservices in .NET, Node.js, Python and Java
+    - Front ends in React, Next.js and Angular
+    - Progressive Web Apps with offline support
+    - Third-party and hardware integrations (SAP, RFID, payments)
+    - Clean Architecture and Domain-Driven Design
+    - Modernising legacy .NET applications
+  tools:
+    - .NET / C# (ASP.NET Core)
+    - Node.js / Express
+    - Python (FastAPI, Django)
+    - Java (Spring Boot)
+    - React
+    - Next.js
+    - Angular
+    - TypeScript
+  proofProjects:
+    - codeon
+    - ar-try-on
+
 - id: cloud
   name: Cloud & DevOps
-  summary: AWS and Azure setups written as code, deployed by pipelines and watched by alarms.
-  tooltip: Moving apps onto AWS and Azure, with pipelines, infrastructure as code and alerts.
+  summary: AWS and Azure setups written as code, shipped in Docker containers by CI/CD pipelines and watched by alarms.
+  tooltip: Docker, CI/CD and infrastructure as code on AWS and Azure.
   deliverables:
-    - Migrations from a VPS or another cloud to AWS and Azure
-    - CI/CD pipelines with per-environment config
-    - Infrastructure as code in Terraform and Pulumi
-    - Windows Server, IIS and .NET hosting
-    - Backups and disaster recovery
-    - Monitoring, alerting and cost reviews
+    - Deploying apps to AWS and Azure
+    - Docker containers and container hosting
+    - CI/CD pipelines in GitHub Actions and Azure DevOps
+    - Infrastructure as code in Terraform, Pulumi and AWS CDK
+    - Migrations from a VPS or another cloud
+    - Monitoring, alerting, backups and cost reviews
     - CDN and DNS on Akamai and Cloudflare
   tools:
-    - AWS (VPC, EC2, RDS, S3, CodePipeline, CodeBuild, CodeDeploy, CloudWatch, SNS, Parameter Store, KMS, Route 53)
-    - Azure (Key Vault, Entra ID, Container Apps)
-    - GCP (IAM, org policies)
+    - AWS (EC2, ECS, Lambda, RDS, S3, CodePipeline, CloudWatch, Route 53)
+    - Azure (App Service, Container Apps, Key Vault, Entra ID)
+    - Docker
     - Terraform
     - Pulumi
+    - AWS CDK
+    - GitHub Actions
+    - Azure DevOps
   proofProjects:
     - vps-to-aws-migration
     - ideali-cloud-operations
 
-- id: security
-  name: Security
-  summary: Headers, TLS, single sign-on, secrets and access design that get you through a security review.
-  tooltip: Security review fixes, SSO, secrets and access design.
-  deliverables:
-    - Security header fixes after ZAP scans
-    - SSL/TLS setup
-    - SSO with SAML and Entra ID
-    - Secrets management
-    - Access design with RBAC and SCIM
-    - SOC 2 readiness
-    - WordPress malware clean-up
-  tools:
-    - OWASP ZAP
-    - Entra ID
-    - Azure Key Vault
-    - Postman Vault
-    - AWS Parameter Store
-    - AWS KMS
-  proofProjects:
-    - key-vault-access
-    - ideali-cloud-operations
-
 - id: ai
   name: AI & RAG
-  summary: RAG apps and agents built with LangChain and LangGraph, traced and evaluated in LangSmith, deployed on Azure.
-  tooltip: RAG assistants and agents with LangChain, LangGraph and LangSmith.
+  summary: AI features built into real products, from RAG assistants to LangGraph agents, traced and evaluated before release.
+  tooltip: RAG assistants and AI features with LangChain, LangGraph and LangSmith.
   deliverables:
-    - RAG apps over your own documents
+    - RAG assistants over your own documents
+    - AI features inside existing web apps
     - Agents with LangChain and LangGraph
     - Tracing and evaluation in LangSmith
-    - Deployment on Azure
     - LLM evaluation with LLM-as-a-judge and regression checks
   tools:
     - LangChain
@@ -63,57 +68,62 @@
     - LangSmith
     - OpenAI API
     - Anthropic Claude API
-    - Azure Container Apps
+    - Python
   proofProjects:
     - runbook-assistant
 
 - id: data
-  name: Data
-  summary: "[One sentence on your data analysis work]"
-  tooltip: "[One line on your data analysis work]"
+  name: Databases & Data
+  summary: Database design, tuning and data work on PostgreSQL, SQL Server and MySQL, plus analysis in Python.
+  tooltip: Schema design, query tuning and data analysis.
   deliverables:
-    - "[typical deliverables]"
+    - Schema design and data modelling
+    - Query and index tuning
+    - Database migrations and versioning
+    - Reporting and data analysis in Python and SQL
   tools:
-    - Databricks
-    - Snowflake
-    - Python
+    - PostgreSQL
+    - SQL Server
+    - MySQL
+    - Entity Framework Core
+    - Python (pandas)
     - SQL
   proofProjects: []
 
-- id: web
-  name: Web
-  summary: Websites and web apps in .NET, React and WordPress, with the technical SEO that gets them found.
-  tooltip: Web apps and sites, plus the technical SEO behind them.
+- id: security
+  name: Security
+  summary: Authentication, single sign-on, secrets and security headers that get your app through a security review.
+  tooltip: Auth, SSO, secrets and security review fixes.
   deliverables:
-    - Web apps in .NET/C#, React + Vite and Node/Express
-    - WordPress sites
-    - Three.js and browser AR prototypes
-    - "Technical SEO: rendering fixes, JSON-LD and Search Console"
+    - Authentication and authorisation (OAuth 2.0, JWT)
+    - SSO with SAML and Entra ID
+    - Access design with RBAC and SCIM
+    - Secrets management
+    - Security header and TLS fixes after ZAP scans
   tools:
-    - .NET / C#
-    - React
-    - Vite
-    - Node.js / Express
-    - PostgreSQL
-    - PHP
-    - HTML/CSS
-    - WordPress
-    - Three.js
+    - Entra ID
+    - OWASP ZAP
+    - Azure Key Vault
+    - AWS Parameter Store
+    - AWS KMS
   proofProjects:
-    - codeon
-    - ar-try-on
+    - key-vault-access
+    - ideali-cloud-operations
 
 - id: automation
   name: Automation & QA
-  summary: Web scraping and data extraction, mobile test automation and email automation.
-  tooltip: Scrapers, mobile test automation and email workflows.
+  summary: Automated tests, web scraping and workflow automation that save your team hours every week.
+  tooltip: Test automation, scrapers and workflow automation.
   deliverables:
-    - Web scraping and data extraction
+    - Unit and integration testing
     - Mobile test automation with the Page Object Model
-    - Email automation
+    - Web scraping and data extraction
+    - Email and workflow automation
   tools:
+    - xUnit
+    - Jest
     - Python
-    - BeautifulSoup
     - Appium
     - WebdriverIO
+    - BeautifulSoup
   proofProjects: []

@@ -5,7 +5,7 @@
  */
 export const MORE_WORK_GROUPS = [
   { id: 'cloud-ai', label: 'Cloud, DevOps & AI' },
-  { id: 'web-qa', label: 'Web, Automation & SEO' },
+  { id: 'web-qa', label: 'Full Stack, Automation & SEO' },
 ] as const;
 
 export type MoreWorkGroupId = (typeof MORE_WORK_GROUPS)[number]['id'];

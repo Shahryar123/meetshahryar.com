@@ -5,13 +5,13 @@
 
 - id: engagement
   order: 1
-  question: How can I hire you for a DevOps or cloud project?
-  answer: You can hire me for a fixed-price project with an agreed scope, on an hourly basis for smaller or open-ended tasks, or on a monthly retainer for ongoing DevOps, cloud operations and support. Most projects start with a short infrastructure audit, so the scope is based on your real setup.
+  question: How can I hire you for a full-stack or cloud project?
+  answer: You can hire me for a fixed-price project with an agreed scope, on an hourly basis for smaller or open-ended tasks, or on a monthly retainer for ongoing development, DevOps and support. Most projects start with a short discovery call, so the scope is based on your real needs.
 
 - id: international
   order: 2
   question: Do you work with international clients?
-  answer: Yes. I've worked remotely with clients in the UK, Ireland, the UAE, Saudi Arabia, Canada and Australia. Calls, documentation and handover are in English, and your infrastructure always stays in your own AWS or Azure accounts.
+  answer: Yes. I've worked remotely with clients in the UK, Ireland, the UAE, Saudi Arabia, Canada and Australia. Calls, documentation and handover are in English, and your code and infrastructure always stay in your own repositories and cloud accounts.
 
 - id: time-zones
   order: 3
@@ -20,8 +20,8 @@
 
 - id: cost
   order: 4
-  question: How much does a cloud migration or DevOps project cost?
-  answer: It depends on the size of your setup and what needs to change. After the infrastructure audit, you get a written estimate covering my fees and your expected monthly cloud costs, so there are no surprises before work starts.
+  question: How much does a web app or cloud project cost?
+  answer: It depends on the features, integrations and how much already exists. After discovery, you get a written estimate covering my fees and your expected monthly hosting costs, so there are no surprises before work starts.
 
 - id: response-time
   order: 5

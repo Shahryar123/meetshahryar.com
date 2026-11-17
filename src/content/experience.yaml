@@ -13,7 +13,7 @@
     - Architected and built TrackIQ, an RFID inventory tracking platform covering manufacturing to sale, as the sole engineer.
     - Integrated handheld and desktop RFID readers with the platform for real-time inventory tracking.
     - Built a healthcare Progressive Web App in Next.js with mrx integration and service workers for offline support.
-    - Work on the AWS infrastructure and CDN that serve the company's apps.
+    - Own the AWS infrastructure, CI/CD and CDN that serve the company's apps.
   stack:
     - React
     - Next.js

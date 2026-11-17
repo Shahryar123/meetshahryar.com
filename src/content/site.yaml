@@ -3,11 +3,11 @@
 main:
   firstName: Muhammad
   surname: Shahryar
-  title: DevOps & Cloud Engineer
+  title: Senior Full-Stack Engineer
   # Hero version: must stay within two lines (about 110 characters).
-  valueLine: I move apps off fragile servers onto AWS and Azure setups that deploy on every push and pass security review.
+  valueLine: I build web apps end to end in .NET, Node, Python and Java, and ship them on AWS and Azure.
   # Full version, used in About.
-  valueLineLong: I move apps off fragile servers onto AWS and Azure setups that deploy on every push, alert before users notice, and pass security review. I also build the AI assistants and websites that run on them.
+  valueLineLong: I build web apps end to end, from React and Angular front ends to .NET, Node, Python and Java APIs on PostgreSQL and SQL databases, and ship them on AWS and Azure with Docker, CI/CD and infrastructure as code.
   availability: "[availability, e.g. Open to new roles]"
   regions: UK, Ireland, UAE, Saudi Arabia, Canada and Australia
   email: muhammadshahryar135@gmail.com
@@ -26,9 +26,9 @@ main:
   # About copy. Each entry is a paragraph, or `quote:` for a pull quote
   # (bold, with a yellow bar). The first paragraph sits beside the terminal.
   about:
-    - I'm a senior software engineer at Alpha Mu Digital Ventures, where I also look after the AWS infrastructure and CDN. I came to infrastructure from .NET and C#, so I tend to start with the application.
-    - quote: How does it build, where do its secrets live, and what happens when the server under it goes away?
-    - I move apps off fragile servers onto AWS and Azure setups that deploy on every push, alert before users notice, and pass security review. I also build the AI assistants and websites that run on them.
+    - I'm a senior software engineer at Alpha Mu Digital Ventures with 5 years of building production software. I work across the whole stack, from React and Angular front ends to .NET, Node, Python and Java back ends, and I look after the AWS infrastructure they run on.
+    - quote: Good software isn't done when the feature works. It's done when it deploys on every push, scales without drama and is easy for the next developer to change.
+    - Because I own the delivery too, I write the Docker setup, CI/CD pipelines and infrastructure as code in Terraform, Pulumi and AWS CDK alongside the app. I also build AI features and RAG assistants into the products I work on.
   # The small About terminal: `whoami` (from Experience), then `ls clouds/`.
   clouds: [aws, azure]
   contact:
