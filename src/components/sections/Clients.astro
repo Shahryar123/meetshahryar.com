@@ -1,296 +1,353 @@
 ---
 /**
- * Clients, right after Stats: one row of flip cards that scrolls continuously.
- * Front: the logo on a glass plate. Back (hover / focus): what I did.
- * Edit `clients` below; add as many as you like. `nda: true` redacts the client.
- * `theme` (1-6, yellow → deep teal) cycles automatically when not set.
- *
- * Logos (src/assets/clients/) are pre-processed: margins trimmed, background
- * made transparent, upscaled to 3x their on-screen height and sharpened, so
- * they stay crisp on retina. Each logo's height is picked so every logo covers
- * about the same area: wide wordmarks render shorter.
- * `glass: 'dark'` gives a smoked plate, for logos with light text.
+ * Clients: a grid of cards (logo, sector, name, what I did, tags), closed by a
+ * dark "your product could be here" card that links to Contact.
+ * Edit `clients` below. Logos keep their own colours; `darkLogo: true` puts a
+ * logo with light lettering (Martin Sports) on a dark plate so it stays legible.
+ * Text in "[brackets]" is a TODO: it shows with the dashed outline until filled in.
  */
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Eyebrow from '@/components/Eyebrow.astro';
+import T from '@/components/T.astro';
 import ideasRegistration from '@/assets/clients/ideasregistration.png';
 import ideali from '@/assets/clients/ideali.png';
 import britishInstruments from '@/assets/clients/britishinstruments.png';
 import iqTech from '@/assets/clients/iqtechsol.png';
 import martinSports from '@/assets/clients/martinsportsgear.png';
 
-type Theme = 1 | 2 | 3 | 4 | 5 | 6;
 interface Client {
   name: string;
+  sector: string;
   did: string;
-  stack?: string[];
-  logo?: ImageMetadata;
-  glass?: 'light' | 'dark';
-  nda?: boolean;
-  theme?: Theme;
+  tags: string[];
+  logo: ImageMetadata;
+  darkLogo?: boolean;
 }
 
-/* PLACEHOLDER details: replace `did` and `stack` with the real ones. */
 const clients: Client[] = [
-  { name: 'IdeasRegistration', logo: ideasRegistration, did: 'Built and deployed the platform on AWS with automated CI/CD.', stack: ['.NET', 'AWS'] },
-  { name: 'Ideali', logo: ideali, did: 'Full-stack features, containerised deployments and monitoring.', stack: ['React', 'Docker'] },
-  { name: 'British Instruments', logo: britishInstruments, did: 'Built an AI sales assistant and the cloud setup behind it.', stack: ['Python', 'Azure'] },
-  { name: 'IQ Tech Solutions', logo: iqTech, did: 'Web app development and cloud deployment.', stack: ['Node.js', 'AWS'] },
-  { name: 'Martin Sports', logo: martinSports, glass: 'dark', did: 'E-commerce storefront, integrations and hosting.', stack: ['React', 'PostgreSQL'] },
+  {
+    name: 'Ideali',
+    logo: ideali,
+    sector: 'SaaS platform',
+    did: 'Cloud infrastructure, security hardening and CI/CD pipelines for the ideali.io platform.',
+    tags: ['AWS', 'CI/CD', 'Security'],
+  },
+  {
+    name: 'British Instruments',
+    logo: britishInstruments,
+    sector: 'Industrial instrumentation · UK',
+    did: 'Website, SEO and content for a UK supplier of industrial measurement and control equipment.',
+    tags: ['SEO', 'Content', 'Email campaigns'],
+  },
+  {
+    name: 'IQ Tech Solutions',
+    logo: iqTech,
+    sector: '[sector]',
+    did: '[One line on what you built or delivered for IQ Tech Solutions.]',
+    tags: ['[Tech]', '[Tech]'],
+  },
+  {
+    name: 'Martin Sports',
+    logo: martinSports,
+    darkLogo: true,
+    sector: 'Cricket equipment',
+    did: 'Storefront design and UI for a cricket equipment brand.',
+    tags: ['UI design', 'Web'],
+  },
+  {
+    name: 'Ideas Registration',
+    logo: ideasRegistration,
+    sector: 'Registration services',
+    did: 'Production build on AWS and migration off a GoDaddy VPS, with separate staging and testing databases.',
+    tags: ['AWS', 'Migration', 'Databases'],
+  },
 ];
 
-const themes: Theme[] = [1, 2, 3, 4, 5, 6];
-/* Repeat the list inside each loop copy so a copy is always wider than the screen
-   (no gap after the last client); ~14 cards x 17rem covers very wide monitors. */
-const reps = Math.max(1, Math.ceil(14 / clients.length));
-const row = Array.from({ length: reps }, () => clients).flat();
-const duration = `${row.length * 6}s`;
+/** Logos are stored at 3x their on-screen height; show them at about 2.25rem. */
+const LOGO_H = 36;
 ---
 
 <section id="clients" aria-labelledby="clients-title" class="shell section-gap offscreen-lazy">
-  <div class="clients-head">
-    <hgroup>
-      <Eyebrow label="Clients" />
-      <h2 id="clients-title" class="type-section-display mt-3">Who I've built for</h2>
-    </hgroup>
-  </div>
+  <hgroup>
+    <Eyebrow label="Clients" />
+    <h2 id="clients-title" class="type-section-display mt-3">
+      Who I've built for
+    </h2>
+  </hgroup>
 
-  <div class="marquee" style={`--duration:${duration}`}>
-    {[false, true].map((copy) => (
-      <ul role="list" class="track" aria-hidden={copy ? 'true' : undefined} inert={copy || undefined}>
-        {row.map((c, i) => (
-          <li class:list={['card', i >= clients.length && 'rep']} aria-hidden={i >= clients.length ? 'true' : undefined} inert={i >= clients.length || undefined} data-theme={c.theme ?? themes[(i % clients.length) % themes.length]} tabindex="0" aria-label={`${c.nda ? 'Confidential client' : c.name}: ${c.did}`}>
-            <div class="card-inner">
-              <div class="face front" aria-hidden="true">
-                <div class:list={['plate', c.glass === 'dark' && 'plate--dark']}>
-                  {c.nda || !c.logo ? (
-                    <div class="redact">
-                      <span /><span />
-                    </div>
-                  ) : (
-                    <Image
-                      src={c.logo}
-                      alt=""
-                      height={Math.round(c.logo.height / 3)}
-                      densities={[1, 2, 3]}
-                      format="webp"
-                      quality={90}
-                      loading="lazy"
-                      decoding="async"
-                      class="logo"
-                    />
-                  )}
-                </div>
-              </div>
-              <div class="face back" aria-hidden="true">
-                <p class="back-label">What I did</p>
-                <p class="did">{c.did}</p>
-                {c.stack && (
-                  <div class="stack">
-                    {c.stack.map((s) => <span>{s}</span>)}
-                  </div>
-                )}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+  <ul role="list" class="clients-grid">
+    {clients.map((c) => (
+      <li class="client">
+        <div class:list={['client-logo', c.darkLogo && 'client-logo--dark']}>
+          <Image
+            src={c.logo}
+            alt={`${c.name} logo`}
+            height={LOGO_H}
+            densities={[1, 2, 3]}
+            format="webp"
+            quality={90}
+            loading="lazy"
+            decoding="async"
+            class="logo"
+          />
+        </div>
+        <p class="client-sector">
+          <T v={c.sector} />
+        </p>
+        <h3 class="client-name">{c.name}</h3>
+        <p class="client-did">
+          <T v={c.did} />
+        </p>
+        <ul role="list" class="client-tags" aria-label="Work">
+          {c.tags.map((t) => (
+            <li>
+              <T v={t} />
+            </li>
+          ))}
+        </ul>
+      </li>
     ))}
-  </div>
+    {/*
+      Flip card: dark front, signal-yellow back with the call to action. Hover
+      (or keyboard focus on its button) turns it; a tap does on touch screens.
+    */}
+    <li class="client client--next">
+      <div class="next-inner">
+        <div class="next-face next-front">
+          <p class="next-label">Next up</p>
+          <h3 class="next-title">Your product could be here.</h3>
+          <p class="next-text">
+            Cloud, CI/CD, migrations or a site that ranks: let's talk about what you're building.
+          </p>
+          <p class="next-hint" aria-hidden="true">
+            <ArrowRight size={16} stroke-width={2} />
+          </p>
+        </div>
+        <div class="next-face next-back">
+          <p class="next-label">Your turn</p>
+          <p class="next-title">Start your journey.</p>
+          <p class="next-text">
+            Tell me what you're running and where it hurts. I'll reply within one working day with
+            questions or a plan.
+          </p>
+          <a class="next-cta" href="/#contact">
+            Let's talk
+            <ArrowRight size={16} stroke-width={2} aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+    </li>
+  </ul>
 </section>
 
 <style>
-  .clients-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    justify-content: space-between;
-    gap: 1rem 2rem;
-  }
-
-  /* --- Marquee --- */
-  .marquee {
-    --gap: 1rem;
-    display: flex;
-    gap: var(--gap);
-    overflow: hidden;
+  .clients-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
     margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
-    margin-inline: calc(50% - 50vw);
-    padding-block: 0.5rem;
-    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   }
-  .track {
-    display: flex;
-    flex-shrink: 0;
-    gap: var(--gap);
-    animation: scroll var(--duration) linear infinite;
+  @media (min-width: 40rem) {
+    .clients-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
-  .marquee:hover .track,
-  .marquee:focus-within .track {
-    animation-play-state: paused;
-  }
-  @keyframes scroll {
-    to {
-      translate: calc(-100% - var(--gap)) 0;
+  @media (min-width: 64rem) {
+    .clients-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
     }
   }
 
-  /* --- Card themes: yellow → green → teal → deep teal --- */
-  .card {
-    --bg: #d9c04f;
-    --fg: #0f2a2e;
-    --soft: color-mix(in oklab, #0f2a2e 70%, var(--bg));
-    --tag-bg: color-mix(in oklab, #0f2a2e 14%, transparent);
-    width: 17rem;
-    height: 7.5rem;
-    flex-shrink: 0;
-    perspective: 1000px;
-    border-radius: var(--radius-node);
-    outline: none;
-  }
-  .card[data-theme='2'] { --bg: #a3c77d; }
-  .card[data-theme='3'] { --bg: #66b08f; }
-  .card[data-theme='4'],
-  .card[data-theme='5'],
-  .card[data-theme='6'] {
-    --fg: #ffffff;
-    --soft: color-mix(in oklab, #ffffff 72%, var(--bg));
-    --tag-bg: color-mix(in oklab, #ffffff 16%, transparent);
-  }
-  .card[data-theme='4'] { --bg: #2b8277; }
-  .card[data-theme='5'] { --bg: #236868; }
-  .card[data-theme='6'] { --bg: #1e4f55; }
-  .card:focus-visible .card-inner {
-    box-shadow: 0 0 0 3px var(--page), 0 0 0 5px var(--signal-ink);
-  }
-
-  /* --- Flip --- */
-  .card-inner {
-    position: relative;
-    height: 100%;
-    border-radius: inherit;
-    transform-style: preserve-3d;
-    transition: transform 0.7s var(--ease-out);
-  }
-  .card:hover .card-inner,
-  .card:focus-visible .card-inner {
-    transform: rotateY(180deg);
-  }
-  .face {
-    position: absolute;
-    inset: 0;
+  .client {
     display: flex;
     flex-direction: column;
-    padding: 0.875rem 1rem;
-    border-radius: inherit;
-    background: var(--bg);
-    color: var(--fg);
-    backface-visibility: hidden;
-  }
-  .back {
-    transform: rotateY(180deg);
-    justify-content: center;
+    padding: 1.5rem;
+    border-radius: var(--radius-node);
+    background: light-dark(#fff, var(--panel));
+    box-shadow: 0 12px 26px -22px rgb(15 42 46 / 0.55);
   }
 
-  /* --- Front: the logo on a glass plate --- */
-  /* Soft light and shade on the card, so the see-through plate reads as glass. */
-  .front {
-    padding: 0.625rem;
-    background:
-      radial-gradient(circle at 15% 0%, rgb(255 255 255 / 0.4), transparent 55%),
-      radial-gradient(circle at 100% 100%, rgb(0 0 0 / 0.2), transparent 55%),
-      var(--bg);
+  /* Logo row, then a hairline under it. */
+  .client-logo {
+    display: flex;
+    align-items: center;
+    height: 3.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--rule) 55%, transparent);
   }
-  .plate {
-    flex: 1;
-    display: grid;
-    place-items: center;
-    padding: 0.5rem 1rem;
-    border: 1px solid rgb(255 255 255 / 0.55);
-    border-radius: 10px;
-    background: linear-gradient(140deg, rgb(255 255 255 / 0.72), rgb(255 255 255 / 0.42));
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.8),
-      0 10px 24px -14px rgb(0 0 0 / 0.5);
-  }
-  /* Smoked glass for logos with light text. */
-  .plate--dark {
-    border-color: rgb(255 255 255 / 0.18);
-    background: linear-gradient(140deg, rgb(8 24 20 / 0.62), rgb(8 24 20 / 0.38));
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.14),
-      0 10px 24px -14px rgb(0 0 0 / 0.6);
-  }
-  .plate :global(.logo) {
+  .client-logo :global(.logo) {
     display: block;
     width: auto;
     max-width: 100%;
+    height: 2.25rem;
     object-fit: contain;
+    object-position: left center;
   }
-  .redact {
-    display: grid;
-    gap: 0.35rem;
-    width: 80%;
+  /* Dark-mode panels: a white plate keeps dark-lettered logos readable. */
+  :global(:root[data-theme='dark']) .client-logo:not(.client-logo--dark) :global(.logo) {
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    background: #fff;
+    box-sizing: content-box;
   }
-  .redact span {
-    display: block;
-    height: 0.6rem;
-    border-radius: 2px;
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .client-logo:not(.client-logo--dark) :global(.logo) {
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      background: #fff;
+      box-sizing: content-box;
+    }
+  }
+  /* Light lettering (Martin Sports): its own colours on a dark plate. */
+  .client-logo--dark :global(.logo) {
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
     background: #0f2a2e;
-  }
-  .redact span:first-child {
-    width: 75%;
-  }
-  .redact span:last-child {
-    width: 40%;
-    opacity: 0.6;
+    box-sizing: content-box;
   }
 
-  /* --- Back --- */
-  .back-label {
-    color: var(--soft);
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
+  .client-sector {
+    margin-top: 1.25rem;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-stretch: 112%;
+    font-weight: 650;
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
-  .did {
-    margin-top: 0.3rem;
-    font-size: 0.8125rem;
-    line-height: 1.35;
-    font-weight: 600;
+  .client-name {
+    margin-top: 0.375rem;
+    font-size: 1.25rem;
+    line-height: 1.25;
+    font-stretch: 106%;
+    font-weight: 680;
   }
-  .stack {
-    display: flex;
-    gap: 0.3rem;
+  .client-did {
     margin-top: 0.5rem;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    line-height: 1.5;
   }
-  .stack span {
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    background: var(--tag-bg);
-    color: var(--soft);
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
+  .client-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: auto;
+    padding-top: 1.25rem;
+  }
+  .client-tags li {
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-full);
+    background: var(--page);
+    color: var(--ink);
+    font-size: 0.8125rem;
+    font-weight: 560;
   }
 
-  /* Reduced motion: no auto-scroll (swipeable strip), and no 3D flip. */
+  /* ---- The closing flip card ---- */
+  .client--next {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    perspective: 1400px;
+    min-height: 16rem;
+  }
+  .next-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 700ms var(--ease-out);
+  }
+  .client--next:hover .next-inner,
+  .client--next:focus-within .next-inner {
+    transform: rotateY(180deg);
+  }
+  .next-face {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border-radius: var(--radius-node);
+    backface-visibility: hidden;
+    box-shadow: 0 12px 26px -22px rgb(15 42 46 / 0.55);
+  }
+  .next-front {
+    background: var(--band);
+    color: #e6efec;
+  }
+  .next-back {
+    background: var(--signal);
+    color: var(--on-signal);
+    transform: rotateY(180deg);
+  }
   @media (prefers-reduced-motion: reduce) {
-    .marquee {
-      overflow-x: auto;
-      mask-image: none;
-      margin-inline: 0;
-    }
-    .track {
-      animation: none;
-    }
-    .track[aria-hidden='true'],
-    .rep {
-      display: none;
-    }
-    .card-inner {
+    .next-inner {
       transition: none;
     }
+  }
+
+  .next-label {
+    font-size: 0.75rem;
+    font-stretch: 112%;
+    font-weight: 650;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .next-front .next-label {
+    color: var(--signal);
+  }
+  .next-title {
+    margin-top: 0.5rem;
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 1.875rem);
+    line-height: 1.1;
+    font-stretch: 112%;
+    font-weight: 780;
+  }
+  .next-text {
+    margin-top: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .next-front .next-text {
+    color: #b9cdc9;
+  }
+  /* A round arrow at the bottom hints that the card turns. */
+  .next-hint {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-top: auto;
+    border: 1px solid rgb(230 239 236 / 0.35);
+    border-radius: var(--radius-full);
+    color: var(--signal);
+  }
+  /* Dark pill on the yellow back. */
+  .next-cta {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    margin-top: auto;
+    padding-inline: 1.375rem;
+    border-radius: var(--radius-full);
+    background: var(--on-signal);
+    color: var(--signal);
+    font-weight: 600;
+    text-decoration: none;
+    transition: scale 100ms var(--ease-out);
+  }
+  .next-cta:active {
+    scale: 0.97;
+  }
+  .next-cta:focus-visible {
+    outline: 2px solid var(--on-signal);
+    outline-offset: 3px;
   }
 </style>
