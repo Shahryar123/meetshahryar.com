@@ -1,0 +1,449 @@
+---
+/**
+ * Command palette (Ctrl+K / ⌘K, or the hint in the nav): jump to a section,
+ * copy the email address, download the CV, switch theme, open profiles.
+ * A native modal <dialog>: focus is trapped and Esc closes it. The input is a
+ * combobox over a listbox; arrows move, Enter runs, typing filters.
+ */
+import Search from '@lucide/astro/icons/search';
+import { getCollection } from 'astro:content';
+import { getSite } from '@/lib/site';
+import { caseStudyHref, hasCaseStudies } from '@/lib/case-studies';
+import { isEmail, isHttpUrl } from '@/lib/todo';
+
+const site = await getSite();
+
+type Item = {
+  label: string;
+  kind: 'Section' | 'Project' | 'Action' | 'Link';
+  /** Extra words that should match, e.g. "dark light" for the theme switch. */
+  keywords?: string;
+  href?: string;
+  action?: 'copy-email' | 'download-cv' | 'theme';
+  external?: boolean;
+};
+
+// Sections that render on the home page. Writing and Testimonials hide while empty.
+const [writing, testimonials] = await Promise.all([
+  getCollection('writing', (w) => !w.data.draft),
+  getCollection('testimonials'),
+]);
+const sections: Item[] = [
+  { label: 'Selected work', href: '/#work', keywords: 'projects case studies' },
+  { label: 'More work', href: '/#more-work', keywords: 'projects' },
+  {
+    label: 'Services',
+    href: '/#services',
+    keywords: 'cloud devops security ai data web automation',
+  },
+  { label: 'How I work', href: '/#process', keywords: 'process steps' },
+  { label: 'Experience', href: '/#experience', keywords: 'jobs roles timeline career' },
+  { label: 'Certifications', href: '/#certifications', keywords: 'certificates badges' },
+  ...(testimonials.length ? [{ label: 'Testimonials', href: '/#testimonials' }] : []),
+  { label: 'About', href: '/#about', keywords: 'bio me' },
+  ...(writing.length ? [{ label: 'Writing', href: '/#writing', keywords: 'articles notes' }] : []),
+  { label: 'FAQ', href: '/#faq', keywords: 'questions pricing' },
+  { label: 'Contact', href: '/#contact', keywords: 'hire email message form' },
+].map((s) => ({ ...s, kind: 'Section' as const }));
+
+// Projects only once their case-study pages exist (until then they'd all go to #work).
+const projects: Item[] = hasCaseStudies
+  ? (await getCollection('projects', (p) => p.data.featured))
+      .sort((a, b) => a.data.order - b.data.order)
+      .map((p) => ({
+        label: p.data.title,
+        kind: 'Project' as const,
+        href: caseStudyHref(p.id),
+        keywords: p.data.stack.join(' '),
+      }))
+  : [];
+
+const actions: Item[] = [
+  ...(isEmail(site.email)
+    ? [
+        {
+          label: 'Copy email address',
+          kind: 'Action' as const,
+          action: 'copy-email' as const,
+          keywords: 'mail contact',
+        },
+      ]
+    : []),
+  { label: 'Download CV (PDF)', kind: 'Action', action: 'download-cv', keywords: 'resume' },
+  { label: 'Switch theme', kind: 'Action', action: 'theme', keywords: 'dark light mode colour' },
+];
+
+const links: Item[] = [
+  { label: 'GitHub', href: site.links.github },
+  { label: 'LinkedIn', href: site.links.linkedin },
+]
+  .filter((l) => isHttpUrl(l.href))
+  .map((l) => ({ ...l, kind: 'Link' as const, external: true, keywords: 'profile' }));
+
+const items = [
+  ...sections,
+  ...projects,
+  ...actions,
+  ...links,
+  { label: 'Privacy notice', kind: 'Link' as const, href: '/privacy/', keywords: 'data gdpr' },
+];
+---
+
+<dialog
+  id="command-palette"
+  class="palette"
+  aria-label="Command palette"
+  data-palette
+  data-email={isEmail(site.email) ? site.email : undefined}
+>
+  <div class="palette-box">
+    <div class="palette-search">
+      <Search size={18} stroke-width={1.75} aria-hidden="true" class="palette-search-icon" />
+      <input
+        id="palette-input"
+        class="palette-input"
+        type="text"
+        role="combobox"
+        aria-label="Search commands"
+        aria-expanded="true"
+        aria-controls="palette-list"
+        aria-autocomplete="list"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Jump to a section or run a command…"
+        data-palette-input
+      />
+      <kbd class="palette-esc">Esc</kbd>
+    </div>
+    <ul
+      id="palette-list"
+      class="palette-list"
+      role="listbox"
+      aria-label="Commands"
+      data-palette-list
+    >
+      {items.map((item, i) => (
+        <li
+          id={`palette-option-${i}`}
+          class="palette-option"
+          role="option"
+          aria-selected="false"
+          data-label={item.label}
+          data-keywords={`${item.kind} ${item.keywords ?? ''}`}
+          data-href={item.href}
+          data-action={item.action}
+          data-external={item.external ? '' : undefined}
+        >
+          <span class="palette-label">{item.label}</span>
+          <span class="palette-kind">{item.kind}</span>
+        </li>
+      ))}
+    </ul>
+    <p class="palette-empty" hidden data-palette-empty>
+      No matches. Try “contact” or “theme”.
+    </p>
+    <p class="sr-only" role="status" data-palette-status></p>
+    <p class="palette-help" aria-hidden="true">
+      <span>
+        <kbd>↑</kbd>
+        <kbd>↓</kbd> move
+      </span>
+      <span>
+        <kbd>Enter</kbd> open
+      </span>
+      <span>
+        <kbd>Esc</kbd> close
+      </span>
+    </p>
+  </div>
+</dialog>
+
+<style>
+  .palette {
+    /* Top-aligned, so the box doesn't jump as the list filters. */
+    margin: 12vh auto auto;
+    width: min(38rem, calc(100% - 2 * var(--gutter)));
+    max-width: none;
+    max-height: 76vh;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-node);
+    background: transparent;
+    color: var(--ink);
+    overflow: visible;
+  }
+  .palette::backdrop {
+    background: color-mix(in oklab, #0a1f22 55%, transparent);
+  }
+  .palette-box {
+    display: flex;
+    flex-direction: column;
+    max-height: 76vh;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-node);
+    background: var(--page);
+    box-shadow: 0 24px 60px -24px rgb(10 31 34 / 0.55);
+  }
+  .palette[open] .palette-box {
+    animation: palette-in 200ms var(--ease-out);
+  }
+  @keyframes palette-in {
+    from {
+      opacity: 0;
+      scale: 0.97;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .palette[open] .palette-box {
+      animation: none;
+    }
+  }
+
+  .palette-search {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .palette-search :global(.palette-search-icon) {
+    flex: none;
+    color: var(--muted);
+  }
+  .palette-input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 1.0625rem;
+    outline: none; /* the dialog itself shows where focus is */
+  }
+  .palette-input::placeholder {
+    color: var(--muted);
+  }
+
+  .palette-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.375rem;
+    overscroll-behavior: contain;
+  }
+  .palette-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-chip);
+    cursor: pointer;
+  }
+  .palette-option[aria-selected='true'] {
+    background: var(--panel);
+    box-shadow: inset 3px 0 0 var(--signal);
+  }
+  .palette-option[hidden] {
+    display: none;
+  }
+  .palette-label {
+    font-weight: 560;
+  }
+  .palette-kind {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  .palette-empty {
+    padding: 1.25rem 1rem;
+    color: var(--muted);
+  }
+  .palette-help {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    padding: 0.625rem 1rem;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  kbd {
+    display: inline-block;
+    min-width: 1.5rem;
+    margin-right: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font: inherit;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    text-align: center;
+  }
+  .palette-esc {
+    flex: none;
+    margin: 0;
+    color: var(--muted);
+  }
+  @media (hover: none) {
+    .palette-help,
+    .palette-esc {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { navigate } from 'astro:transitions/client';
+
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+
+  function palette() {
+    const dialog = document.querySelector<HTMLDialogElement>('[data-palette]');
+    if (!dialog) return null;
+    return {
+      dialog,
+      input: dialog.querySelector<HTMLInputElement>('[data-palette-input]')!,
+      options: [...dialog.querySelectorAll<HTMLLIElement>('[role="option"]')],
+      empty: dialog.querySelector<HTMLElement>('[data-palette-empty]')!,
+      status: dialog.querySelector<HTMLElement>('[data-palette-status]')!,
+    };
+  }
+
+  function open() {
+    const p = palette();
+    if (!p || p.dialog.open) return;
+    p.input.value = '';
+    filter();
+    p.dialog.showModal();
+    p.input.focus();
+    document
+      .querySelectorAll('[data-palette-open]')
+      .forEach((b) => b.setAttribute('aria-expanded', 'true'));
+  }
+
+  const visible = () => palette()?.options.filter((o) => !o.hidden) ?? [];
+
+  function setActive(option: HTMLLIElement | undefined) {
+    const p = palette();
+    if (!p) return;
+    p.options.forEach((o) => o.setAttribute('aria-selected', String(o === option)));
+    if (option) {
+      p.input.setAttribute('aria-activedescendant', option.id);
+      option.scrollIntoView({ block: 'nearest' });
+    } else {
+      p.input.removeAttribute('aria-activedescendant');
+    }
+  }
+
+  /** Every typed word must appear in the label, kind or keywords. */
+  function filter() {
+    const p = palette();
+    if (!p) return;
+    const words = p.input.value.toLowerCase().split(/\s+/).filter(Boolean);
+    for (const o of p.options) {
+      const text = `${o.dataset.label} ${o.dataset.keywords}`.toLowerCase();
+      o.hidden = !words.every((w) => text.includes(w));
+    }
+    const shown = visible();
+    p.empty.hidden = shown.length > 0;
+    p.status.textContent = words.length
+      ? `${shown.length} ${shown.length === 1 ? 'result' : 'results'}`
+      : '';
+    setActive(shown[0]);
+  }
+
+  async function run(option: HTMLLIElement) {
+    const p = palette();
+    if (!p) return;
+    const { href, action } = option.dataset;
+
+    if (action === 'copy-email') {
+      const email = p.dialog.dataset.email;
+      try {
+        if (!email) throw new Error('no email');
+        await navigator.clipboard.writeText(email);
+        option.querySelector('.palette-label')!.textContent = 'Email copied';
+        p.status.textContent = 'Email address copied.';
+        setTimeout(() => {
+          p.dialog.close();
+          option.querySelector('.palette-label')!.textContent = option.dataset.label ?? '';
+        }, 700);
+      } catch {
+        p.dialog.close();
+        if (email) location.href = `mailto:${email}`;
+      }
+      return;
+    }
+
+    p.dialog.close();
+    if (action === 'theme') {
+      document.querySelector<HTMLButtonElement>('[data-theme-toggle]')?.click();
+    } else if (action === 'download-cv') {
+      const a = document.createElement('a');
+      a.href = '/Muhammad_Shahryar_Software_Engineer.pdf';
+      a.download = '';
+      a.click();
+    } else if (href) {
+      if (option.dataset.external !== undefined) window.open(href, '_blank', 'noopener');
+      else navigate(href);
+    }
+  }
+
+  // Global shortcut: one listener for the whole visit (it survives page swaps).
+  document.addEventListener('keydown', (event) => {
+    if (event.key.toLowerCase() === 'k' && (event.ctrlKey || event.metaKey) && !event.altKey) {
+      event.preventDefault();
+      const p = palette();
+      if (p?.dialog.open) p.dialog.close();
+      else open();
+    }
+  });
+
+  function init() {
+    const p = palette();
+    if (!p) return;
+
+    // The nav hint shows the right shortcut for this computer.
+    document.querySelectorAll('[data-palette-mod]').forEach((el) => {
+      el.textContent = isMac ? '⌘' : 'Ctrl';
+    });
+    document
+      .querySelectorAll('[data-palette-open]')
+      .forEach((b) => b.addEventListener('click', open));
+
+    p.input.addEventListener('input', filter);
+    p.input.addEventListener('keydown', (event) => {
+      const shown = visible();
+      const current = shown.findIndex((o) => o.getAttribute('aria-selected') === 'true');
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (!shown.length) return;
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        setActive(shown[(current + step + shown.length) % shown.length]);
+      } else if (event.key === 'Home' || event.key === 'End') {
+        if (!shown.length || p.input.value) return; // with text, Home/End move the caret
+        event.preventDefault();
+        setActive(event.key === 'Home' ? shown[0] : shown[shown.length - 1]);
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        if (shown[current]) run(shown[current]);
+      }
+    });
+    for (const o of p.options) {
+      o.addEventListener('pointermove', () => {
+        if (o.getAttribute('aria-selected') !== 'true') setActive(o);
+      });
+      o.addEventListener('click', () => run(o));
+    }
+    // A click on the backdrop (outside the box) closes it.
+    p.dialog.addEventListener('click', (event) => {
+      if (event.target === p.dialog) p.dialog.close();
+    });
+    p.dialog.addEventListener('close', () => {
+      document
+        .querySelectorAll('[data-palette-open]')
+        .forEach((b) => b.setAttribute('aria-expanded', 'false'));
+    });
+  }
+  document.addEventListener('astro:page-load', init);
+</script>

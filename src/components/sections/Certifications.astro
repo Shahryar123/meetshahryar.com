@@ -6,6 +6,8 @@ import T from '@/components/T.astro';
 import { byOrder, formatMonth } from '@/lib/format';
 import { isHttpUrl } from '@/lib/todo';
 import ArrowUpRight from '@lucide/astro/icons/arrow-up-right';
+import RotateCw from '@lucide/astro/icons/rotate-cw';
+import RotateCcw from '@lucide/astro/icons/rotate-ccw';
 
 const hasVerifyUrl = (c: { data: { verifyUrl: string } }) => isHttpUrl(c.data.verifyUrl);
 // Certificates with a verify link first, then the rest; each group keeps its `order`.
@@ -44,76 +46,150 @@ const monogram = (platform: string) => MONOGRAMS[platform] ?? platform.slice(0, 
 
 {certs.length > 0 && (
   <Section id="certifications" eyebrow="Always learning" title="Certifications" size="display">
-    {/* Phase 3 turns each tile into a flip card: badge on the front, details on the back. */}
+    {/*
+      Flip cards: the front shows the certificate and where it came from; Details
+      turns the card to the back (issuer, dates, credential ID, Verify). The face
+      you can't see is inert, so keyboard and screen readers only reach one side.
+    */}
     <ul role="list" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {certs.map((c) => (
-        <li class="cert">
-          {c.data.certificate ? (
-            <a class="cert-scan" href={fullScan.get(c.id)} target="_blank" rel="noopener">
-              <Image
-                src={c.data.certificate}
-                alt={`${c.data.name} certificate (opens full size)`}
-                widths={[400, 800]}
-                sizes="(min-width: 64rem) 24rem, (min-width: 40rem) 45vw, 92vw"
-                class="size-full object-contain"
-              />
-            </a>
-          ) : c.data.badge ? (
-            /* No certificate scan: the badge sits in the same frame so cards line up. */
-            <div class="cert-scan cert-scan--badge">
-              <Image
-                src={c.data.badge}
-                alt={`${c.data.name} badge`}
-                widths={[200, 400]}
-                sizes="12rem"
-                class="size-full object-contain"
-              />
-            </div>
-          ) : (
-            <div class="cert-badge">
-              <span class="todo type-small">[badge]</span>
-            </div>
-          )}
-          {/* The site it came from: monogram tile, name, and how many credentials it issued. */}
-          <div class="platform mt-5">
-            <span class="platform-tile" aria-hidden="true">
-              {monogram(platformOf(c))}
-            </span>
-            <div class="min-w-0 flex-1">
-              <p class="type-subhead">{platformOf(c)}</p>
-              <p class="type-small text-muted">
-                {countFor(platformOf(c))} {countFor(platformOf(c)) === 1 ? 'credential' : 'credentials'}
-              </p>
-            </div>
-            <p class="issued tabular-nums">
-              <T v={formatMonth(c.data.issueDate)} />
-            </p>
-          </div>
+        <li class="cert-card" data-cert>
+          <div class="cert-inner">
+            <div class="cert cert-front" data-face="front">
+              {c.data.certificate ? (
+                <a class="cert-scan" href={fullScan.get(c.id)} target="_blank" rel="noopener">
+                  <Image
+                    src={c.data.certificate}
+                    alt={`${c.data.name} certificate (opens full size)`}
+                    widths={[400, 800]}
+                    sizes="(min-width: 64rem) 24rem, (min-width: 40rem) 45vw, 92vw"
+                    class="size-full object-contain"
+                  />
+                </a>
+              ) : c.data.badge ? (
+                /* No certificate scan: the badge sits in the same frame so cards line up. */
+                <div class="cert-scan cert-scan--badge">
+                  <Image
+                    src={c.data.badge}
+                    alt={`${c.data.name} badge`}
+                    widths={[200, 400]}
+                    sizes="12rem"
+                    class="size-full object-contain"
+                  />
+                </div>
+              ) : (
+                <div class="cert-badge">
+                  <span class="todo type-small">[badge]</span>
+                </div>
+              )}
+              {/* The site it came from: monogram tile, name, and how many credentials it issued. */}
+              <div class="platform mt-5">
+                <span class="platform-tile" aria-hidden="true">
+                  {monogram(platformOf(c))}
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="type-subhead">{platformOf(c)}</p>
+                  <p class="type-small text-muted">
+                    {countFor(platformOf(c))}{' '}
+                    {countFor(platformOf(c)) === 1 ? 'credential' : 'credentials'}
+                  </p>
+                </div>
+                <p class="issued tabular-nums">
+                  <T v={formatMonth(c.data.issueDate)} />
+                </p>
+              </div>
 
-          <div class="credential mt-4 pt-4">
-            <div class="min-w-0">
-              <h3 class="font-[620]">
+              <div class="credential mt-4 pt-4">
+                <div class="min-w-0">
+                  <h3 class="font-[620]">
+                    <T v={c.data.name} />
+                  </h3>
+                  {(c.data.issuer !== platformOf(c) ||
+                    (c.data.expiryDate && c.data.expiryDate !== 'none')) && (
+                    <p class="type-small text-muted mt-1">
+                      {c.data.issuer !== platformOf(c) && <>By {c.data.issuer}</>}
+                      {c.data.expiryDate && c.data.expiryDate !== 'none' && (
+                        <>
+                          {' '}
+                          Expires <T v={formatMonth(c.data.expiryDate)} />
+                        </>
+                      )}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  class="verify btn btn-secondary"
+                  aria-label={`Details: ${c.data.name}`}
+                  data-flip
+                >
+                  Details
+                  <RotateCw size={15} stroke-width={2} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            <div class="cert cert-back" data-face="back" inert>
+              <h3 class="type-subhead">
                 <T v={c.data.name} />
               </h3>
-              {(c.data.issuer !== platformOf(c) ||
-                (c.data.expiryDate && c.data.expiryDate !== 'none')) && (
-                <p class="type-small text-muted mt-1">
-                  {c.data.issuer !== platformOf(c) && <>By {c.data.issuer}</>}
-                  {c.data.expiryDate && c.data.expiryDate !== 'none' && (
-                    <>
-                      {' '}
-                      Expires <T v={formatMonth(c.data.expiryDate)} />
-                    </>
-                  )}
-                </p>
-              )}
+              <dl class="cert-facts mt-4">
+                <div>
+                  <dt>Issued by</dt>
+                  <dd>{c.data.issuer}</dd>
+                </div>
+                {c.data.platform && (
+                  <div>
+                    <dt>Through</dt>
+                    <dd>{c.data.platform}</dd>
+                  </div>
+                )}
+                <div>
+                  <dt>Issued</dt>
+                  <dd class="tabular-nums">
+                    <T v={formatMonth(c.data.issueDate)} />
+                  </dd>
+                </div>
+                {c.data.expiryDate && (
+                  <div>
+                    <dt>Expires</dt>
+                    <dd class="tabular-nums">
+                      {c.data.expiryDate === 'none' ? (
+                        'Doesn’t expire'
+                      ) : (
+                        <T v={formatMonth(c.data.expiryDate)} />
+                      )}
+                    </dd>
+                  </div>
+                )}
+                <div class="cert-fact-wide">
+                  <dt>Credential ID</dt>
+                  <dd class="cert-id">{c.data.credentialId}</dd>
+                </div>
+              </dl>
+              <div class="cert-back-actions mt-auto pt-5">
+                {verifyHref(c) && (
+                  <a
+                    class="verify btn btn-secondary"
+                    href={verifyHref(c)}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Verify<span class="sr-only"> {c.data.name} (opens in a new tab)</span>
+                    <ArrowUpRight size={16} stroke-width={2} aria-hidden="true" />
+                  </a>
+                )}
+                <button
+                  type="button"
+                  class="verify btn btn-secondary"
+                  aria-label={`Back to the front: ${c.data.name}`}
+                  data-unflip
+                >
+                  <RotateCcw size={15} stroke-width={2} aria-hidden="true" />
+                  Back
+                </button>
+              </div>
             </div>
-            {verifyHref(c) && (
-              <a class="verify btn btn-secondary" href={verifyHref(c)} target="_blank" rel="noopener">
-                Verify<span class="sr-only"> {c.data.name} (opens in a new tab)</span>
-                <ArrowUpRight size={16} stroke-width={2} aria-hidden="true" />
-              </a>
-            )}
           </div>
         </li>
       ))}
@@ -122,6 +198,64 @@ const monogram = (platform: string) => MONOGRAMS[platform] ?? platform.slice(0, 
 )}
 
 <style>
+  /* ---- flip card ---- */
+  .cert-card {
+    perspective: 1600px;
+  }
+  .cert-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr); /* never wider than the card's column */
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 650ms var(--ease-out);
+  }
+  .cert-card[data-flipped] .cert-inner {
+    transform: rotateY(180deg);
+  }
+  /* Both faces share one grid cell, so the card is as tall as the taller face. */
+  .cert-front,
+  .cert-back {
+    grid-area: 1 / 1;
+    backface-visibility: hidden;
+  }
+  .cert-back {
+    display: flex;
+    flex-direction: column;
+    transform: rotateY(180deg);
+  }
+  /* Reduced motion: the card swaps faces at once. */
+  @media (prefers-reduced-motion: reduce) {
+    .cert-inner {
+      transition: none;
+    }
+  }
+  .cert-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.875rem 1rem;
+  }
+  .cert-facts dt {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  .cert-facts dd {
+    margin-top: 0.125rem;
+    font-weight: 560;
+  }
+  .cert-fact-wide {
+    grid-column: 1 / -1;
+  }
+  .cert-id {
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+  .cert-back-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-top: 1px solid color-mix(in oklab, var(--rule) 45%, transparent);
+  }
+
   .cert {
     padding: 1.5rem;
     border-radius: var(--radius-node);
@@ -194,3 +328,29 @@ const monogram = (platform: string) => MONOGRAMS[platform] ?? platform.slice(0, 
     white-space: nowrap;
   }
 </style>
+
+<script>
+  function setFlipped(card: HTMLElement, flipped: boolean) {
+    const front = card.querySelector<HTMLElement>('[data-face="front"]');
+    const back = card.querySelector<HTMLElement>('[data-face="back"]');
+    if (!front || !back) return;
+    card.toggleAttribute('data-flipped', flipped);
+    front.inert = flipped;
+    back.inert = !flipped;
+    // Keep focus on the side that's now showing.
+    card
+      .querySelector<HTMLElement>(flipped ? '[data-unflip]' : '[data-flip]')
+      ?.focus({ preventScroll: true });
+  }
+
+  function init() {
+    document.querySelectorAll<HTMLElement>('[data-cert]').forEach((card) => {
+      card.querySelector('[data-flip]')?.addEventListener('click', () => setFlipped(card, true));
+      card.querySelector('[data-unflip]')?.addEventListener('click', () => setFlipped(card, false));
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && card.hasAttribute('data-flipped')) setFlipped(card, false);
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', init);
+</script>

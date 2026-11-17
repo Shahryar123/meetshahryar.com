@@ -206,6 +206,15 @@ const Row = hasCaseStudies ? 'a' : 'button';
     --rd: calc(var(--i) * 70ms);
   }
 
+  /*
+   * Rows wait 2rem to the right of their place until the section scrolls into
+   * view; clip so that offset can't make the page scroll sideways on phones.
+   * (clip, not hidden: hidden would break the sticky pin.)
+   */
+  .sw-track {
+    overflow-x: clip;
+  }
+
   /* ---------- Rows (every width) ---------- */
 
   .sw-list {
@@ -214,6 +223,7 @@ const Row = hasCaseStudies ? 'a' : 'button';
     margin-top: 2.5rem;
   }
   .sw-item {
+    min-width: 0; /* grid item: let long titles wrap instead of widening the column */
     transition:
       opacity 0.6s ease var(--rd),
       translate 0.8s var(--ease-out) var(--rd);
@@ -221,6 +231,7 @@ const Row = hasCaseStudies ? 'a' : 'button';
   .sw-row {
     /* Resets for the <button> version (before the case-study pages exist). */
     width: 100%;
+    min-width: 0;
     padding: 0;
     border: 0;
     font: inherit;

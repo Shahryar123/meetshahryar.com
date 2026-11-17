@@ -4,6 +4,7 @@ import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
+import CommandPalette from '@/components/CommandPalette.astro';
 import { getSite } from '@/lib/site';
 import { clean } from '@/lib/todo';
 
@@ -82,5 +83,9 @@ const imageUrl = new URL(image.src, Astro.site);
       <slot />
     </main>
     <Footer />
+    <CommandPalette />
+    <script>
+      import '@/scripts/button-feel';
+    </script>
   </body>
 </html>

@@ -11,22 +11,60 @@ import { getSite } from '@/lib/site';
 const site = await getSite();
 const artSizes = '(min-width: 64rem) 46vw, (min-width: 40rem) 32rem, 92vw';
 const artWidths = [480, 720, 1000];
+
+/*
+ * The name, split for the load sequence: words (kept unbreakable) of letters,
+ * each with its running index for the stagger.
+ */
+let index = 0;
+const words = [site.firstName, site.surname]
+  .filter(Boolean)
+  .map((word) => [...word].map((ch) => ({ ch, i: index++ })));
 ---
 
 <section class="hero shell" aria-labelledby="hero-title">
   <div class="hero-top">
     <div class="hero-text">
       <h1 id="hero-title">
-        <span class="hero-name type-display block">{site.firstName} {site.surname}</span>
+        <span class="hero-name type-display block">
+          <span class="sr-only">
+            {site.firstName} {site.surname}
+          </span>
+          {/*
+            Load sequence: each letter's slot is locked to its final (wide) width by
+            an invisible copy; the visible copy on top settles from condensed to wide.
+            Nothing around it moves, so there's no layout shift.
+          */}
+          <span aria-hidden="true">
+            {words.map((letters, w) => (
+              <>
+                {w > 0 && ' '}
+                <span class="name-word">
+                  {letters.map((l) => (
+                    <span class="name-slot" style={`--i: ${l.i}`}>
+                      <span class="name-fit">{l.ch}</span>
+                      <span class="name-glyph">{l.ch}</span>
+                    </span>
+                  ))}
+                </span>
+              </>
+            ))}
+          </span>
+        </span>
         <span class="sr-only">, </span>
         <span class="hero-role mt-4 block">{site.title}</span>
       </h1>
       <p class="hero-value type-lead mt-6">{site.valueLine}</p>
       <div class="hero-actions mt-8">
-        <a class="btn btn-primary" href="#work">
+        <a class="btn btn-primary" href="#work" data-magnetic>
           See my work
         </a>
-        <a class="btn btn-secondary" href="/Muhammad_Shahryar_Software_Engineer.pdf" download>
+        <a
+          class="btn btn-secondary"
+          href="/Muhammad_Shahryar_Software_Engineer.pdf"
+          download
+          data-magnetic
+        >
           <Download size={18} stroke-width={1.75} aria-hidden="true" />
           Download CV (PDF)
         </a>
@@ -45,7 +83,6 @@ const artWidths = [480, 720, 1000];
       )}
     </div>
   </div>
-
 </section>
 
 <style>
@@ -142,4 +179,90 @@ const artWidths = [480, 720, 1000];
     }
   }
 
+  /* ---- the name's letters (see the markup note) ---- */
+  .name-word {
+    white-space: nowrap; /* letters are inline-blocks: don't break inside a word */
+  }
+  .name-slot {
+    position: relative;
+    display: inline-block;
+  }
+  .name-fit {
+    visibility: hidden;
+  }
+  .name-glyph {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% 0;
+  }
+
+  /*
+   * ---- load sequence (~1.3s, once per page load) ----
+   * Portrait wipes in 0-750ms; the name settles 100-1150ms, 30ms per letter;
+   * title, value line and buttons follow. Reduced motion: final state at once.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .name-glyph {
+      animation: name-settle 700ms var(--ease-out) both;
+      animation-delay: calc(100ms + var(--i) * 30ms);
+    }
+    .hero-art {
+      animation: art-wipe 750ms var(--ease-out) both;
+    }
+    .hero-art :global(img) {
+      animation: art-settle 1100ms var(--ease-out) both;
+    }
+    .hero-role,
+    .hero-value,
+    .hero-actions {
+      animation: rise 600ms var(--ease-out) both;
+    }
+    .hero-role {
+      animation-delay: 450ms;
+    }
+    .hero-value {
+      animation-delay: 580ms;
+    }
+    .hero-actions {
+      animation-delay: 700ms;
+    }
+  }
+  @keyframes name-settle {
+    from {
+      font-stretch: 75%;
+      opacity: 0.35;
+    }
+    to {
+      font-stretch: 125%;
+      opacity: 1;
+    }
+  }
+  /* Starts a quarter visible, so the portrait is on screen from the first frame. */
+  @keyframes art-wipe {
+    from {
+      clip-path: inset(0 75% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes art-settle {
+    from {
+      scale: 1.06;
+    }
+    to {
+      scale: 1;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      translate: 0 0.75rem;
+    }
+    to {
+      opacity: 1;
+      translate: none;
+    }
+  }
 </style>
