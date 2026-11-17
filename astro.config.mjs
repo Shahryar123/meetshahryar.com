@@ -30,7 +30,7 @@ const LATIN = [
 ];
 
 export default defineConfig({
-  // TODO: confirm the production domain (taken from the original README title).
+  // Production domain (confirmed 2026-11-17). Sitemap, robots.txt, llms.txt, share tags and JSON-LD use it.
   site: 'https://meetshahryar.com',
   integrations: [mdx(), sitemap(), cspHtaccess()],
   fonts: [
