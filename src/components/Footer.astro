@@ -54,13 +54,14 @@ const name = `${site.firstName} ${site.surname}`;
         <button
           type="button"
           class="palette-hint"
-          aria-label="Open command palette"
           aria-keyshortcuts="Control+K Meta+K"
           aria-haspopup="dialog"
           aria-controls="command-palette"
           aria-expanded="false"
           data-palette-open
         >
+          {/* No aria-label: the name must include the visible text (WCAG 2.5.3, voice control). */}
+          <span class="sr-only">Command palette:</span>
           <kbd data-palette-mod>Ctrl</kbd>
           <kbd>K</kbd>
           <span class="palette-hint-label">Quick jump</span>

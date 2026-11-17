@@ -15,9 +15,10 @@ const total = pad(items.length);
 
 /*
  * Panel colours run yellow → green → deep teal along each row, whatever its
- * length. From index 4 on they are dark enough for light text (4.6:1 or more).
+ * length. From index 4 on they are dark enough for light text (4.6:1 or more
+ * against #f4f8f6); the first four take dark text (5.9:1 or more).
  */
-const RAMP = ['#f6b93b', '#d6c04f', '#a2c67e', '#68b18e', '#2a8279', '#226567', '#1b4f55'];
+const RAMP = ['#f6b93b', '#d6c04f', '#a2c67e', '#68b18e', '#287c73', '#226567', '#1b4f55'];
 const LIGHT_INK_FROM = 4;
 /** Small resting tilts, so a row reads as cards laid by hand. Open panels straighten. */
 const TILTS = [-1.4, 1.1, -0.7, 1.5, -1.1, 0.8, -1.6];
@@ -262,7 +263,6 @@ const rows = MORE_WORK_GROUPS.map((group) => {
     font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 700;
-    opacity: 0.8;
   }
   .mw-name {
     font-size: 0.9375rem;
