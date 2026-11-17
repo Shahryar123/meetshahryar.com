@@ -51,6 +51,20 @@ const name = `${site.firstName} ${site.surname}`;
       </ul>
 
       <div class="footer-actions">
+        <button
+          type="button"
+          class="palette-hint"
+          aria-label="Open command palette"
+          aria-keyshortcuts="Control+K Meta+K"
+          aria-haspopup="dialog"
+          aria-controls="command-palette"
+          aria-expanded="false"
+          data-palette-open
+        >
+          <kbd data-palette-mod>Ctrl</kbd>
+          <kbd>K</kbd>
+          <span class="palette-hint-label">Quick jump</span>
+        </button>
         <a class="footer-pill" href="/Muhammad_Shahryar_Software_Engineer.pdf" download>
           <Download size={19} stroke-width={2} aria-hidden="true" />
           CV (PDF)
@@ -174,6 +188,43 @@ const name = `${site.firstName} ${site.surname}`;
     display: flex;
     align-items: center;
     gap: 0.75rem;
+  }
+  /* Ctrl K: opens the command palette. Keyboard-centric, so desktop only. */
+  .palette-hint {
+    display: none;
+    align-items: center;
+    gap: 0.3rem;
+    height: 3rem;
+    padding-inline: 1rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-full);
+    color: var(--muted);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  @media (min-width: 64rem) {
+    .palette-hint {
+      display: inline-flex;
+    }
+  }
+  .palette-hint:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .palette-hint kbd {
+    min-width: 1.5rem;
+    padding: 0.125rem 0.375rem;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    text-align: center;
+  }
+  .palette-hint-label {
+    margin-left: 0.3rem;
+    font-weight: 600;
   }
   .footer-top-btn {
     display: grid;
