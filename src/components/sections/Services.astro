@@ -36,8 +36,6 @@ const chips = (tools: string[]) =>
 ---
 
 <Section id="services" eyebrow="What I do" title="Services" size="display">
-  <p class="services-hint" aria-hidden="true">{services.length} areas · pick one to see what's included</p>
-
   {/*
     Tabs (WAI-ARIA pattern): areas on the left, one dark detail panel on the right.
     Every panel is in the HTML; only the active one shows. Links to #service-<id>
@@ -189,13 +187,6 @@ const chips = (tools: string[]) =>
 </script>
 
 <style>
-  .services-hint {
-    margin-top: -2.5rem;
-    margin-bottom: 1.5rem;
-    color: var(--muted);
-    font-size: 0.8125rem;
-    text-align: right;
-  }
   .services {
     display: grid;
     grid-template-columns: minmax(0, 1fr); /* lets the one-line tab subtitles truncate on phones */
