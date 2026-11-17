@@ -21,7 +21,7 @@ main:
   links:
     github: https://github.com/Shahryar123
     linkedin: https://www.linkedin.com/in/shahryar123
-    calendly: "[Calendly URL]"
+    calendly: "https://calendly.com/muhammadshahryar135/30min"
     repo: "[URL of this site's repo]"
   # About copy. Each entry is a paragraph, or `quote:` for a pull quote
   # (bold, with a yellow bar). The first paragraph sits beside the terminal.
