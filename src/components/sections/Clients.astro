@@ -1,0 +1,318 @@
+---
+/**
+ * Clients, right after Stats: one row of flip cards that scrolls continuously.
+ * Front: initials, tag, name. Back (hover / focus): what I did.
+ * Edit `clients` below; add as many as you like. `nda: true` redacts the name.
+ * `theme` cycles yellow → dark → mint → light when not set.
+ */
+import Eyebrow from '@/components/Eyebrow.astro';
+
+type Theme = 'signal' | 'dark' | 'mint' | 'light';
+interface Client {
+  name: string;
+  tag: string;
+  did: string;
+  stack?: string[];
+  nda?: boolean;
+  theme?: Theme;
+}
+
+/* PLACEHOLDER details: replace `did`, `tag` and `stack` with the real ones. */
+const clients: Client[] = [
+  { name: 'IdeasRegistration', tag: 'Cloud', did: 'Migrated the platform to AWS with automated CI/CD.', stack: ['AWS', 'Terraform'] },
+  { name: 'Ideall', tag: 'Cloud', did: 'Built containerised deployments and monitoring.', stack: ['Docker', 'Grafana'] },
+  { name: 'Confidential retail client', tag: 'NDA', did: 'Scaled e-commerce infrastructure for peak traffic.', stack: ['Azure', 'AKS'], nda: true },
+  { name: 'British Instruments', tag: 'Industrial · UK', did: 'Hardened and documented their Azure estate.', stack: ['Azure', 'Bicep'] },
+  { name: 'Client Five', tag: 'SaaS', did: 'Kubernetes rollout and cost optimisation.', stack: ['Kubernetes', 'Helm'] },
+];
+
+const themes: Theme[] = ['signal', 'dark', 'mint', 'light'];
+/** "British Instruments" → BI, "IdeasRegistration" → IR, "Ideall" → Id. */
+const initials = (name: string) => {
+  const words = name.split(/\s+/);
+  if (words.length > 1) return (words[0][0] + words[1][0]).toUpperCase();
+  const caps = name.match(/[A-Z]/g) ?? [];
+  return caps.length > 1 ? caps.slice(0, 2).join('') : name.slice(0, 2);
+};
+const duration = `${clients.length * 7}s`;
+---
+
+<section id="clients" aria-labelledby="clients-title" class="shell section-gap offscreen-lazy">
+  <div class="clients-head">
+    <hgroup>
+      <Eyebrow label="Clients" />
+      <h2 id="clients-title" class="type-section-display mt-3">Who I've built for</h2>
+    </hgroup>
+    <p class="hint">Hover or tab to a card to flip it</p>
+  </div>
+
+  <div class="marquee" style={`--duration:${duration}`}>
+    {[false, true].map((copy) => (
+      <ul role="list" class="track" aria-hidden={copy ? 'true' : undefined} inert={copy || undefined}>
+        {clients.map((c, i) => (
+          <li class="card" data-theme={c.theme ?? themes[i % themes.length]} tabindex="0" aria-label={`${c.nda ? 'Confidential client' : c.name}: ${c.did}`}>
+            <div class="card-inner">
+              <div class="face front" aria-hidden="true">
+                <div class="row">
+                  {c.nda ? (
+                    <span />
+                  ) : (
+                    <span class="mono">{initials(c.name)}</span>
+                  )}
+                  <span class:list={['tag', c.nda && 'tag--nda']}>{c.tag}</span>
+                </div>
+                <div class="front-body">
+                  {c.nda && (
+                    <div class="redact">
+                      <span /><span />
+                    </div>
+                  )}
+                  <p class="name">{c.name}</p>
+                  <p class="flip-cue">what I did ↻</p>
+                </div>
+              </div>
+              <div class="face back" aria-hidden="true">
+                <p class="back-label">What I did</p>
+                <p class="did">{c.did}</p>
+                {c.stack && (
+                  <div class="stack">
+                    {c.stack.map((s) => <span>{s}</span>)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    ))}
+  </div>
+</section>
+
+<style>
+  .clients-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+  }
+  .hint {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  /* --- Marquee --- */
+  .marquee {
+    --gap: 1rem;
+    display: flex;
+    gap: var(--gap);
+    overflow: hidden;
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+    margin-inline: calc(50% - 50vw);
+    padding-block: 0.5rem;
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .track {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--gap);
+    animation: scroll var(--duration) linear infinite;
+  }
+  .marquee:hover .track,
+  .marquee:focus-within .track {
+    animation-play-state: paused;
+  }
+  @keyframes scroll {
+    to {
+      translate: calc(-100% - var(--gap)) 0;
+    }
+  }
+
+  /* --- Card themes --- */
+  .card {
+    --bg: var(--signal);
+    --fg: var(--on-signal);
+    --soft: color-mix(in oklab, var(--on-signal) 70%, var(--signal));
+    --tag-bg: color-mix(in oklab, var(--on-signal) 12%, transparent);
+    --mono-bg: var(--on-signal);
+    --mono-fg: var(--signal);
+    width: 17rem;
+    height: 7.5rem;
+    flex-shrink: 0;
+    perspective: 1000px;
+    border-radius: var(--radius-node);
+    outline: none;
+  }
+  .card[data-theme='dark'] {
+    --bg: #0f2a2e;
+    --fg: #e6efec;
+    --soft: #9db4b0;
+    --tag-bg: #1c3e43;
+    --mono-bg: var(--signal);
+    --mono-fg: var(--on-signal);
+  }
+  .card[data-theme='mint'] {
+    --bg: #d3e2de;
+    --fg: #0f2a2e;
+    --soft: #4a6662;
+    --tag-bg: #0f2a2e;
+    --mono-bg: #0f2a2e;
+    --mono-fg: #e6efec;
+  }
+  .card[data-theme='light'] {
+    --bg: #ffffff;
+    --fg: #0f2a2e;
+    --soft: #4a6662;
+    --tag-bg: #e6efec;
+    --mono-bg: #e6efec;
+    --mono-fg: #1f6f6a;
+  }
+  .card:focus-visible .card-inner {
+    box-shadow: 0 0 0 3px var(--page), 0 0 0 5px var(--signal-ink);
+  }
+
+  /* --- Flip --- */
+  .card-inner {
+    position: relative;
+    height: 100%;
+    border-radius: inherit;
+    transform-style: preserve-3d;
+    transition: transform 0.7s var(--ease-out);
+  }
+  .card:hover .card-inner,
+  .card:focus-visible .card-inner {
+    transform: rotateY(180deg);
+  }
+  .face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0.875rem 1rem;
+    border-radius: inherit;
+    background: var(--bg);
+    color: var(--fg);
+    backface-visibility: hidden;
+  }
+  .back {
+    transform: rotateY(180deg);
+    justify-content: center;
+  }
+
+  /* --- Front --- */
+  .row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .mono {
+    display: grid;
+    place-items: center;
+    width: 2.125rem;
+    height: 2.125rem;
+    border-radius: 8px;
+    background: var(--mono-bg);
+    color: var(--mono-fg);
+    font-size: 0.875rem;
+    font-weight: 800;
+  }
+  .tag {
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    background: var(--tag-bg);
+    color: var(--soft);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 600;
+  }
+  .card[data-theme='mint'] .tag {
+    color: #e6efec;
+  }
+  .tag--nda {
+    background: #0f2a2e;
+    color: var(--signal) !important;
+  }
+  .front-body {
+    margin-top: auto;
+  }
+  .redact {
+    display: grid;
+    gap: 0.3rem;
+    margin-bottom: 0.4rem;
+  }
+  .redact span {
+    display: block;
+    height: 0.6rem;
+    border-radius: 2px;
+    background: #0f2a2e;
+  }
+  .redact span:first-child {
+    width: 75%;
+  }
+  .redact span:last-child {
+    width: 40%;
+    opacity: 0.6;
+  }
+  .name {
+    font-size: 1.0625rem;
+    line-height: 1.1;
+    font-stretch: 118%;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .flip-cue {
+    margin-top: 0.35rem;
+    color: var(--soft);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+  }
+
+  /* --- Back --- */
+  .back-label {
+    color: var(--soft);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .did {
+    margin-top: 0.3rem;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+  .stack {
+    display: flex;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+  }
+  .stack span {
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    background: var(--tag-bg);
+    color: var(--soft);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+  }
+  .card[data-theme='mint'] .stack span {
+    color: #e6efec;
+  }
+
+  /* Reduced motion: no auto-scroll (swipeable strip), and no 3D flip. */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      overflow-x: auto;
+      mask-image: none;
+      margin-inline: 0;
+    }
+    .track {
+      animation: none;
+    }
+    .track[aria-hidden='true'] {
+      display: none;
+    }
+    .card-inner {
+      transition: none;
+    }
+  }
+</style>
