@@ -3,11 +3,11 @@
  * Clients, right after Stats: one row of flip cards that scrolls continuously.
  * Front: initials, tag, name. Back (hover / focus): what I did.
  * Edit `clients` below; add as many as you like. `nda: true` redacts the name.
- * `theme` cycles yellow → dark → mint → light when not set.
+ * `theme` (1-6, yellow → deep teal) cycles automatically when not set.
  */
 import Eyebrow from '@/components/Eyebrow.astro';
 
-type Theme = 'signal' | 'dark' | 'mint' | 'light';
+type Theme = 1 | 2 | 3 | 4 | 5 | 6;
 interface Client {
   name: string;
   tag: string;
@@ -26,7 +26,11 @@ const clients: Client[] = [
   { name: 'Client Five', tag: 'SaaS', did: 'Kubernetes rollout and cost optimisation.', stack: ['Kubernetes', 'Helm'] },
 ];
 
-const themes: Theme[] = ['signal', 'dark', 'mint', 'light'];
+const themes: Theme[] = [1, 2, 3, 4, 5, 6];
+/* Repeat the list inside each loop copy so a copy is always wider than the screen
+   (no gap after the last client); ~14 cards x 17rem covers very wide monitors. */
+const reps = Math.max(1, Math.ceil(14 / clients.length));
+const row = Array.from({ length: reps }, () => clients).flat();
 /** "British Instruments" → BI, "IdeasRegistration" → IR, "Ideall" → Id. */
 const initials = (name: string) => {
   const words = name.split(/\s+/);
@@ -34,7 +38,7 @@ const initials = (name: string) => {
   const caps = name.match(/[A-Z]/g) ?? [];
   return caps.length > 1 ? caps.slice(0, 2).join('') : name.slice(0, 2);
 };
-const duration = `${clients.length * 7}s`;
+const duration = `${row.length * 6}s`;
 ---
 
 <section id="clients" aria-labelledby="clients-title" class="shell section-gap offscreen-lazy">
@@ -49,8 +53,8 @@ const duration = `${clients.length * 7}s`;
   <div class="marquee" style={`--duration:${duration}`}>
     {[false, true].map((copy) => (
       <ul role="list" class="track" aria-hidden={copy ? 'true' : undefined} inert={copy || undefined}>
-        {clients.map((c, i) => (
-          <li class="card" data-theme={c.theme ?? themes[i % themes.length]} tabindex="0" aria-label={`${c.nda ? 'Confidential client' : c.name}: ${c.did}`}>
+        {row.map((c, i) => (
+          <li class:list={['card', i >= clients.length && 'rep']} aria-hidden={i >= clients.length ? 'true' : undefined} inert={i >= clients.length || undefined} data-theme={c.theme ?? themes[(i % clients.length) % themes.length]} tabindex="0" aria-label={`${c.nda ? 'Confidential client' : c.name}: ${c.did}`}>
             <div class="card-inner">
               <div class="face front" aria-hidden="true">
                 <div class="row">
@@ -128,14 +132,14 @@ const duration = `${clients.length * 7}s`;
     }
   }
 
-  /* --- Card themes --- */
+  /* --- Card themes: yellow → green → teal → deep teal --- */
   .card {
-    --bg: var(--signal);
-    --fg: var(--on-signal);
-    --soft: color-mix(in oklab, var(--on-signal) 70%, var(--signal));
-    --tag-bg: color-mix(in oklab, var(--on-signal) 12%, transparent);
-    --mono-bg: var(--on-signal);
-    --mono-fg: var(--signal);
+    --bg: #d9c04f;
+    --fg: #0f2a2e;
+    --soft: color-mix(in oklab, #0f2a2e 70%, var(--bg));
+    --tag-bg: color-mix(in oklab, #0f2a2e 14%, transparent);
+    --mono-bg: #ffffff;
+    --mono-fg: #0f2a2e;
     width: 17rem;
     height: 7.5rem;
     flex-shrink: 0;
@@ -143,30 +147,18 @@ const duration = `${clients.length * 7}s`;
     border-radius: var(--radius-node);
     outline: none;
   }
-  .card[data-theme='dark'] {
-    --bg: #0f2a2e;
-    --fg: #e6efec;
-    --soft: #9db4b0;
-    --tag-bg: #1c3e43;
-    --mono-bg: var(--signal);
-    --mono-fg: var(--on-signal);
+  .card[data-theme='2'] { --bg: #a3c77d; }
+  .card[data-theme='3'] { --bg: #66b08f; }
+  .card[data-theme='4'],
+  .card[data-theme='5'],
+  .card[data-theme='6'] {
+    --fg: #ffffff;
+    --soft: color-mix(in oklab, #ffffff 72%, var(--bg));
+    --tag-bg: color-mix(in oklab, #ffffff 16%, transparent);
   }
-  .card[data-theme='mint'] {
-    --bg: #d3e2de;
-    --fg: #0f2a2e;
-    --soft: #4a6662;
-    --tag-bg: #0f2a2e;
-    --mono-bg: #0f2a2e;
-    --mono-fg: #e6efec;
-  }
-  .card[data-theme='light'] {
-    --bg: #ffffff;
-    --fg: #0f2a2e;
-    --soft: #4a6662;
-    --tag-bg: #e6efec;
-    --mono-bg: #e6efec;
-    --mono-fg: #1f6f6a;
-  }
+  .card[data-theme='4'] { --bg: #2b8277; }
+  .card[data-theme='5'] { --bg: #236868; }
+  .card[data-theme='6'] { --bg: #1e4f55; }
   .card:focus-visible .card-inner {
     box-shadow: 0 0 0 3px var(--page), 0 0 0 5px var(--signal-ink);
   }
@@ -225,9 +217,6 @@ const duration = `${clients.length * 7}s`;
     font-size: 0.625rem;
     font-weight: 600;
   }
-  .card[data-theme='mint'] .tag {
-    color: #e6efec;
-  }
   .tag--nda {
     background: #0f2a2e;
     color: var(--signal) !important;
@@ -244,7 +233,7 @@ const duration = `${clients.length * 7}s`;
     display: block;
     height: 0.6rem;
     border-radius: 2px;
-    background: #0f2a2e;
+    background: var(--fg);
   }
   .redact span:first-child {
     width: 75%;
@@ -294,9 +283,6 @@ const duration = `${clients.length * 7}s`;
     font-family: var(--font-mono);
     font-size: 0.625rem;
   }
-  .card[data-theme='mint'] .stack span {
-    color: #e6efec;
-  }
 
   /* Reduced motion: no auto-scroll (swipeable strip), and no 3D flip. */
   @media (prefers-reduced-motion: reduce) {
@@ -308,7 +294,8 @@ const duration = `${clients.length * 7}s`;
     .track {
       animation: none;
     }
-    .track[aria-hidden='true'] {
+    .track[aria-hidden='true'],
+    .rep {
       display: none;
     }
     .card-inner {
