@@ -78,7 +78,8 @@ const words = [site.firstName, site.surname]
       </div>
       {heroPhotoOnDark && (
         <div class="art art-dark">
-          <Photo image={heroPhotoOnDark} priority widths={artWidths} sizes={artSizes} />
+          {/* Lazy: while hidden (light theme) it's never downloaded. */}
+          <Photo image={heroPhotoOnDark} widths={artWidths} sizes={artSizes} />
         </div>
       )}
     </div>
@@ -228,13 +229,18 @@ const words = [site.firstName, site.surname]
       animation-delay: 700ms;
     }
   }
+  /*
+   * Condensed -> wide as a horizontal scale, not the font's width axis:
+   * animating font-stretch re-shaped and re-laid-out the text every frame
+   * (130-210ms per frame on a throttled phone); scale runs on the compositor.
+   */
   @keyframes name-settle {
     from {
-      font-stretch: 75%;
+      scale: 0.6 1;
       opacity: 0.35;
     }
     to {
-      font-stretch: 125%;
+      scale: 1 1;
       opacity: 1;
     }
   }

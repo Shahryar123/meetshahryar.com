@@ -35,7 +35,7 @@ const safeWidths = [...new Set(widths.map((w) => Math.min(w, maxWidth)))];
     sizes={sizes}
     loading={priority ? 'eager' : 'lazy'}
     fetchpriority={priority ? 'high' : 'auto'}
-    decoding={priority ? 'sync' : 'async'}
+    decoding="async"
     class="block h-full w-full object-contain"
   />
 ) : (

@@ -26,7 +26,7 @@ const version = (i: number) =>
 const parts = (text: string) => text.split(/(\d+(?:\.\d+)?%)/);
 ---
 
-<section id="experience" aria-labelledby="experience-title" class="shell section-gap">
+<section id="experience" aria-labelledby="experience-title" class="shell section-gap offscreen-lazy">
   <div class="exp-head">
     <hgroup>
       <Eyebrow label="Career" />
@@ -528,20 +528,35 @@ const parts = (text: string) => text.split(/(\d+(?:\.\d+)?%)/);
       update();
     };
 
-    measure();
-    wrap.dataset.live = '';
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (!frame) frame = requestAnimationFrame(update);
+    // Start only when the timeline is within a screen of the viewport: measuring
+    // at load forced a layout of this (content-visibility) section, ~230ms on a
+    // throttled phone.
+    const start = () => {
+      measure();
+      wrap.dataset.live = '';
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (!frame) frame = requestAnimationFrame(update);
+        },
+        { passive: true, signal },
+      );
+      window.addEventListener('resize', measure, { signal });
+      // Fonts arriving or cards reflowing move the dots.
+      const sizes = new ResizeObserver(() => measure());
+      sizes.observe(wrap);
+      signal.addEventListener('abort', () => sizes.disconnect());
+    };
+    const near = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        near.disconnect();
+        start();
       },
-      { passive: true, signal },
+      { rootMargin: '100% 0px' },
     );
-    window.addEventListener('resize', measure, { signal });
-    // Fonts arriving or cards reflowing move the dots.
-    const sizes = new ResizeObserver(() => measure());
-    sizes.observe(wrap);
-    signal.addEventListener('abort', () => sizes.disconnect());
+    near.observe(wrap);
+    signal.addEventListener('abort', () => near.disconnect());
   }
   document.addEventListener('astro:page-load', initTimeline);
 </script>

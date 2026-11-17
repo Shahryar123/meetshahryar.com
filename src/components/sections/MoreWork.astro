@@ -632,12 +632,22 @@ const rows = MORE_WORK_GROUPS.map((group) => {
         panel.addEventListener('pointerleave', () => window.clearTimeout(timer));
       }
 
-      // Entrance, for rows that start below the fold.
-      if (!reduce && row.getBoundingClientRect().top > window.innerHeight) {
-        row.dataset.reveal = 'pending';
+      // Entrance, for rows that start below the fold. The observer's first
+      // report says whether the row starts off screen, without forcing a layout
+      // at load (getBoundingClientRect here cost ~250ms on a throttled phone).
+      if (!reduce) {
+        let first = true;
         const io = new IntersectionObserver(
           (entries) => {
-            if (!entries.some((e) => e.isIntersecting)) return;
+            const seen = entries.some((e) => e.isIntersecting);
+            if (first) {
+              first = false;
+              const below = entries.some((e) => !e.isIntersecting && e.boundingClientRect.top > 0);
+              if (seen || !below) return io.disconnect(); // already on screen (or above): no entrance
+              row.dataset.reveal = 'pending';
+              return;
+            }
+            if (!seen) return;
             row.dataset.reveal = 'done';
             io.disconnect();
           },

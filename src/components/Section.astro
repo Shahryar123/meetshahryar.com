@@ -18,7 +18,7 @@ interface Props {
 const { id, title, eyebrow, intro, size = 'default', class: className } = Astro.props;
 ---
 
-<section id={id} aria-labelledby={`${id}-title`} class:list={['shell section-gap', className]}>
+<section id={id} aria-labelledby={`${id}-title`} class:list={['shell section-gap offscreen-lazy', className]}>
   <hgroup>
     <Eyebrow label={eyebrow} />
     <h2

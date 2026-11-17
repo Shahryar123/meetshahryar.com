@@ -345,3 +345,14 @@
     opacity: 0;
   }
 }
+
+/*
+ * Sections below the hero: the browser skips their layout and paint until
+ * they're near the viewport (the first layout was laying out ~2,500 boxes).
+ * `auto` remembers each section's real height once seen; 900px is the guess
+ * before that, so the scrollbar and #anchor jumps stay close.
+ */
+.offscreen-lazy {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}

@@ -4,6 +4,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/hero/Hero.astro';
 import Work from '@/components/sections/Work.astro';
 import MoreWork from '@/components/sections/MoreWork.astro';
+import Stats from '@/components/sections/Stats.astro';
 import Services from '@/components/sections/Services.astro';
 import Process from '@/components/sections/Process.astro';
 import Experience from '@/components/sections/Experience.astro';
@@ -74,6 +75,7 @@ const jsonLd = JSON.stringify({
   <script slot="head" is:inline type="application/ld+json" set:html={jsonLd} />
   <Hero />
   <Work />
+  <Stats />
   <MoreWork />
   <Services />
   <Process />
