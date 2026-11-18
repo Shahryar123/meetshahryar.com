@@ -39,12 +39,14 @@ AddCharset utf-8 .txt .xml .css .js
 # ---- Caching ----
 <IfModule mod_headers.c>
   # HTML, txt and xml change on every deploy: always revalidate.
-  <FilesMatch "\.(html|txt|xml)$">
+  # The CV keeps its file name when it's updated, so it revalidates too
+  # (a cheap 304 when unchanged) instead of serving a stale copy for a week.
+  <FilesMatch "\.(html|txt|xml|pdf)$">
     Header set Cache-Control "no-cache"
   </FilesMatch>
 
-  # Images, PDFs and the favicon in public/ keep their names: cache for a week.
-  <FilesMatch "\.(png|jpe?g|webp|avif|svg|ico|pdf)$">
+  # Images and the favicon in public/ keep their names: cache for a week.
+  <FilesMatch "\.(png|jpe?g|webp|avif|svg|ico)$">
     Header set Cache-Control "public, max-age=604800"
   </FilesMatch>
 

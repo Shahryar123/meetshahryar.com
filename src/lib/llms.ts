@@ -7,15 +7,15 @@ import { getCollection } from 'astro:content';
 import { getSite } from '@/lib/site';
 import { CATEGORY_IDS, categoryLabel } from '@/lib/categories';
 import { clean, hasTodo, isEmail, isHttpUrl } from '@/lib/todo';
+import { formatMonth } from '@/lib/format';
 
 const filled = <T>(items: T[]) => items.filter((v) => !hasTodo(v));
 const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
-/** "2025-09" → "Sep 2025"; placeholders → "". */
+/** "2025-09" → "Sep 2025" (same format as the page); placeholders → "". */
 const monthYear = (ym: string) => {
   if (ym === 'present') return 'present';
   if (hasTodo(ym)) return '';
-  const date = new Date(`${ym}-01T00:00:00Z`);
-  return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+  return formatMonth(ym);
 };
 
 export async function buildLlmsTxt(siteUrl: URL, full: boolean): Promise<string> {
@@ -39,8 +39,11 @@ export async function buildLlmsTxt(siteUrl: URL, full: boolean): Promise<string>
   line(`# ${name}`);
   line();
   line(
-    `> ${name} is a ${site.title} based in ${site.location.city}, ${site.location.country} (${site.utcOffset}). ${site.valueLineLong}`,
+    `> ${name} is a ${site.title} based in ${site.location.city}, ${site.location.country} (${site.utcOffset}).`,
   );
+  line();
+  // valueLineLong is written in the first person, so it's quoted rather than run on.
+  line(`Summary, quoted from the site: "${site.valueLineLong}"`);
   line();
   line(`Currently at ${site.employer}. Has worked with clients in the ${site.regions}.`);
   if (!hasTodo(site.availability)) line(`Availability: ${site.availability}.`);

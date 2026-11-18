@@ -8,7 +8,7 @@ export const GET: APIRoute = async () => {
   const name = [site.firstName, clean(site.surname)].filter(Boolean).join(' ');
   const manifest = {
     name: `${name}, ${site.title}`,
-    short_name: site.firstName,
+    short_name: clean(site.surname) || site.firstName,
     description: site.valueLine,
     start_url: '/',
     display: 'browser',

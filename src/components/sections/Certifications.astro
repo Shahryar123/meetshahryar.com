@@ -177,7 +177,7 @@ const monogram = (platform: string) => MONOGRAMS[platform] ?? platform.slice(0, 
                     target="_blank"
                     rel="noopener"
                   >
-                    Verify<span class="sr-only"> {c.data.name} (opens in a new tab)</span>
+                    {hasVerifyUrl(c) ? 'Verify' : 'View certificate'}<span class="sr-only"> {c.data.name} (opens in a new tab)</span>
                     <ArrowUpRight size={16} stroke-width={2} aria-hidden="true" />
                   </a>
                 )}

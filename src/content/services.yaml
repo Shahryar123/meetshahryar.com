@@ -29,8 +29,6 @@
   proofLinks:
     - label: British Instruments website
       href: https://britishinstruments.co.uk
-    - label: RFID inventory and asset tracking platform
-      href: /#experience
 
 - id: cloud
   name: Cloud & DevOps

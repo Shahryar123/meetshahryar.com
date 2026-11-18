@@ -28,4 +28,4 @@ const heroDarkFiles = import.meta.glob<{ default: ImageMetadata }>(
 );
 export const heroPhotoOnDark: ImageMetadata | undefined = Object.values(heroDarkFiles)[0]?.default;
 
-export const PHOTO_ALT = 'Shahryar, Senior Full-Stack Engineer';
+export const PHOTO_ALT = 'Muhammad Shahryar';

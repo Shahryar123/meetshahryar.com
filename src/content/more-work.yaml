@@ -104,7 +104,7 @@
   icon: migrate
   title: Azure to AWS cloud migration
   summary: "A full cloud migration from Azure to AWS, run as a planned, low-risk cutover. I set up separate testing, staging and production environments, each isolated with its own configuration, and promoted releases between them through CI/CD. Applications, databases and DNS were moved with minimal downtime, with monitoring in place from day one."
-  stack: [AWS, Azure, EC2, RDS, CI/CD, Testing, Staging, Production]
+  stack: [AWS, Azure, EC2, RDS, CI/CD]
   categories: [cloud]
   year: 2025
 

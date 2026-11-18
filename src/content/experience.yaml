@@ -31,7 +31,7 @@
   highlights:
     - Built middleware in .NET 9 and C# for SAP Qualtrics.
     - Wrote infrastructure as code in Pulumi (.NET) and automated multi-pipeline deployments in Azure DevOps.
-    - Supported clients directly, including Ooredoo and Etisalat.
+    - Supported enterprise clients directly.
   stack:
     - .NET 9 / C#
     - React

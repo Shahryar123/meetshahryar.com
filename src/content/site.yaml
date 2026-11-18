@@ -3,7 +3,7 @@
 main:
   firstName: Muhammad
   surname: Shahryar
-  title: Senior Full-Stack Engineer
+  title: Senior Software Engineer
   # Hero version: must stay within two lines (about 110 characters).
   valueLine: I build web apps end to end in .NET, Node, Python and Java, and ship them on AWS and Azure.
   # Full version, used in About.
