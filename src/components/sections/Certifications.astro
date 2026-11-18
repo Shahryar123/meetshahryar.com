@@ -55,6 +55,17 @@ const monogram = (platform: string) => MONOGRAMS[platform] ?? platform.slice(0, 
                     class="size-full object-contain"
                   />
                 </a>
+              ) : c.data.badge && hasVerifyUrl(c) ? (
+                /* Badge only: it opens the issuer's credential page. */
+                <a class="cert-scan cert-scan--badge" href={c.data.verifyUrl} target="_blank" rel="noopener">
+                  <Image
+                    src={c.data.badge}
+                    alt={`${c.data.name} badge (opens the credential in a new tab)`}
+                    widths={[200, 400]}
+                    sizes="12rem"
+                    class="size-full object-contain"
+                  />
+                </a>
               ) : c.data.badge ? (
                 /* No certificate scan: the badge sits in the same frame so cards line up. */
                 <div class="cert-scan cert-scan--badge">
