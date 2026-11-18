@@ -49,10 +49,6 @@ const rows = MORE_WORK_GROUPS.map((group) => {
 ---
 
 <Section id="more-work" eyebrow="Selected builds" title="More work" size="display">
-  <p class="mw-hint" aria-hidden="true">
-    {items.length} projects · hover or tap a panel to open it
-  </p>
-
   {/*
     One row of panels per group; one panel per row is open. Hover (mouse, wide
     screens), tap or keyboard focus opens a panel. Below 64rem the rows become
@@ -141,13 +137,6 @@ const rows = MORE_WORK_GROUPS.map((group) => {
 </Section>
 
 <style>
-  .mw-hint {
-    margin-top: -2.5rem;
-    margin-bottom: 1.5rem;
-    color: var(--muted);
-    font-size: 0.8125rem;
-    text-align: right;
-  }
   @media (max-width: 47.99rem) {
     .mw-hint {
       margin-top: -1.5rem;
