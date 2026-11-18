@@ -4,16 +4,17 @@
 
 - id: web
   name: Full-Stack Development
-  summary: Web apps and APIs built end to end, from React and Angular front ends to .NET, Node, Python and Java back ends.
+  summary: Production-grade web platforms engineered end to end, from component-driven React and Angular front ends to domain-driven .NET, Node, Python and Java services.
   tooltip: Full-stack web apps and APIs in .NET, Node, Python and Java with React and Angular.
   deliverables:
-    - Web apps and SaaS platforms, from first design to production
-    - REST APIs and microservices in .NET, Node.js, Python and Java
-    - Front ends in React, Next.js and Angular
-    - Progressive Web Apps with offline support
-    - Third-party and hardware integrations (SAP, RFID, payments)
-    - Clean Architecture and Domain-Driven Design
-    - Modernising legacy .NET applications
+    - Multi-tenant SaaS platforms, from system design to production rollout
+    - RESTful APIs and event-driven microservices in .NET, Node.js, Python and Java
+    - SSR and SPA front ends in React, Next.js and Angular, with technical SEO
+    - Offline-first Progressive Web Apps with service workers
+    - RFID inventory and asset tracking across the full product lifecycle
+    - Hardware and enterprise integrations (SAP, RFID readers, payment gateways)
+    - Clean Architecture, Domain-Driven Design and CQRS
+    - Incremental modernisation of legacy .NET monoliths
   tools:
     - .NET / C# (ASP.NET Core)
     - Node.js / Express
@@ -25,7 +26,11 @@
     - TypeScript
   proofProjects:
     - codeon
-    - ar-try-on
+  proofLinks:
+    - label: British Instruments website
+      href: https://britishinstruments.co.uk
+    - label: RFID inventory and asset tracking platform
+      href: /#experience
 
 - id: cloud
   name: Cloud & DevOps
@@ -35,7 +40,8 @@
     - Deploying apps to AWS and Azure
     - Docker containers and container hosting
     - CI/CD pipelines in GitHub Actions and Azure DevOps
-    - Infrastructure as code in Terraform, Pulumi and AWS CDK
+    - Multi-stage testing, staging and production environments on AWS EC2, isolated and promoted through CI/CD
+    - "Infrastructure as Code with Pulumi, Terraform and AWS CDK: reusable modules, remote state and drift-free deployments"
     - Migrations from a VPS or another cloud
     - Monitoring, alerting, backups and cost reviews
     - CDN and DNS on Akamai and Cloudflare
@@ -54,23 +60,32 @@
 
 - id: ai
   name: AI & RAG
-  summary: AI features built into real products, from RAG assistants to LangGraph agents, traced and evaluated before release.
-  tooltip: RAG assistants and AI features with LangChain, LangGraph and LangSmith.
+  summary: Production AI features, from retrieval-augmented assistants and agentic LangGraph workflows to computer-vision try-on, traced and evaluated before release.
+  tooltip: RAG assistants, AI agents and computer vision with LangChain, LangGraph and MediaPipe.
   deliverables:
-    - RAG assistants over your own documents
-    - AI features inside existing web apps
-    - Agents with LangChain and LangGraph
-    - Tracing and evaluation in LangSmith
-    - LLM evaluation with LLM-as-a-judge and regression checks
+    - RAG pipelines with embeddings, vector search and hybrid retrieval
+    - Agentic workflows and tool calling with LangChain and LangGraph
+    - LLM features embedded in existing web apps
+    - Real-time virtual try-on with pose estimation and image segmentation
+    - Observability, tracing and evaluation in LangSmith
+    - LLM-as-a-judge evals and regression test suites
+    - Data and AI pipelines on Databricks and Microsoft Fabric feeding RAG and analytics
+    - Model deployment, prompt flows and agents in Azure AI Foundry
   tools:
     - LangChain
     - LangGraph
     - LangSmith
     - OpenAI API
     - Anthropic Claude API
+    - MediaPipe
+    - Three.js
+    - Databricks
+    - Microsoft Fabric
+    - Azure AI Foundry
     - Python
   proofProjects:
     - runbook-assistant
+    - ar-try-on
 
 - id: data
   name: Databases & Data
@@ -92,38 +107,55 @@
 
 - id: security
   name: Security
-  summary: Authentication, single sign-on, secrets and security headers that get your app through a security review.
-  tooltip: Auth, SSO, secrets and security review fixes.
+  summary: Defence-in-depth for web apps and cloud estates, from identity and secrets to hardened infrastructure and security checks built into every pipeline.
+  tooltip: Identity, secrets, cloud hardening and DevSecOps.
   deliverables:
-    - Authentication and authorisation (OAuth 2.0, JWT)
-    - SSO with SAML and Entra ID
-    - Access design with RBAC and SCIM
-    - Secrets management
-    - Security header and TLS fixes after ZAP scans
+    - Authentication and authorisation with OAuth 2.0, OpenID Connect and JWT
+    - SSO with SAML and Entra ID, plus SCIM user provisioning
+    - Role-based access control and least-privilege IAM policies
+    - Centralised secrets management with rotation, no secrets in code
+    - Encryption at rest and in transit with KMS-managed keys and TLS
+    - DevSecOps in CI/CD with dependency, container image and secret scanning
+    - Web application hardening against the OWASP Top 10, with WAF and rate limiting
+    - Security headers, CSP and TLS fixes after OWASP ZAP scans
+    - Audit logging and alerting for suspicious activity
   tools:
     - Entra ID
-    - OWASP ZAP
-    - Azure Key Vault
-    - AWS Parameter Store
+    - AWS IAM
     - AWS KMS
+    - AWS WAF
+    - AWS Parameter Store
+    - Azure Key Vault
+    - OWASP ZAP
+    - GitHub Dependabot
+    - Trivy
+    - Cloudflare
   proofProjects:
     - key-vault-access
     - ideali-cloud-operations
 
 - id: automation
   name: Automation & QA
-  summary: Automated tests, web scraping and workflow automation that save your team hours every week.
-  tooltip: Test automation, scrapers and workflow automation.
+  summary: Test automation, self-service infrastructure provisioning and workflow automation that remove manual toil and catch regressions before release.
+  tooltip: Test automation, DevOps automation and email workflow automation.
   deliverables:
-    - Unit and integration testing
-    - Mobile test automation with the Page Object Model
-    - Web scraping and data extraction
-    - Email and workflow automation
+    - Unit, integration and end-to-end test suites wired into CI
+    - Mobile test automation with Appium, WebdriverIO and the Page Object Model
+    - Self-service infrastructure provisioning with Pulumi, Pulumi ESC and Azure DevOps
+    - Bulk email campaign automation with CSV personalisation and inline images
+    - Web scraping and structured data extraction pipelines
   tools:
     - xUnit
     - Jest
     - Python
     - Appium
     - WebdriverIO
+    - Pulumi
+    - Azure DevOps
     - BeautifulSoup
   proofProjects: []
+  proofLinks:
+    - label: MailFusion
+      href: /#more-work
+    - label: DevOps automation platform
+      href: /#more-work

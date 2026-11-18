@@ -88,6 +88,8 @@ const services = defineCollection({
     deliverables: z.array(z.string()).min(1),
     tools: z.array(z.string()).min(1),
     proofProjects: z.array(reference('projects')).default([]),
+    /** Proof that isn't a case study: a More work card, a live site, an Experience entry. */
+    proofLinks: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
   }),
 });
 

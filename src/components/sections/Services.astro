@@ -112,24 +112,42 @@ const chips = (tools: string[]) =>
                     </li>
                   ))}
                 </ul>
+                {s.proofs.length + s.proofLinks.length > 0 && (
+                  <div class="mt-8">
+                    <h4 class="svc-label">
+                      See the work
+                    </h4>
+                    <ul role="list" class="svc-proofs mt-3">
+                      {s.proofs.map((p) => (
+                        <li>
+                          <a class="svc-proof" href={caseStudyHref(p.id)}>
+                            <T v={p.data.title} />
+                            <ArrowUpRight size={16} stroke-width={2} aria-hidden="true" />
+                          </a>
+                        </li>
+                      ))}
+                      {s.proofLinks.map((l) => {
+                        const external = /^https?:/.test(l.href);
+                        return (
+                          <li>
+                            <a
+                              class="svc-proof"
+                              href={l.href}
+                              {...(external ? { target: '_blank', rel: 'noopener' } : {})}
+                            >
+                              <T v={l.label} />
+                              {external && <span class="sr-only"> (opens in a new tab)</span>}
+                              <ArrowUpRight size={16} stroke-width={2} aria-hidden="true" />
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
 
-            {s.proofs.length > 0 && (
-              <div class="mt-8">
-                <h4 class="svc-label">{s.proofs.length === 1 ? 'See the project' : 'See the projects'}</h4>
-                <ul role="list" class="svc-proofs mt-3">
-                  {s.proofs.map((p) => (
-                    <li>
-                      <a class="svc-proof" href={caseStudyHref(p.id)}>
-                        <T v={p.data.title} />
-                        <ArrowUpRight size={16} stroke-width={2} aria-hidden="true" />
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
         </div>
       ))}
@@ -386,6 +404,7 @@ const chips = (tools: string[]) =>
     border-radius: 0.625rem;
     background: var(--signal);
     color: var(--on-signal);
+    text-transform: capitalize; /* Title Case labels */
     font-size: 0.875rem;
     font-weight: 700;
     transition: filter 0.2s ease;
