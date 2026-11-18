@@ -246,6 +246,10 @@ const rows = MORE_WORK_GROUPS.map((group) => {
     font-size: 0.75rem;
     font-weight: 700;
   }
+  .mw-name,
+  .mw-title {
+    text-transform: capitalize; /* Title Case, as in Services */
+  }
   .mw-name {
     font-size: 0.9375rem;
     line-height: 1.25;
@@ -484,8 +488,9 @@ const rows = MORE_WORK_GROUPS.map((group) => {
       min-height: 0;
       max-width: 100%;
       overflow: hidden;
-      font-size: 0.875rem;
-      line-height: 1.2;
+      font-size: 1.0625rem;
+      line-height: 1.15;
+      font-weight: 800;
       writing-mode: vertical-rl;
       rotate: 180deg;
     }

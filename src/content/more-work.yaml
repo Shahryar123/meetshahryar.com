@@ -4,30 +4,30 @@
 # A "View project" button appears once `url` is a real link; until then the
 # panel offers "Ask me about it" (links to the contact section).
 
-# --- Row 1: Cloud, DevOps & AI ---
+# --- Row 1: Cloud & AI Engineering ---
 
 - id: devops-automation-platform
   order: 1
   group: cloud-ai
   kind: DevOps
   icon: cloud
-  open: true
   title: DevOps automation platform
-  summary: A self-service React (Vite) app that provisions cloud infrastructure across environments through Pulumi, Pulumi ESC and Azure DevOps pipelines.
+  summary: "A self-service React (Vite) portal that lets teams provision cloud infrastructure without writing pipeline code. Requests run through Pulumi stacks, with Pulumi ESC handling per-environment configuration and secrets. Azure DevOps pipelines apply each change consistently across dev, staging and production."
   stack: [React, Pulumi, Azure DevOps]
   categories: [cloud]
-  year: "[year]"
+  year: 2024
 
 - id: azure-aws-assessment
   order: 2
   group: cloud-ai
   kind: Migration
   icon: migrate
+  open: true
   title: Azure-to-AWS lift-and-shift assessment
-  summary: An ASP.NET MVC app moved onto EC2 Windows and RDS SQL Server with no code changes.
+  summary: "A lift-and-shift assessment for moving an ASP.NET MVC application from Azure to AWS. The app was rehosted on EC2 Windows with its database on RDS SQL Server, without any code changes. The assessment covered sizing, networking, cutover steps and the cost trade-offs of the move."
   stack: [ASP.NET MVC, EC2, RDS SQL Server]
   categories: [cloud]
-  year: "[year]"
+  year: 2025
 
 - id: gcp-key-hardening
   order: 3
@@ -35,21 +35,21 @@
   kind: Security
   icon: shield
   title: GCP service-account key hardening
-  summary: Service-account keys locked down with org policy constraints.
+  summary: "Hardened how service-account keys are created and used across a Google Cloud organisation. Org policy constraints block new user-managed keys and limit where existing ones can be used. This cuts the risk of long-lived credentials leaking and moves workloads towards keyless authentication."
   stack: [GCP, Org policy]
   categories: [security, cloud]
-  year: "[year]"
+  year: 2025
 
 - id: trackiq
   order: 4
   group: cloud-ai
   kind: Platform
   icon: box
-  title: TrackIQ
-  summary: An RFID inventory tracking platform, from manufacturing to sale, built alone at Alpha Mu Digital.
+  title: RFID inventory and asset tracking platform
+  summary: "An RFID-based inventory tracking platform covering a product's journey from manufacturing to sale, with asset tracking built in. Handheld and desktop RFID readers feed real-time stock movements into a React and Node.js app backed by PostgreSQL. I architected and built it end to end at Alpha Mu Digital, and it ships in Docker containers."
   stack: [React, Node.js, Express, PostgreSQL, Docker]
   categories: [web]
-  year: 2025
+  year: 2026
 
 - id: llm-eval-harness
   order: 5
@@ -57,9 +57,10 @@
   kind: AI
   icon: sparkles
   title: Layered LLM evaluation harness
-  summary: Four layers of checks for LLM output (automated safety checks, rubric-based LLM-as-a-judge scoring, human review and statistical regression detection), with 95 automated tests and scheduled live-model evaluations in CI.
+  summary: "A layered evaluation harness that checks LLM output before it reaches users. It combines automated safety checks, rubric-based LLM-as-a-judge scoring, human review and statistical regression detection. 95 automated tests and scheduled live-model evaluations run in CI, so quality drops are caught early."
+  stack: [LangChain, LangGraph, LangSmith, Databricks, Azure, Microsoft Fabric]
   categories: [ai, automation]
-  year: "[year]"
+  year: 2026
 
 - id: ai-sales-assistant
   order: 6
@@ -67,22 +68,23 @@
   kind: AI
   icon: chat
   title: AI sales assistant for British Instruments
-  summary: Product finder, quote requests and handoff to a person.
+  summary: "An AI sales assistant for British Instruments' industrial measurement catalogue. It helps visitors find the right product, request a quote and get to a person when a question needs a human. The goal is faster, better-qualified leads without customers waiting on email."
+  stack: [LangChain, LangGraph, RAG, OpenAI API, Python]
   categories: [ai]
-  status: "[status]"
+  year: 2026
+
+# --- Row 2: Web, Automation & Growth ---
 
 - id: salesfusion-crm
   order: 7
-  group: cloud-ai
+  group: web-qa
   kind: App
   icon: chart
   title: SalesFusion CRM
-  summary: A CRM for leads, contacts and sales pipelines, with authentication, search and filtering, and an analytics dashboard.
-  stack: [Python, Flask, SQLAlchemy, SQLite]
+  summary: "A CRM for managing leads, contacts and sales pipelines in one place. It has secure authentication, search and filtering, and an analytics dashboard for tracking deals. Built in Python with Flask and SQLAlchemy on SQLite."
+  stack: [Python, Flask, SQLAlchemy, SQLite, Jinja2, Chart.js]
   categories: [web]
-  year: "[year]"
-
-# --- Row 2: Web, Automation & SEO ---
+  year: 2025
 
 - id: mailfusion
   order: 8
@@ -90,62 +92,54 @@
   kind: App
   icon: mail
   title: MailFusion
-  summary: My Python app for single and bulk (CSV) email campaigns with inline images.
-  stack: [Python]
+  summary: "An end-to-end email marketing platform, from building the contact list to reporting on results. It fetches and organises customer emails, then sends coordinated promotional campaigns to the right customers through Gmail, Outlook or any SMTP provider, using imported HTML templates with personalisation and inline images. Every campaign is tracked, with delivery stats and analytics to show what's working."
+  stack: [Python, Gmail, Outlook, SMTP, HTML templates]
   categories: [automation]
-  year: "[year]"
+  year: 2025
+
+- id: azure-aws-migration
+  order: 9
+  group: web-qa
+  kind: Migration
+  icon: migrate
+  title: Azure to AWS cloud migration
+  summary: "A full cloud migration from Azure to AWS, run as a planned, low-risk cutover. I set up separate testing, staging and production environments, each isolated with its own configuration, and promoted releases between them through CI/CD. Applications, databases and DNS were moved with minimal downtime, with monitoring in place from day one."
+  stack: [AWS, Azure, EC2, RDS, CI/CD, Testing, Staging, Production]
+  categories: [cloud]
+  year: 2025
 
 - id: british-instruments
-  order: 9
+  order: 10
   group: web-qa
   kind: Web
   icon: globe
+  open: true
   title: British Instruments website
-  summary: "[your role]: the site and contact form, technical SEO (a server-side rendering fix for brand pages, JSON-LD, long-form technical articles with SVG diagrams) and email marketing."
-  stack: [SSR, JSON-LD, SEO]
+  summary: "A UK-based e-commerce store supplying precision and industrial instruments to customers in multiple countries. I built the site and its contact and enquiry forms, and handled technical SEO, including a server-side rendering fix for brand pages, JSON-LD structured data and long-form technical articles with SVG diagrams. Email marketing campaigns drive repeat business and new leads."
+  stack: [E-commerce, SSR, JSON-LD, Technical SEO, Email marketing]
   categories: [web]
   url: https://britishinstruments.co.uk
-  year: "[year]"
-
-- id: flutter-test-automation
-  order: 10
-  group: web-qa
-  kind: QA
-  icon: phone
-  open: true
-  title: Mobile test automation for a Flutter fintech app
-  summary: Appium and WebdriverIO with the Page Object Model, plus an Appium vs Patrol comparison.
-  stack: [Appium, WebdriverIO, POM]
-  categories: [automation]
-  year: "[year]"
-
-- id: wordpress-sites
-  order: 11
-  group: web-qa
-  kind: Web ops
-  icon: pen-tool
-  title: Client WordPress sites
-  summary: Hosting, malware incident response, DNS and firewall fixes across 30–40 sites.
-  stack: [WordPress, DNS]
-  categories: [web, security]
-  year: "[years]"
+  year: 2026
 
 - id: martin-sports
-  order: 12
+  order: 11
   group: web-qa
-  kind: Design
+  kind: Web
   icon: pencil
-  title: Martin Sports cricket store
-  summary: Design and UI.
+  title: Martin Sports Gear
+  summary: "An e-commerce store and athlete training platform for Martin Sports Gear, a cricket equipment brand. Players can shop for cricketing gear and access training programmes in one place. Built in Next.js with a fast, responsive storefront that works well on any device."
+  stack: [Next.js, React, E-commerce]
   categories: [web]
-  year: "[year]"
+  url: https://martinsportsgear.com/
+  year: 2026
 
 - id: technical-seo
-  order: 13
+  order: 12
   group: web-qa
   kind: SEO
   icon: search
   title: Technical SEO audits
-  summary: An audit for Guardian Safety Online and SEO for Fire Safety UAE.
+  summary: "Technical SEO audits for Guardian Safety Online, plus ongoing SEO for Fire Safety UAE. Using Google Search Console, PageSpeed Insights and Google Analytics, I reviewed crawlability, indexing, Core Web Vitals, structured data and how visitors find and use each site. Each audit ended with a prioritised action plan to fix technical issues, speed up pages and grow organic traffic."
+  stack: [Google Search Console, PageSpeed Insights, Google Analytics, Core Web Vitals]
   categories: [web]
-  year: "[year]"
+  year: 2026

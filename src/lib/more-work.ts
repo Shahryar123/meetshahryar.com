@@ -4,8 +4,8 @@
  * Order here = row order on the page.
  */
 export const MORE_WORK_GROUPS = [
-  { id: 'cloud-ai', label: 'Cloud, DevOps & AI' },
-  { id: 'web-qa', label: 'Full Stack, Automation & SEO' },
+  { id: 'cloud-ai', label: 'Cloud & AI Engineering' },
+  { id: 'web-qa', label: 'Web, Automation & Growth' },
 ] as const;
 
 export type MoreWorkGroupId = (typeof MORE_WORK_GROUPS)[number]['id'];
