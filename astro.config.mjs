@@ -32,7 +32,7 @@ const LATIN = [
 export default defineConfig({
   // Production domain (confirmed 2026-11-17). Sitemap, robots.txt, llms.txt, share tags and JSON-LD use it.
   site: 'https://meetshahryar.com',
-  integrations: [mdx(), sitemap(), cspHtaccess()],
+  integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/certificates/') }), cspHtaccess()],
   fonts: [
     {
       // Self-hosted Mona Sans with both axes: wdth 75–125, wght 200–900.

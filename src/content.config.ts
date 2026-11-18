@@ -126,7 +126,7 @@ const certifications = defineCollection({
       platform: z.string().optional(),
       issueDate: yearMonth,
       expiryDate: yearMonth.or(z.literal('none')).optional(),
-      credentialId: z.string(),
+      credentialId: z.string().optional(),
       verifyUrl: url,
       badge: image().optional(),
       /** Scan of the certificate itself, shown as a thumbnail that links to the full image. */

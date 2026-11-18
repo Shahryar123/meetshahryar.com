@@ -1,0 +1,55 @@
+---
+/**
+ * One certificate scan on its own page, so the browser tab shows the
+ * certificate's name instead of an image filename. Opened from Verify when a
+ * certificate has no issuer link yet. Kept out of search results.
+ */
+import { getImage } from 'astro:assets';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const certs = await getCollection('certifications');
+  return certs.filter((c) => c.data.certificate).map((c) => ({ params: { id: c.id }, props: { cert: c } }));
+}
+
+const { cert } = Astro.props;
+const src = cert.data.certificate!;
+const img = await getImage({ src, format: 'webp', width: Math.min(src.width, 2000) });
+const title = `${cert.data.name} · ${cert.data.issuer} certificate`;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <img src={img.src} width={img.attributes.width} height={img.attributes.height} alt={title} />
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: #0e0e0e;
+  }
+  body {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+  }
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: 100dvh;
+    width: auto;
+    height: auto;
+  }
+</style>
