@@ -51,7 +51,7 @@
    * a theme; the toggle then pins it with data-theme on <html>.
    */
   :root {
-    color-scheme: light dark;
+    color-scheme: light; /* light by default; the toggle sets data-theme='dark' */
     --page: light-dark(#e6efec, #0f2a2e); /* petrol */
     --panel: light-dark(#f4f8f6, #15363b);
     --rule: light-dark(#9fbcb7, #2f5a60); /* connectors and decorative dividers only */

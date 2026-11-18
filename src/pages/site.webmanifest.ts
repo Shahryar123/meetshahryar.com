@@ -13,7 +13,7 @@ export const GET: APIRoute = async () => {
     start_url: '/',
     display: 'browser',
     background_color: '#e6efec',
-    theme_color: '#0f2a2e',
+    theme_color: '#e6efec',
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
       { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },

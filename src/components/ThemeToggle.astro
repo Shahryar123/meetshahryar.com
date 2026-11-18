@@ -94,7 +94,7 @@ const { withLabel = false } = Astro.props;
   const current = (): 'light' | 'dark' => {
     const set = document.documentElement.dataset.theme;
     if (set === 'light' || set === 'dark') return set;
-    return media.matches ? 'light' : 'dark';
+    return 'light';
   };
 
   function sync() {
