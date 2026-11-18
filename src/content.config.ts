@@ -202,8 +202,8 @@ const site = defineCollection({
     }),
     /** Paragraphs, or { quote } for a pull quote. */
     about: z.array(z.string().or(z.object({ quote: z.string() }))).min(1),
-    /** About terminal: `ls clouds/` lists these as folders. */
-    clouds: z.array(z.string()).min(1),
+    /** About terminal: `ls production-stack/` lists these as folders. */
+    stack: z.array(z.string()).min(1),
     contact: z.object({
       invitation: z.string(),
       budgets: z.array(z.string()).min(1),

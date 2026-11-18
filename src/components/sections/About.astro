@@ -94,8 +94,8 @@ const [first, ...rest] = site.about;
               )
             }
 
-            <p class="cmd"><span class="prompt" aria-hidden="true">$</span> ls clouds/</p>
-            <p class="out dirs">{site.clouds.map((c) => `${c}/`).join(' ')}</p>
+            <p class="cmd"><span class="prompt" aria-hidden="true">$</span> ls production-stack/</p>
+            <p class="out dirs">{site.stack.map((s) => `${s}/`).join('  ')}</p>
 
             <p class="cmd" aria-hidden="true">
               <span class="prompt">$</span> <span class="cursor"></span>
@@ -224,6 +224,7 @@ const [first, ...rest] = site.about;
     }
     .about-term {
       max-width: none;
+      margin-top: 2.5rem; /* clear the section top so the tilted corner isn't cut */
     }
   }
   .about-copy {
@@ -313,7 +314,8 @@ const [first, ...rest] = site.about;
   }
   .dirs {
     color: var(--accent);
-    white-space: pre;
+    white-space: pre-wrap; /* the longer list wraps inside the box */
+    overflow-wrap: normal;
   }
   .cursor {
     display: inline-block;

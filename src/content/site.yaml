@@ -29,8 +29,8 @@ main:
     - I'm a senior software engineer at Alpha Mu Digital Ventures with 5 years of building production software. I work across the whole stack, from React and Angular front ends to .NET, Node, Python and Java back ends, and I look after the AWS infrastructure they run on.
     - quote: Good software isn't done when the feature works. It's done when it deploys on every push, scales without drama and is easy for the next developer to change.
     - Because I own the delivery too, I write the Docker setup, CI/CD pipelines and infrastructure as code in Terraform, Pulumi and AWS CDK alongside the app. I also build AI features and RAG assistants into the products I work on.
-  # The small About terminal: `whoami` (from Experience), then `ls clouds/`.
-  clouds: [aws, azure]
+  # The small About terminal: `whoami` (from Experience), then `ls production-stack/`.
+  stack: [react, next.js, .net, node.js, docker, terraform, github-actions, aws, azure]
   contact:
     invitation: "Tell me what you're running and what's getting in the way. I'll reply within one working day with questions or a plan."
     # Budget dropdown options (USD). "Not sure yet" is always added at the end.
