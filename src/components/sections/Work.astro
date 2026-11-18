@@ -158,6 +158,13 @@ const Row = hasCaseStudies ? 'a' : 'button';
           <p class="sw-summary">
             <T v={p.data.summary} />
           </p>
+          {p.data.highlights.length > 0 && (
+            <ul role="list" class="sw-points">
+              {p.data.highlights.map((h) => (
+                <li>{h}</li>
+              ))}
+            </ul>
+          )}
           {p.data.flow.length > 0 && (
             <ol role="list" class="sw-flow" aria-label="In short">
               {p.data.flow.map((step) => (
@@ -273,6 +280,10 @@ const Row = hasCaseStudies ? 'a' : 'button';
     gap: 0.25rem;
     min-width: 0;
     padding: 0.875rem 1rem;
+  }
+  .sw-title,
+  .sw-name {
+    text-transform: capitalize; /* Title Case, as in Services and More work */
   }
   .sw-title {
     font-size: 0.9375rem;
@@ -467,6 +478,28 @@ const Row = hasCaseStudies ? 'a' : 'button';
       font-size: 0.9375rem;
       line-height: 1.6;
     }
+    .sw-points {
+      display: grid;
+      gap: 0.375rem;
+      margin-top: 0.875rem;
+      color: color-mix(in oklab, var(--muted) 55%, var(--ink));
+      font-size: 0.875rem;
+      line-height: 1.45;
+    }
+    .sw-points li {
+      position: relative;
+      padding-left: 1.125rem;
+    }
+    .sw-points li::before {
+      content: '';
+      position: absolute;
+      left: 0.125rem;
+      top: 0.55em;
+      width: 0.4rem;
+      height: 0.4rem;
+      border-radius: 50%;
+      background: var(--c);
+    }
     .sw-flow {
       display: flex;
       flex-wrap: wrap;
@@ -608,6 +641,12 @@ const Row = hasCaseStudies ? 'a' : 'button';
       margin-top: 0.5rem;
       font-size: 0.875rem;
       line-height: 1.5;
+    }
+    .sw-points {
+      gap: 0.25rem;
+      margin-top: 0.5rem;
+      font-size: 0.8125rem;
+      line-height: 1.35;
     }
     .sw-flow {
       margin-top: 0.875rem;

@@ -41,6 +41,8 @@ const projects = defineCollection({
       stack: z.array(z.string()).min(1),
       /** The work in a few short steps, shown as "A → B → C" on the Selected work card. */
       flow: z.array(z.string()).default([]),
+      /** Two or three key points, shown as bullets on the Selected work card. */
+      highlights: z.array(z.string()).max(3).default([]),
       /** Shown on this project's segment of the Selected work ring. */
       icon: z.enum(WORK_ICONS),
       links: z
