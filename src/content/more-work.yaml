@@ -45,8 +45,8 @@
   group: cloud-ai
   kind: Platform
   icon: box
-  title: RFID inventory and asset tracking platform
-  summary: "An RFID-based inventory tracking platform covering a product's journey from manufacturing to sale, with asset tracking built in. Handheld and desktop RFID readers feed real-time stock movements into a React and Node.js app backed by PostgreSQL. I architected and built it end to end at Alpha Mu Digital, and it ships in Docker containers."
+  title: Inventory management and asset tracking platform
+  summary: "An inventory management platform covering a product's journey from manufacturing to sale, with asset tracking built in. Handheld and desktop readers feed real-time stock movements into a React and Node.js app backed by PostgreSQL. I architected and built it end to end at Alpha Mu Digital, and it ships in Docker containers."
   stack: [React, Node.js, Express, PostgreSQL, Docker]
   categories: [web]
   year: 2026

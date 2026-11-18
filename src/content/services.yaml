@@ -11,8 +11,8 @@
     - RESTful APIs and event-driven microservices in .NET, Node.js, Python and Java
     - SSR and SPA front ends in React, Next.js and Angular, with technical SEO
     - Offline-first Progressive Web Apps with service workers
-    - RFID inventory and asset tracking across the full product lifecycle
-    - Hardware and enterprise integrations (SAP, RFID readers, payment gateways)
+    - Inventory management and asset tracking across the full product lifecycle
+    - Hardware and enterprise integrations (SAP, handheld and desktop readers, payment gateways)
     - Clean Architecture, Domain-Driven Design and CQRS
     - Incremental modernisation of legacy .NET monoliths
   tools:
@@ -25,10 +25,7 @@
     - Angular
     - TypeScript
   proofProjects:
-    - codeon
-  proofLinks:
-    - label: British Instruments website
-      href: https://britishinstruments.co.uk
+    - british-instruments
 
 - id: cloud
   name: Cloud & DevOps
